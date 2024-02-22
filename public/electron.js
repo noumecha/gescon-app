@@ -35,7 +35,7 @@ const createWindow = () => {
 
     // opent dev tools in dev mode
     if(isDev) {
-        mainWindow.webContents.openDevTools({mode: 'attach'});
+        mainWindow.webContents.openDevTools({mode: 'detached'});
     }
 };
 
