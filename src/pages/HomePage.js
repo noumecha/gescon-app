@@ -33,7 +33,7 @@ import Footer from "../components/Footer.js";
 import Preloader from "../components/Preloader.js";
 
 import Accordion from "./components/Accordion.js";
-import Alerts from "./components/Alert.js";
+import Alerts from "./components/Alerts.js";
 import Badges from "./components/Badges.js";
 import Breadcrumbs from "./components/Breadcrumbs.js";
 import Buttons from "./components/Buttons.js";
