@@ -1,6 +1,6 @@
 {
-  "name": "matx-react",
-  "version": "4.0.0",
+  "name": "gescon-app",
+  "version": "0.1.0",
   "homepage": "./",
   "main": "public/electron.js",
   "type": "module",
