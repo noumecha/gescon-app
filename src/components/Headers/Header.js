@@ -36,7 +36,7 @@ const Header = () => {
                           tag="h5"
                           className="text-uppercase text-muted mb-0"
                         >
-                          Traffic
+                          Demandes de Congés
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
                           350,897
@@ -52,7 +52,7 @@ const Header = () => {
                       <span className="text-success mr-2">
                         <i className="fa fa-arrow-up" /> 3.48%
                       </span>{" "}
-                      <span className="text-nowrap">Since last month</span>
+                      <span className="text-nowrap">Depuis le dernier mois</span>
                     </p>
                   </CardBody>
                 </Card>
@@ -66,7 +66,7 @@ const Header = () => {
                           tag="h5"
                           className="text-uppercase text-muted mb-0"
                         >
-                          New users
+                          Nouveaux Employers
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">2,356</span>
                       </div>
@@ -80,7 +80,7 @@ const Header = () => {
                       <span className="text-danger mr-2">
                         <i className="fas fa-arrow-down" /> 3.48%
                       </span>{" "}
-                      <span className="text-nowrap">Since last week</span>
+                      <span className="text-nowrap">Depuis la semaine passée</span>
                     </p>
                   </CardBody>
                 </Card>
@@ -94,7 +94,7 @@ const Header = () => {
                           tag="h5"
                           className="text-uppercase text-muted mb-0"
                         >
-                          Sales
+                          Congés accordés
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">924</span>
                       </div>
@@ -108,7 +108,7 @@ const Header = () => {
                       <span className="text-warning mr-2">
                         <i className="fas fa-arrow-down" /> 1.10%
                       </span>{" "}
-                      <span className="text-nowrap">Since yesterday</span>
+                      <span className="text-nowrap">Depuis hier</span>
                     </p>
                   </CardBody>
                 </Card>
@@ -136,7 +136,7 @@ const Header = () => {
                       <span className="text-success mr-2">
                         <i className="fas fa-arrow-up" /> 12%
                       </span>{" "}
-                      <span className="text-nowrap">Since last month</span>
+                      <span className="text-nowrap">Depuis le dernier mois</span>
                     </p>
                   </CardBody>
                 </Card>

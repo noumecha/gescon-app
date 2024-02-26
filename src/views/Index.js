@@ -75,7 +75,7 @@ const Index = (props) => {
                     <h6 className="text-uppercase text-light ls-1 mb-1">
                       Overview
                     </h6>
-                    <h2 className="text-white mb-0">Sales value</h2>
+                    <h2 className="text-white mb-0">Statistiques</h2>
                   </div>
                   <div className="col">
                     <Nav className="justify-content-end" pills>
@@ -87,7 +87,7 @@ const Index = (props) => {
                           href="#pablo"
                           onClick={(e) => toggleNavs(e, 1)}
                         >
-                          <span className="d-none d-md-block">Month</span>
+                          <span className="d-none d-md-block">Mois</span>
                           <span className="d-md-none">M</span>
                         </NavLink>
                       </NavItem>
@@ -100,8 +100,8 @@ const Index = (props) => {
                           href="#pablo"
                           onClick={(e) => toggleNavs(e, 2)}
                         >
-                          <span className="d-none d-md-block">Week</span>
-                          <span className="d-md-none">W</span>
+                          <span className="d-none d-md-block">semaine</span>
+                          <span className="d-md-none">S</span>
                         </NavLink>
                       </NavItem>
                     </Nav>
@@ -128,7 +128,7 @@ const Index = (props) => {
                     <h6 className="text-uppercase text-muted ls-1 mb-1">
                       Performance
                     </h6>
-                    <h2 className="mb-0">Total orders</h2>
+                    <h2 className="mb-0">Demandes Totales</h2>
                   </div>
                 </Row>
               </CardHeader>
@@ -168,7 +168,7 @@ const Index = (props) => {
                 <thead className="thead-light">
                   <tr>
                     <th scope="col">Page name</th>
-                    <th scope="col">Visitors</th>
+                    <th scope="col">Employés</th>
                     <th scope="col">Unique users</th>
                     <th scope="col">Bounce rate</th>
                   </tr>
