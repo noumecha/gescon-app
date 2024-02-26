@@ -19,7 +19,7 @@ var routes = [
     name: "Employés",
     icon: "ni ni-planet text-blue",
     component: <Icons />,
-    layout: "/",
+    layout: "/admin",
   },
   {
     path: "/user-profile",
