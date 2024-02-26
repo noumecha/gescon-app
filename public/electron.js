@@ -1,10 +1,11 @@
 // import required modules
-import isDev from 'electron-is-dev';
+/*import isDev from 'electron-is-dev';
 import path from 'path';
-import { app, BrowserWindow } from 'electron';
-//const path = require('path');
-//const { app, BrowserWindow } = require('electron');
+import { app, BrowserWindow } from 'electron';*/
+const path = require('path');
+const { app, BrowserWindow } = require('electron');
 //const isDev = require('electron-is-dev');
+const isDev = import('electron-is-dev');
 
 // initialize main window var
 let mainWindow;
