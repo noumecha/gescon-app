@@ -63,6 +63,7 @@
   },
   "devDependencies": {
     "electron": "^29.0.1",
+    "electron-packager": "^17.1.2",
     "gulp": "4.0.2",
     "gulp-append-prepend": "1.0.9"
   },
