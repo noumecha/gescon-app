@@ -1,20 +1,3 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2024 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 /*eslint-disable*/
 import { useState } from "react";
 import { NavLink as NavLinkRRD, Link } from "react-router-dom";
@@ -118,11 +101,12 @@ const Sidebar = (props) => {
         {/* Brand */}
         {logo ? (
           <NavbarBrand className="pt-0" {...navbarBrandProps}>
-            <img
+            GESCON-APP
+            {/*<img
               alt={logo.imgAlt}
               className="navbar-brand-img"
               src={logo.imgSrc}
-            />
+        />*/}
           </NavbarBrand>
         ) : null}
         {/* User */}
@@ -217,7 +201,7 @@ const Sidebar = (props) => {
               <Input
                 aria-label="Search"
                 className="form-control-rounded form-control-prepended"
-                placeholder="Search"
+                placeholder="Rechercher ..."
                 type="search"
               />
               <InputGroupAddon addonType="prepend">
@@ -236,29 +220,29 @@ const Sidebar = (props) => {
           {/* Navigation */}
           <Nav className="mb-md-3" navbar>
             <NavItem>
-              <NavLink href="https://demos.creative-tim.com/argon-dashboard-react/#/documentation/overview?ref=adr-admin-sidebar">
+              <NavLink href="/">
                 <i className="ni ni-spaceship" />
-                Getting started
+                Tutoriel
               </NavLink>
             </NavItem>
             <NavItem>
-              <NavLink href="https://demos.creative-tim.com/argon-dashboard-react/#/documentation/colors?ref=adr-admin-sidebar">
+              <NavLink href="/">
                 <i className="ni ni-palette" />
-                Foundation
+                Autres
               </NavLink>
             </NavItem>
             <NavItem>
-              <NavLink href="https://demos.creative-tim.com/argon-dashboard-react/#/documentation/alerts?ref=adr-admin-sidebar">
+              <NavLink href="/">
                 <i className="ni ni-ui-04" />
-                Components
+                Paramètres
               </NavLink>
             </NavItem>
           </Nav>
           <Nav className="mb-md-3" navbar>
             <NavItem className="active-pro active">
-              <NavLink href="https://www.creative-tim.com/product/argon-dashboard-pro-react?ref=adr-admin-sidebar">
+              <NavLink href="/">
                 <i className="ni ni-spaceship" />
-                Upgrade to PRO
+                Se Deconnecter
               </NavLink>
             </NavItem>
           </Nav>
