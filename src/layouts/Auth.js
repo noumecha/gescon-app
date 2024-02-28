@@ -3,6 +3,8 @@ import { useLocation, Route, Routes, Navigate } from "react-router-dom";
 // reactstrap components
 import { Container, Row, Col } from "reactstrap";
 
+import { useAuth } from "services/AuthContext";
+
 // core components
 import AuthNavbar from "components/Navbars/AuthNavbar.js";
 import AuthFooter from "components/Footers/AuthFooter.js";
@@ -10,6 +12,9 @@ import AuthFooter from "components/Footers/AuthFooter.js";
 import routes from "routes.js";
 
 const Auth = (props) => {
+
+  const { isLoggedIn } = useAuth();
+
   const mainContent = React.useRef(null);
   const location = useLocation();
 

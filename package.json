@@ -21,18 +21,21 @@
   "author": "XXX XXX",
   "license": "MIT",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "electron-forge start",
     "package-mac": "npm run build  && electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
     "package-win": "npm run build  && electron-packager . MyApp --overwrite --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds",
     "package-linux": "npm run build  && electron-packager . MyApp --overwrite --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds",
     "start-electron": "electron .",
     "build": "react-scripts build",
+    "react-start": "react-scripts start",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
     "compile:scss": "sass src/assets/scss/argon-dashboard-react.scss src/assets/css/argon-dashboard-react.css",
     "minify:scss": "sass src/assets/scss/argon-dashboard-react.scss src/assets/css/argon-dashboard-react.min.css --style compressed",
-    "build:scss": "npm run compile:scss && npm run minify:scss && npm run map:scss"
+    "build:scss": "npm run compile:scss && npm run minify:scss && npm run map:scss",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -62,10 +65,15 @@
     "sass": "1.69.5"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.3.0",
+    "bindings": "^1.5.0",
     "electron": "^29.0.1",
     "electron-packager": "^17.1.2",
+    "fs": "^0.0.1-security",
     "gulp": "4.0.2",
-    "gulp-append-prepend": "1.0.9"
+    "gulp-append-prepend": "1.0.9",
+    "path": "^0.12.7",
+    "sqlite3": "^5.1.7"
   },
   "optionalDependencies": {
     "eslint-plugin-flowtype": "8.0.3",

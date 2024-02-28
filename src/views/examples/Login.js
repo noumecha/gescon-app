@@ -1,4 +1,5 @@
 // reactstrap components
+import { useState } from "react";
 import {
   Button,
   Card,
@@ -12,8 +13,19 @@ import {
   InputGroup,
   Col,
 } from "reactstrap";
+import { useAuth } from "services/AuthContext";
 
-const Login = () => {
+const Login = ({ onLogin }) => {
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const { login } = useAuth();
+  function handleLogin() {
+    login();
+    console.log("username: " + username);
+    console.log("password: " + password);
+  }
+
   return (
     <>
       <Col lg="5" md="7">
@@ -35,6 +47,8 @@ const Login = () => {
                   <Input
                     placeholder="Nom d'utilisateur"
                     type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                   />
                 </InputGroup>
               </FormGroup>
@@ -49,11 +63,13 @@ const Login = () => {
                     placeholder="Mot de passe"
                     type="password"
                     autoComplete="new-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </InputGroup>
               </FormGroup>
               <div className="text-center">
-                <Button className="my-4" color="primary" type="button">
+                <Button onClick={handleLogin} className="my-4" color="primary" type="button">
                   Se Connecter
                 </Button>
               </div>

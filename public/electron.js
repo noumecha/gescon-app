@@ -1,11 +1,19 @@
-// import required modules
-/*import isDev from 'electron-is-dev';
-import path from 'path';
-import { app, BrowserWindow } from 'electron';*/
+const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const { app, BrowserWindow } = require('electron');
-//const isDev = require('electron-is-dev');
 const isDev = import('electron-is-dev');
+
+// creation de la base de données dans le dossier de l'application
+const dbPath = path.join(__dirname, '../gescon-db.db');
+const db = new sqlite3.Database(dbPath);
+
+// create users table 
+db.run(
+    `CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    password TEXT NOT NULL)`
+);
 
 // initialize main window var
 let mainWindow;
@@ -41,7 +49,22 @@ const createWindow = () => {
 };
 
 // create the main window when the app is ready
-app.whenReady().then(createWindow);
+//app.whenReady().then(createWindow);
+
+// add user to the db 
+app.on('ready', () => {
+    const testUser = { username: 'user', password: 'password' };
+
+    db.run('INSERT INTO user (username, password) VALUES (?, ?)', [testUser.username,testUser.password], (err) => {
+        if(err) {
+            console.error(err.message);
+        } else {
+            console.log('Utilisateur ' + testUser.username + ' ajouter à la base de données');
+        }
+    });
+
+    createWindow();
+} )
 
 // quit the app when all windows are closed (except on macOS)
 app.on('window-all-closed', () => {
