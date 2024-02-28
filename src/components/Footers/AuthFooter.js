@@ -14,10 +14,10 @@ const Login = () => {
                 © {new Date().getFullYear()}{" "}
                 <a
                   className="font-weight-bold ml-1"
-                  href="https://www.creative-tim.com?ref=adr-auth-footer"
+                  href="/"
                   target="_blank"
                 >
-                  XXX XXX
+                  GESCON-APP
                 </a>
               </div>
             </Col>
@@ -25,10 +25,10 @@ const Login = () => {
               <Nav className="nav-footer justify-content-center justify-content-xl-end">
                 <NavItem>
                   <NavLink
-                    href="https://www.creative-tim.com?ref=adr-auth-footer"
+                    href="/"
                     target="_blank"
                   >
-                    XXX XXX
+                    GESCON-APP
                   </NavLink>
                 </NavItem>
               </Nav>
