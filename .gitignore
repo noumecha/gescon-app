@@ -3,3 +3,8 @@
 package-lock.json
 /build
 .eslintcache
+out/
+release-builds/
+
+/out
+/release-builds
