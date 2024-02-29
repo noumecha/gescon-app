@@ -7,4 +7,5 @@ out/
 release-builds/
 
 /out
+/dist
 /release-builds
