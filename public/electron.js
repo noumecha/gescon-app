@@ -7,14 +7,6 @@ const isDev = import('electron-is-dev');
 const dbPath = path.join(__dirname, '../gescon-db.db');
 const db = new sqlite3.Database(dbPath);
 
-// create users table 
-db.run(
-    `CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    password TEXT NOT NULL)`
-);
-
 // initialize main window var
 let mainWindow;
 
@@ -76,4 +68,9 @@ app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
     }
+})
+
+// close db connection : 
+app.on('before-quit', () => {
+    db.close();
 })

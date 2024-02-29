@@ -6,26 +6,22 @@ import "assets/plugins/nucleo/css/nucleo.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "assets/scss/argon-dashboard-react.scss";
 
-import { useAuth } from "services/AuthContext";
 import { AuthProvider } from "services/AuthContext";
 
 import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
+import { useAuth } from "services/AuthContext";
 
 function App() {
+
   const { isLoggedIn } = useAuth();
+
   return (
     <BrowserRouter>
       <Routes>
-        {isLoggedIn 
-          ?
-            (<Route path="/admin/index" element={<AdminLayout />} />)
-          :
-            (<Route path="/auth/*" element={<AuthLayout />} />)
-        }
-        {/*<Route path="/admin/*" element={<AdminLayout />} />
-        <Route path="/auth/*" element={<AuthLayout />} />
-      <Route path="*" element={<Navigate to="/admin/index" replace />} />*/}
+        <Route path="/admin/*" element={ isLoggedIn ? <AdminLayout /> : <Navigate to="/auth/login"/>} />
+        <Route path="/auth/*" element={ isLoggedIn ? <Navigate to="/admin/index"/> : <AuthLayout />} />
+        <Route path="*" element={ isLoggedIn ? <Navigate to="/admin/index" /> : <Navigate to="/auth/login"/>} />
       </Routes>
     </BrowserRouter>
   );
