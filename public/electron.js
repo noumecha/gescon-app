@@ -1,6 +1,6 @@
 const path = require('path');
 const { app, BrowserWindow } = require('electron');
-const isDev = import('electron-is-dev');
+//const isDev = import('electron-is-dev');
 
 // initialize main window var
 let mainWindow;
@@ -23,25 +23,26 @@ const createWindow = () => {
     mainWindow.setMenuBarVisibility(false);
 
     // load the appropriate URL based on the env
+    console.log(__dirname);
     mainWindow.loadURL(
-        isDev
-          ? `http://localhost:3000` // dev url
-            : `file://${path.join(__dirname, '../build/index.html')}` // prod url
+        `file://${path.join(__dirname, '/../build/index.html')}`
+        //isDev ? `http://localhost:3000` : `file://${path.join(__dirname, '/../build/index.html')}`
+        //isDev ? `file://${path.join(__dirname, '/../build/index.html')}` : `http://localhost:3000`
     );
 
     // opent dev tools in dev mode
-    if(isDev) {
+    /*if(isDev) {
         mainWindow.webContents.openDevTools({mode: 'detached'});
-    }
+    }*/
 };
 
 // create the main window when the app is ready
-//app.whenReady().then(createWindow);
+app.whenReady().then(createWindow);
 
 // add user to the db 
-app.on('ready', () => {
+/*app.on('ready', () => {
     createWindow();
-} )
+} )*/
 
 // quit the app when all windows are closed (except on macOS)
 app.on('window-all-closed', () => {

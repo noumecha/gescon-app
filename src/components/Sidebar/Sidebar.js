@@ -34,6 +34,7 @@ import {
   Row,
   Col,
 } from "reactstrap";
+import { useAuth } from "services/AuthContext";
 
 var ps;
 
@@ -81,6 +82,12 @@ const Sidebar = (props) => {
       href: logo.outterLink,
       target: "_blank",
     };
+  }
+
+  // to logout function 
+  const { logout } = useAuth();
+  const handleLogout = () => {
+    logout();
   }
 
   return (
@@ -220,19 +227,31 @@ const Sidebar = (props) => {
           {/* Navigation */}
           <Nav className="mb-md-3" navbar>
             <NavItem>
-              <NavLink href="/">
+              <NavLink 
+                to="/"
+                tag={NavLinkRRD}
+                onClick={closeCollapse}
+              >
                 <i className="ni ni-spaceship" />
                 Tutoriel
               </NavLink>
             </NavItem>
             <NavItem>
-              <NavLink href="/">
+              <NavLink 
+                to="/"
+                tag={NavLinkRRD}
+                onClick={closeCollapse}
+              >
                 <i className="ni ni-palette" />
                 Autres
               </NavLink>
             </NavItem>
             <NavItem>
-              <NavLink href="/">
+              <NavLink 
+                to="/"
+                tag={NavLinkRRD}
+                onClick={closeCollapse}
+              >
                 <i className="ni ni-ui-04" />
                 Paramètres
               </NavLink>
@@ -240,7 +259,10 @@ const Sidebar = (props) => {
           </Nav>
           <Nav className="mb-md-3" navbar>
             <NavItem className="active-pro active">
-              <NavLink href="/">
+              <NavLink
+                tag={NavLinkRRD}
+                onClick={handleLogout}           
+              >
                 <i className="ni ni-spaceship" />
                 Se Deconnecter
               </NavLink>
