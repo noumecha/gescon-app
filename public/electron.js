@@ -16,6 +16,7 @@ const createWindow = () => {
             enableRemoteModule: true,
             contextIsolation: false,
             autoHideMenuBar: true,
+            preload: path.join(__dirname, './preload.js')
         }
     });
     

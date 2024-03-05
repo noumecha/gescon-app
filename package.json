@@ -36,7 +36,8 @@
     "build:scss": "npm run compile:scss && npm run minify:scss && npm run map:scss",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "electron-build": "electron-builder"
+    "electron-build": "electron-builder",
+    "rebuild": "electron-rebuild -f -w better-sqlite3"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -48,7 +49,13 @@
       "target": [
         "portable"
       ]
-    }
+    },
+    "directories": {
+      "buildRessources" : "public"
+    },
+    "extraRessources" : [
+      "./gescon-db.db"
+    ]
   },
   "browserslist": [
     ">0.2%",
@@ -58,6 +65,7 @@
   ],
   "dependencies": {
     "@fortawesome/fontawesome-free": "6.5.1",
+    "better-sqlite3": "^9.4.3",
     "bootstrap": "4.6.2",
     "chart.js": "2.9.4",
     "classnames": "2.3.2",
@@ -72,7 +80,8 @@
     "react-router-dom": "6.21.1",
     "react-scripts": "5.0.1",
     "reactstrap": "8.10.0",
-    "sass": "1.69.5"
+    "sass": "1.69.5",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.3.0",

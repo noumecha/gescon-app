@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 // node.js library that concatenates classes (strings)
 import classnames from "classnames";
 // javascipt plugin for creating charts
@@ -44,6 +44,17 @@ const Index = (props) => {
     setActiveNav(index);
     setChartExample1Data("data" + index);
   };
+
+  /*const [data, setData] = useState({});
+
+  const fetchData = useCallback(() => {
+    const datas = window.sqlite; //.usersDB?.readAllUsers();
+    setData(datas);
+  }, []);
+
+  fetchData();
+  console.log("Fetching data..." + data);*/
+
   return (
     <>
       <Header />

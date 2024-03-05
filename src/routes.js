@@ -1,8 +1,9 @@
 import Index from "views/Index.js";
 import Profile from "views/examples/Profile.js";
 import Register from "views/examples/Register.js";
-//import Login from "views/examples/Login.js";
+import Login from "views/examples/Login.js";
 import Tables from "views/examples/Tables.js";
+import Conges from "views/examples/Conges.js";
 import Icons from "views/examples/Icons.js";
 
 var routes = [
@@ -21,10 +22,10 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/tables",
+    path: "/conges",
     name: "Congés",
     icon: "ni ni-calendar-grid-58 text-blue",
-    component: <Tables />,
+    component: <Conges />,
     layout: "/admin",
   },
   {
@@ -76,13 +77,13 @@ var routes = [
     component: <Profile />,
     layout: "/admin",
   },
-  /*{
+  {
     path: "/login",
     name: "Se Connecter",
     icon: "ni ni-key-25 text-info",
     component: <Login />,
     layout: "/auth",
-  },*/
+  },
   {
     path: "/register",
     name: "Ajouter des utilisateurs",
