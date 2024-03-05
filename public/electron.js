@@ -25,9 +25,9 @@ const createWindow = () => {
     // load the appropriate URL based on the env
     console.log(__dirname);
     mainWindow.loadURL(
-        `file://${path.join(__dirname, '/../build/index.html')}`
+        `http://localhost:3000`
+        //`file://${path.join(__dirname, '/../build/index.html')}`
         //isDev ? `http://localhost:3000` : `file://${path.join(__dirname, '/../build/index.html')}`
-        //isDev ? `file://${path.join(__dirname, '/../build/index.html')}` : `http://localhost:3000`
     );
 
     // opent dev tools in dev mode
