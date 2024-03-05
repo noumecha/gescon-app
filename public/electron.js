@@ -1,5 +1,5 @@
 const path = require('path');
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 //const isDev = import('electron-is-dev');
 
 // initialize main window var
@@ -12,11 +12,11 @@ const createWindow = () => {
         width: 800,
         height: 600,
         webPreferences: {
-            nodeIntegration: true,
+            nodeIntegration: false,
             enableRemoteModule: true,
-            contextIsolation: false,
+            contextIsolation: true,
             autoHideMenuBar: true,
-            preload: path.join(__dirname, './preload.js')
+            preload: path.join(__dirname, 'preload.js')
         }
     });
     
@@ -38,7 +38,9 @@ const createWindow = () => {
 };
 
 // create the main window when the app is ready
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+    createWindow();
+});
 
 // add user to the db 
 /*app.on('ready', () => {
@@ -48,6 +50,10 @@ app.whenReady().then(createWindow);
 // quit the app when all windows are closed (except on macOS)
 app.on('window-all-closed', () => {
     app.quit();
+})
+
+ipcMain.on('user-data', (event, args) => {
+    console.log(args);
 })
 
 // create a new window when the app is activated (macOS)

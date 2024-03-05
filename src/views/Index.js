@@ -1,11 +1,8 @@
-import { useCallback, useState } from "react";
-// node.js library that concatenates classes (strings)
+/* eslint-disable no-unused-vars */
+import { useCallback, useEffect, useState } from "react";
 import classnames from "classnames";
-// javascipt plugin for creating charts
 import Chart from "chart.js";
-// react plugin used to create charts
 import { Line, Bar } from "react-chartjs-2";
-// reactstrap components
 import {
   Button,
   Card,
@@ -54,6 +51,9 @@ const Index = (props) => {
 
   fetchData();
   console.log("Fetching data..." + data);*/
+  useEffect(() => {
+    // loading functions there
+  }, []);
 
   return (
     <>
