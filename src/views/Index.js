@@ -42,19 +42,24 @@ const Index = (props) => {
     setChartExample1Data("data" + index);
   };
 
-  /*const [data, setData] = useState({});
+ const [data, setData] = useState({});
 
-  const fetchData = useCallback(() => {
-    const datas = window.sqlite; //.usersDB?.readAllUsers();
-    setData(datas);
-  }, []);
-
-  fetchData();
-  console.log("Fetching data..." + data);*/
   useEffect(() => {
-    // loading functions there
+    const func = async () => {
+      try {
+        const devName = window.electronAPI.devName;
+        console.log("author : " + devName);
+        const res = await window.electronAPI.ping();
+        console.log("Ping : " ,res);
+      } catch (error) {
+        console.error("Erreur trouvé : " + error);
+      }
+    }
+  
+    func()
   }, []);
 
+  console.log("users : ", data);
   return (
     <>
       <Header />
