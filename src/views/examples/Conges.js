@@ -1,4 +1,3 @@
-// reactstrap components
 import {
   Badge,
   Card,
@@ -36,7 +35,7 @@ const Conges = () => {
               onClick={(e) => e.preventDefault()}
               size="m"
             >
-              + Nouveau
+              + Importer un fichier
             </Button>
             <Button
               color="primary"
@@ -58,11 +57,11 @@ const Conges = () => {
               <Table className="align-items-center table-flush" responsive>
                 <thead className="thead-light">
                   <tr>
-                    <th scope="col">Project</th>
-                    <th scope="col">Budget</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Users</th>
-                    <th scope="col">Completion</th>
+                    <th scope="col">Noms</th>
+                    <th scope="col">Grades</th>
+                    <th scope="col">Nombres demandes</th>
+                    <th scope="col">Statut demande</th>
+                    <th scope="col">Nouveau</th>
                     <th scope="col" />
                   </tr>
                 </thead>

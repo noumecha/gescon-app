@@ -86,7 +86,8 @@
     "sass": "1.69.5",
     "sequelize": "^6.37.1",
     "sequelize-cli": "^6.6.2",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.3.0",
