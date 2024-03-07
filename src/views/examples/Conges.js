@@ -3,6 +3,15 @@ import {
   Card,
   Button,
   CardHeader,
+  CardBody,
+  FormGroup,
+  Form,
+  Input,
+  Modal,
+  InputGroupAddon,
+  InputGroupText,
+  InputGroup,
+  Col,
   CardFooter,
   DropdownMenu,
   DropdownItem,
@@ -20,32 +29,81 @@ import {
 } from "reactstrap";
 // core components
 import Header from "components/Headers/Header.js";
+import { useState } from "react";
 
 const Conges = () => {
+  const [formModal, setFormModal] = useState(false);
+
+  const toggleModal = () => {
+    setFormModal(!formModal);
+  }
+
   return (
     <>
       <Header />
       {/* Page content */}
       <Container className="mt--7" fluid>
         <Row className="">
-          <div className="col mb-5 d-flex">
-            <Button
-              color="primary"
-              href="#pablo"
-              onClick={(e) => e.preventDefault()}
-              size="m"
-            >
-              + Importer un fichier
-            </Button>
-            <Button
-              color="primary"
-              href="#pablo"
-              onClick={(e) => e.preventDefault()}
-              size="m"
-            >
-              + Nouveau
-            </Button>
-            </div>
+            <Col md="3">
+              <Button
+                block
+                className="my-4 mb-3"
+                color="primary"
+                type="button"
+                onClick={toggleModal}
+              >
+                + Nouveau Congé
+              </Button>
+              <Modal
+                className="modal-dialog-centered"
+                size="sm"
+                isOpen={formModal}
+                toggle={toggleModal}
+              >
+                <div className="modal-body p-0">
+                  <Card className="bg-secondary shadow border-0">
+                    <CardHeader className="bg-transparent">
+                      <div className="text-muted text-center mt-2">
+                        <h2>Nouvelle demandes de congés</h2>
+                      </div>
+                    </CardHeader>
+                    <CardBody className="">
+                      <Form role="form">
+                        <FormGroup className="mb-3">
+                          <InputGroup className="input-group-alternative">
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText>
+                                <i className="ni ni-email-83" />
+                              </InputGroupText>
+                            </InputGroupAddon>
+                            <Input placeholder="Email" type="email" />
+                          </InputGroup>
+                        </FormGroup>
+                        <FormGroup>
+                          <InputGroup className="input-group-alternative">
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText>
+                                <i className="ni ni-lock-circle-open" />
+                              </InputGroupText>
+                            </InputGroupAddon>
+                            <Input placeholder="Password" type="password" />
+                          </InputGroup>
+                        </FormGroup>
+                        <Col md="3" className="text-center">
+                          <Button
+                            className="my-2"
+                            color="primary"
+                            type="button"
+                          >
+                            Valider
+                          </Button>
+                        </Col>
+                      </Form>
+                    </CardBody>
+                  </Card>
+                </div>
+              </Modal>
+          </Col>
         </Row>
         {/* Table */}
         <Row>

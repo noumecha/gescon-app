@@ -87,32 +87,43 @@ const Personnel = () => {
             <Row>
                 <div className="col">
                     {excelData ? (
-                        <div className="table-responsive">
-                            <Table className="align-items-center table-flush" responsive>
-                                <thead className="thead-light">
-                                    <tr>
-                                        {Object.keys(excelData[0]).map((key) => (
-                                            <th key={key}>
-                                                {key}
-                                            </th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {excelData.map((row, index) => (
-                                        <tr key={index}>
-                                            {Object.keys(row).map((key) => (
-                                                <td key={key}>
-                                                    {row[key]}
-                                                </td>
+                        <div className="col">
+                            <Card className="shadow">
+                                <CardHeader className="border-0">
+                                    <h3 className="mb-0 text-center">Listes du personnel</h3>
+                                </CardHeader>
+                                <Table className="align-items-center table-flush" responsive>
+                                    <thead className="thead-light">
+                                        <tr>
+                                            {Object.keys(excelData[0]).map((key) => (
+                                                <th key={key}>
+                                                    {key}
+                                                </th>
                                             ))}
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
+                                    </thead>
+                                    <tbody>
+                                        {excelData.map((row, index) => (
+                                            <tr key={index}>
+                                                {Object.keys(row).map((key) => (
+                                                    <td key={key}>
+                                                        {row[key]}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </Table>
+                            </Card>
                         </div>
-                    ) : (
-                        <div> Aucun fichier importer </div>
+                    ) : (  
+                        <div className="col">  
+                            <Card className="shadow">
+                                <CardHeader className="border-0">
+                                    <h3 className="mb-0 text-center"> Aucun fichier importer </h3>
+                                </CardHeader>
+                            </Card>
+                        </div>
                     )}
                 </div>
             </Row>

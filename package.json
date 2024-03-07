@@ -66,7 +66,7 @@
   ],
   "dependencies": {
     "@fortawesome/fontawesome-free": "6.5.1",
-    "bootstrap": "4.6.2",
+    "bootstrap": "^4.6.2",
     "chart.js": "2.9.4",
     "classnames": "2.3.2",
     "electron-is-dev": "^3.0.1",
@@ -76,6 +76,7 @@
     "mysql2": "^3.9.2",
     "nouislider": "15.4.0",
     "react": "18.2.0",
+    "react-bootstrap": "^2.10.1",
     "react-chartjs-2": "2.11.2",
     "react-copy-to-clipboard": "5.1.0",
     "react-datetime": "3.2.0",
