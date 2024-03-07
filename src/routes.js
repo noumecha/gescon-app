@@ -2,10 +2,15 @@ import Index from "views/Index.js";
 import Profile from "views/examples/Profile.js";
 import Register from "views/examples/Register.js";
 import Login from "views/examples/Login.js";
-import Tables from "views/examples/Tables.js";
+//import Tables from "views/examples/Tables.js";
 import Conges from "views/examples/Conges.js";
 import Personnel from "views/examples/Personnel.js";
+import Decision from "views/examples/Decision.js";
 import Icons from "views/examples/Icons.js";
+import Permission from "views/examples/Permission";
+import Attestation from "views/examples/Attestation";
+import FichePersonnel from "views/examples/FichePersonnel";
+import ArchiveAttestation from "views/examples/ArchiveAttestation";
 
 var routes = [
   {
@@ -30,10 +35,10 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/tables",
+    path: "/Permission",
     name: "Permissions",
     icon: "ni ni-single-copy-04 text-blue",
-    component: <Tables />,
+    component: <Permission />,
     layout: "/admin",
   },
   {
@@ -44,31 +49,31 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/tables",
+    path: "/fiches",
     name: "Fiches Personnel",
     icon: "ni ni-collection text-blue",
-    component: <Tables />,
+    component: <FichePersonnel />,
     layout: "/admin",
   },
   {
-    path: "/tables",
+    path: "/attestation",
     name: "Attestations",
     icon: "ni ni-paper-diploma text-blue",
-    component: <Tables />,
+    component: <Attestation />,
     layout: "/admin",
   },
   {
-    path: "/tables",
+    path: "/archive",
     name: "Attestations Archivés",
     icon: "ni ni-archive-2 text-blue",
-    component: <Tables />,
+    component: <ArchiveAttestation />,
     layout: "/admin",
   },
   {
-    path: "/tables",
+    path: "/decision",
     name: "Decisions",
     icon: "ni ni-ruler-pencil text-blue",
-    component: <Tables />,
+    component: <Decision />,
     layout: "/admin",
   },
   {

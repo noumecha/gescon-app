@@ -88,8 +88,8 @@ const Personnel = () => {
                 <div className="col">
                     {excelData ? (
                         <div className="table-responsive">
-                            <table className="table">
-                                <thead>
+                            <Table className="align-items-center table-flush" responsive>
+                                <thead className="thead-light">
                                     <tr>
                                         {Object.keys(excelData[0]).map((key) => (
                                             <th key={key}>
@@ -109,11 +109,16 @@ const Personnel = () => {
                                         </tr>
                                     ))}
                                 </tbody>
-                            </table>
+                            </Table>
                         </div>
                     ) : (
                         <div> Aucun fichier importer </div>
                     )}
+                </div>
+            </Row>
+            <Row>
+                <div className="col">
+                    <button type="submit" className="mt-3 btn btn-secondary btn-md">Exporter le fichier</button>
                 </div>
             </Row>
         </Container>
