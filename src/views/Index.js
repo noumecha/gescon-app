@@ -43,6 +43,11 @@ const Index = (props) => {
 
  const [data, setData] = useState({});
 
+  const fetchData = useCallback(() => {
+    const data = window.electronAPI.userDB?.readAllUsers();
+    setData(data);
+  }, []);
+
   useEffect(() => {const func = async () => {
       try {
         const devName = window.electronAPI.devName;

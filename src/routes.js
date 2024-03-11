@@ -6,7 +6,7 @@ import Login from "views/examples/Login.js";
 import Conges from "views/examples/Conges.js";
 import Personnel from "views/examples/Personnel.js";
 import Decision from "views/examples/Decision.js";
-import Icons from "views/examples/Icons.js";
+//import Icons from "views/examples/Icons.js";
 import Permission from "views/examples/Permission";
 import Attestation from "views/examples/Attestation";
 import FichePersonnel from "views/examples/FichePersonnel";
