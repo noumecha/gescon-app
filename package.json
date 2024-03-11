@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Desktop application for leaves",
   "homepage": "./",
-  "main": "./src/electron.js",
+  "main": "public/electron.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noumecha/gescon-app.git"
@@ -37,6 +37,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "electron-build": "electron-builder",
+    "postinstall": "electron-builder install-app-deps",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
     "electron-rebuild": "electron-rebuild -f -w mysql2"
   },
@@ -50,13 +51,7 @@
       "target": [
         "portable"
       ]
-    },
-    "directories": {
-      "buildRessources": "public"
-    },
-    "extraRessources": [
-      "./gescon-db.db"
-    ]
+    }
   },
   "browserslist": [
     ">0.2%",
@@ -73,7 +68,6 @@
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "moment": "2.29.4",
-    "mysql2": "^3.9.2",
     "nouislider": "15.4.0",
     "react": "18.2.0",
     "react-bootstrap": "^2.10.1",
@@ -87,12 +81,10 @@
     "sass": "1.69.5",
     "sequelize": "^6.37.1",
     "sequelize-cli": "^6.6.2",
-    "sqlite3": "^5.1.7",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.3.0",
-    "@electron/rebuild": "^3.6.0",
     "bindings": "^1.5.0",
     "concurrently": "^8.2.2",
     "docxtemplater": "^3.46.0",
@@ -102,7 +94,6 @@
     "fs": "^0.0.1-security",
     "gulp": "^4.0.2",
     "gulp-append-prepend": "1.0.9",
-    "mysql": "^2.18.1",
     "officegen": "^0.6.5",
     "path": "^0.12.7",
     "wait-on": "^7.2.0"
