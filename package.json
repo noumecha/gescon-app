@@ -38,7 +38,7 @@
     "make": "electron-forge make",
     "electron-build": "electron-builder",
     "postinstall": "electron-builder install-app-deps",
-    "rebuild": "electron-rebuild -f -w better-sqlite3"
+    "rebuild": "electron-rebuild -f -w better-sqlite3 --verbose"
   },
   "eslintConfig": {
     "extends": "react-app"
