@@ -37,6 +37,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "electron-build": "electron-builder",
+    "build-all" : "electron-builder -mwl",
     "postinstall": "electron-builder install-app-deps",
     "rebuild": "electron-rebuild -f -w better-sqlite3 --verbose"
   },
