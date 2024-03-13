@@ -1,5 +1,4 @@
 const { contextBridge, ipcRenderer } = require("electron");
-const { userDB } = require("./database/DBManager");
 const dev = "Spaker the TMC";
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -7,6 +6,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 contextBridge.exposeInMainWorld("electronAPI", {
     devName: dev,
-    userDB,
+    sql: () => ipcRenderer.send('sql-operations'),
+    setTitle: (title) => ipcRenderer.send('set-title', title),
     ping: () => ipcRenderer.invoke('ping'),
 });

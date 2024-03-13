@@ -41,15 +41,11 @@ const Index = (props) => {
     setChartExample1Data("data" + index);
   };
 
- const [data, setData] = useState({});
-
-  const fetchData = useCallback(() => {
-    const data = window.electronAPI.userDB?.readAllUsers();
-    setData(data);
-  }, []);
-
   useEffect(() => {const func = async () => {
       try {
+        window.electronAPI.sql();
+        const title = "Code by Noumel";
+        window.electronAPI.setTitle(title);
         const devName = window.electronAPI.devName;
         console.log("author : " + devName);
         const res = await window.electronAPI.ping();
@@ -62,7 +58,6 @@ const Index = (props) => {
     func()
   }, []);
 
-  console.log("users : ", data);
   return (
     <>
       <Header />

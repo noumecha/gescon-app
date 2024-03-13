@@ -22,9 +22,6 @@
   "license": "MIT",
   "scripts": {
     "start": "electron-forge start",
-    "package-mac": "npm run build  && electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
-    "package-win": "npm run build  && electron-packager . MyApp --overwrite --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds",
-    "package-linux": "npm run build  && electron-packager . MyApp --overwrite --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds",
     "start-electron": "electron .",
     "build": "react-scripts build",
     "react-start": "react-scripts start",
@@ -37,9 +34,9 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "electron-build": "electron-builder",
-    "build-all" : "electron-builder -mwl",
+    "build-all": "electron-builder -mwl",
     "postinstall": "electron-builder install-app-deps",
-    "rebuild": "electron-rebuild -f -w better-sqlite3 --verbose"
+    "rebuild": "electron-rebuild --verbose"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -61,7 +58,8 @@
       "buildRessources": "public"
     },
     "extraRessources": [
-      "./public/gescon_app.db"
+      "./public/gescon_app.db",
+      "node_modules/crypto-browserify"
     ]
   },
   "browserslist": [
@@ -72,14 +70,18 @@
   ],
   "dependencies": {
     "@fortawesome/fontawesome-free": "6.5.1",
-    "better-sqlite3": "^9.4.3",
     "bootstrap": "^4.6.2",
+    "browserify-zlib": "^0.2.0",
     "chart.js": "2.9.4",
     "classnames": "2.3.2",
+    "crypto": "^1.0.1",
+    "crypto-browserify": "^3.12.0",
     "electron-is-dev": "^3.0.1",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "moment": "2.29.4",
+    "mysql2": "^3.9.2",
+    "net": "^1.0.2",
     "nouislider": "15.4.0",
     "react": "18.2.0",
     "react-bootstrap": "^2.10.1",
@@ -93,10 +95,19 @@
     "sass": "1.69.5",
     "sequelize": "^6.37.1",
     "sequelize-cli": "^6.6.2",
+    "stream": "^0.0.2",
+    "timers": "^0.1.1",
+    "tls": "^0.0.1",
+    "url": "^0.11.3",
+    "vm-browserify": "^1.1.2",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "@babel/preset-react": "^7.23.3",
     "@electron-forge/cli": "^7.3.0",
+    "babel-loader": "^9.1.3",
     "bindings": "^1.5.0",
     "concurrently": "^8.2.2",
     "docxtemplater": "^3.46.0",
@@ -109,7 +120,16 @@
     "gulp-append-prepend": "1.0.9",
     "officegen": "^0.6.5",
     "path": "^0.12.7",
-    "wait-on": "^7.2.0"
+    "wait-on": "^7.2.0",
+    "webpack": "^5.90.3",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.3"
+  },
+  "resolve": {
+    "fallback": {
+      "url": false,
+      "crypto": false
+    }
   },
   "optionalDependencies": {
     "eslint-plugin-flowtype": "8.0.3",

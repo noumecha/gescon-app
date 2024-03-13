@@ -1,5 +1,6 @@
 const path = require('path');
 const { app, BrowserWindow, ipcMain } = require('electron');
+const mysql = require('mysql2');
 //const isDev = import('electron-is-dev');
 
 let mainWindow;
@@ -29,8 +30,35 @@ const createWindow = () => {
 
 };
 
+function handleSetTitle (event, title) {
+    const webContents = event.sender
+    const win = BrowserWindow.fromWebContents(webContents)
+    win.setTitle(title)
+}
+
+function handleData (event) {
+    // Connection à la base de données MySQL
+    const connection = mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password: '',
+        database: 'gesnotes'
+    });
+    connection.connect();
+    const sql = 'SELECT * FROM eleve';
+    connection.query(sql, (error, results) => {
+        if (error) {
+            event.reply('eleves-result', { success: false, error: error.message });
+        } else {
+            event.reply('eleves-result', { success: true, data: results });
+        }
+    });
+}
+
 app.whenReady().then(() => {
     ipcMain.handle('ping', () => 'pong!');
+    ipcMain.on('set-title', handleSetTitle);
+    ipcMain.on('sql-operations', handleData);
     createWindow();
 });
 
