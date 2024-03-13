@@ -5,7 +5,7 @@ const mysql = require('mysql2');
 
 let mainWindow;
 
-const createWindow = () => {
+function createWindow() {
     // configure the main window
     mainWindow = new BrowserWindow({
         width: 800,
@@ -36,7 +36,7 @@ function handleSetTitle (event, title) {
     win.setTitle(title)
 }
 
-function handleData (event) {
+function handleData () {
     // Connection à la base de données MySQL
     const connection = mysql.createConnection({
         host: 'localhost',
@@ -48,17 +48,17 @@ function handleData (event) {
     const sql = 'SELECT * FROM eleve';
     connection.query(sql, (error, results) => {
         if (error) {
-            event.reply('eleves-result', { success: false, error: error.message });
+            console.error('eleves-result', { success: false, error: error.message });
         } else {
-            event.reply('eleves-result', { success: true, data: results });
+            console.log('eleves-result', { success: true, data: results });
         }
     });
 }
 
 app.whenReady().then(() => {
     ipcMain.handle('ping', () => 'pong!');
+    ipcMain.handle('sql', () => handleData);
     ipcMain.on('set-title', handleSetTitle);
-    ipcMain.on('sql-operations', handleData);
     createWindow();
 });
 

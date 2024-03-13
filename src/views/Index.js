@@ -43,7 +43,8 @@ const Index = (props) => {
 
   useEffect(() => {const func = async () => {
       try {
-        window.electronAPI.sql();
+        const sql = window.electronAPI.sql();
+        console.log("sql-operations", sql);
         const title = "Code by Noumel";
         window.electronAPI.setTitle(title);
         const devName = window.electronAPI.devName;
