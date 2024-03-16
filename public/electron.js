@@ -67,16 +67,23 @@ const pool = mysql.createPool({
     database: 'gesnotes'
 }) 
 
+function handleAddEleve (event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+    })
+}
+
 app.whenReady().then(() => {
     ipcMain.handle('ping', () => 'pong!');
     ipcMain.handle('sql', () => handleData);  
     ipcMain.on('requete-sql', (event, arg) => {
-        pool.query('SELECT * FROM gesnotes', (err, results) => {
+        pool.query('SELECT * FROM eleve', (err, results) => {
             if (err) throw err;
-            event.sender.send('resultat-sql', results);
+            event.sender.send('resultat-sql', JSON.stringify(results));
         });
     });
     ipcMain.on('set-title', handleSetTitle);
+    ipcMain.on('add-eleve', handleAddEleve);
     createWindow();
 });
 

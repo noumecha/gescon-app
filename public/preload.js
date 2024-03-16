@@ -6,6 +6,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 contextBridge.exposeInMainWorld("electronAPI", {
     devName: dev,
+    addEleve: (req) => ipcRenderer.send('add-eleve', req),
     requeteSQL: () => ipcRenderer.send('requete-sql'),
     recevoirResultats: (callback) => ipcRenderer.on('resultat-sql', callback),
     setSql: (args) => ipcRenderer.send('set-sql', args),
