@@ -40,17 +40,23 @@ const Index = (props) => {
     setActiveNav(index);
     setChartExample1Data("data" + index);
   };
-
-  useEffect(() => {const func = async () => {
+  const [data, setData] = useState(null)
+  useEffect(() => {
+    const func = async () => {
       try {
-        const sql = window.electronAPI.sql();
-        console.log("sql-operations", sql);
-        const title = "Code by Noumel";
+        const title = "Gescon app by Noumel";
         window.electronAPI.setTitle(title);
-        const devName = window.electronAPI.devName;
-        console.log("author : " + devName);
         const res = await window.electronAPI.ping();
         console.log("Ping : " ,res);
+        //const datas = await window.electronAPI.sql();
+        //console.log("receive datas : " , datas);
+        window.electronAPI.requeteSQL();
+        await window.electronAPI.recevoirResultats((event, res) => {
+          console.log("event : " + event);
+          console.log("res : " + res);
+          setData(res);
+        })
+        console.log("the datas :" + data);
       } catch (error) {
         console.error("Erreur trouvé : " + error);
       }

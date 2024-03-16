@@ -20,10 +20,9 @@ const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useAuth();
+
   function handleLogin() {
     login();
-    console.log("username: " + username);
-    console.log("password: " + password);
   }
 
   return (
