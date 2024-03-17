@@ -9,8 +9,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     addEleve: (req) => ipcRenderer.send('add-eleve', req),
     requeteSQL: () => ipcRenderer.send('requete-sql'),
     recevoirResultats: (callback) => ipcRenderer.on('resultat-sql', callback),
-    setSql: (args) => ipcRenderer.send('set-sql', args),
-    sql: () => ipcRenderer.invoke('sql'),
     setTitle: (title) => ipcRenderer.send('set-title', title),
     ping: () => ipcRenderer.invoke('ping'),
 });
