@@ -50,15 +50,47 @@ function handleAddEleve (event, req) {
     })
 }
 
+function userLogin (event, {username, password}) {
+    pool.query('SELECT * FROM utilisateurs WHERE username =?', [username, password], (err, results) => {
+        if (err) throw err;
+        if (results.length > 0) {
+            const user = results[0];
+            if (user.nom_utilisateur === username && user.mdp_utilisateur === password) {
+                event.sender.send('login-success', 'utilisateur connecté');
+            } else {
+                event.sender.send('login-fail',"nom d'utilisateur ou mot de passe incorrect!");
+            }
+        } else {
+            event.reply("utilisateur non trouvé");
+        }
+    });
+}
+
 app.whenReady().then(() => {
     ipcMain.handle('ping', () => 'pong!');
     ipcMain.on('requete-sql', (event, arg) => {
         pool.query('SELECT * FROM personnel', (err, results) => {
             if (err) throw err;
-            event.sender.send('resultat-sql', JSON.stringify(results));
+            event.sender.send('resultat-sql', results);
         });
     });
+    /*ipcMain.on('user-login', (event, {username, password}) => {
+        pool.query('SELECT * FROM utilisateurs WHERE username = ?', [username, password], (err, results) => {
+            if (err) throw err;
+            if (results.length > 0) {
+                const user = results[0];
+                if (user.nom_utilisateur === username && user.mdp_utilisateur === password) {
+                    event.reply("connected");
+                } else {
+                    event.reply("nom d'utilisateur ou mot de passe incorrect !");
+                }
+            } else {
+                event.reply("utilisateur non trouvé");
+            }
+        });
+    });*/
     ipcMain.on('set-title', handleSetTitle);
+    ipcMain.on('user-login', userLogin);
     ipcMain.on('add-eleve', handleAddEleve);
     createWindow();
 });
