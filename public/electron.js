@@ -64,7 +64,7 @@ const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'gesnotes'
+    database: 'gescon_app_db'
 }) 
 
 function handleAddEleve (event, req) {
@@ -77,7 +77,7 @@ app.whenReady().then(() => {
     ipcMain.handle('ping', () => 'pong!');
     ipcMain.handle('sql', () => handleData);  
     ipcMain.on('requete-sql', (event, arg) => {
-        pool.query('SELECT * FROM eleve', (err, results) => {
+        pool.query('SELECT * FROM personnel', (err, results) => {
             if (err) throw err;
             event.sender.send('resultat-sql', JSON.stringify(results));
         });
