@@ -48,11 +48,11 @@ const Index = (props) => {
         window.electronAPI.setTitle(title);
         const res = await window.electronAPI.ping();
         console.log("Ping : " ,res);
-        const req = 'INSERT INTO eleve (nom,prenom,classe) VALUES ("spaker", "ivan", "Tle C");';
-        window.electronAPI.addEleve(req);
+        //const req = 'INSERT INTO eleve (nom,prenom,classe) VALUES ("bams", "toto", "2nd C");';
+        //window.electronAPI.addEleve(req);
         window.electronAPI.requeteSQL();
         await window.electronAPI.recevoirResultats((event, res) => {
-          console.log("event : " + event);
+          console.log("event : " + JSON.stringify(event));
           console.log("res : " + JSON.stringify(res));
           setData(res);
         })
