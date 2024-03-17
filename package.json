@@ -95,7 +95,6 @@
     "sass": "1.69.5",
     "sequelize": "^6.37.1",
     "sequelize-cli": "^6.6.2",
-    "sqlite3": "^5.1.7",
     "stream": "^0.0.2",
     "timers": "^0.1.1",
     "tls": "^0.0.1",

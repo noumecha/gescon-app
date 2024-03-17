@@ -44,10 +44,24 @@ const pool = mysql.createPool({
     database: 'gescon_app_db'
 }) 
 
-function handleAddEleve (event, req) {
+/*function handleAddEleve (event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
+        console.log('eleve added');
     })
+}*/
+// fucntion for the personnel : 
+function addPersonnel(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('personnel-added-success', { message: 'Personnel ajouté avec succès !' });
+    })
+}
+function getPersonnel(event, arg) {
+    pool.query('SELECT * FROM Personnel', (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-personnel', JSON.stringify(res));
+    });
 }
 
 app.whenReady().then(() => {
@@ -58,8 +72,16 @@ app.whenReady().then(() => {
             event.sender.send('resultat-sql', JSON.stringify(results));
         });
     });
+    ipcMain.on('add-personnel', addPersonnel);
+    ipcMain.on('get-personnel', getPersonnel);
+    /*ipcMain.on('get-personnel', (event, args) => {
+        pool.query('SELECT * FROM personnel', (err, data) => {
+            if (err) throw err;
+            event.sender.send('all-personnel', JSON.stringify(data));
+        });
+    });*/
     ipcMain.on('set-title', handleSetTitle);
-    ipcMain.on('add-eleve', handleAddEleve);
+    //ipcMain.on('add-eleve', handleAddEleve);
     createWindow();
 });
 
