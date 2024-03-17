@@ -36,29 +36,6 @@ function handleSetTitle (event, title) {
     win.setTitle(title)
 }
 
-function handleData () {
-    // Connection à la base de données MySQL
-    return new Promise ((resolve, reject) => {
-        const connection = mysql.createConnection({
-            host: 'localhost',
-            user: 'root',
-            password: '',
-            database: 'gesnotes'
-        });
-        connection.connect();
-        const sql = 'SELECT * FROM eleve';
-        connection.query(sql, (error, results) => {
-            if (error) {
-                console.error('eleves-result', { success: false, error: error.message });
-                reject(error);
-            } else {
-                console.log('eleves-result', { success: true, data: results });
-                resolve(JSON.stringify(results));
-            }
-        });
-    });
-}
-
 const pool = mysql.createPool({
     connectionLimit: 10,
     host: 'localhost',
@@ -75,7 +52,6 @@ function handleAddEleve (event, req) {
 
 app.whenReady().then(() => {
     ipcMain.handle('ping', () => 'pong!');
-    ipcMain.handle('sql', () => handleData);  
     ipcMain.on('requete-sql', (event, arg) => {
         pool.query('SELECT * FROM personnel', (err, results) => {
             if (err) throw err;

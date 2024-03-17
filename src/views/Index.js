@@ -52,7 +52,7 @@ const Index = (props) => {
         //window.electronAPI.addEleve(req);
         window.electronAPI.requeteSQL();
         await window.electronAPI.recevoirResultats((event, res) => {
-          console.log("event : " + event);
+          console.log("event : " + JSON.stringify(event));
           console.log("res : " + JSON.stringify(res));
           setData(res);
         })
