@@ -8,6 +8,7 @@ import {
   FormGroup,
   Form,
   Input,
+  Label,
   Modal,
   InputGroupAddon,
   InputGroupText,
@@ -48,69 +49,6 @@ const Conges = () => {
       <Header />
       {/* Page content */}
       <Container className="mt--7" fluid>
-        <Row className="">
-            <Col md="3">
-              <Button
-                block
-                className="my-4 mb-3"
-                color="primary"
-                type="button"
-                onClick={toggleModal}
-              >
-                + Nouveau Congé
-              </Button>
-              <Modal
-                className="modal-dialog-centered"
-                size="sm"
-                isOpen={formModal}
-                toggle={toggleModal}
-              >
-                <div className="modal-body p-0">
-                  <Card className="bg-secondary shadow border-0">
-                    <CardHeader className="bg-transparent">
-                      <div className="text-muted text-center mt-2">
-                        <h2>Nouvelle demandes de congés</h2>
-                      </div>
-                    </CardHeader>
-                    <CardBody className="">
-                      <Form role="form">
-                        <FormGroup className="mb-3">
-                          <InputGroup className="input-group-alternative">
-                            <InputGroupAddon addonType="prepend">
-                              <InputGroupText>
-                                <i className="ni ni-email-83" />
-                              </InputGroupText>
-                            </InputGroupAddon>
-                            <Input placeholder="Email" type="email" />
-                          </InputGroup>
-                        </FormGroup>
-                        <FormGroup>
-                          <InputGroup className="input-group-alternative">
-                            <InputGroupAddon addonType="prepend">
-                              <InputGroupText>
-                                <i className="ni ni-lock-circle-open" />
-                              </InputGroupText>
-                            </InputGroupAddon>
-                            <Input placeholder="Password" type="password" />
-                          </InputGroup>
-                        </FormGroup>
-                        <Col md="3" className="text-center">
-                          <Button
-                            className="my-2"
-                            color="primary"
-                            type="button"
-                          >
-                            Valider
-                          </Button>
-                        </Col>
-                      </Form>
-                    </CardBody>
-                  </Card>
-                </div>
-              </Modal>
-          </Col>
-        </Row>
-        {/* Table */}
         <Row>
           <Col className="order-xl-1" xl="8">
             <Card className="bg-secondary shadow">
@@ -199,6 +137,42 @@ const Conges = () => {
                         </FormGroup>
                       </Col>
                     </Row>
+                    <Row>
+                      <Col lg="6">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-type"
+                          >
+                            Type
+                          </label>
+                          <Input
+                            className="form-control-alternative"
+                            defaultValue={selectedPerson ? selectedPerson.type === 1 ? "Contractuelle" : "Fonctionnaire" : "Fonctionnaire"}
+                            id="input-type"
+                            placeholder="type personnel"
+                            type="text"
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col lg="6">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-structure"
+                          >
+                            Structure
+                          </label>
+                          <Input
+                            className="form-control-alternative"
+                            defaultValue={selectedPerson ? selectedPerson.structure : "Service Général"}
+                            id="input-structure"
+                            placeholder="structure de travail"
+                            type="text"
+                          />
+                        </FormGroup>
+                      </Col>
+                    </Row>
                   </div>
                   <hr className="my-4" />
                   {/* Congés */}
@@ -207,74 +181,69 @@ const Conges = () => {
                   </h6>
                   <div className="pl-lg-4">
                     <Row>
-                      <Col md="12">
+                      <Col md="6">
                         <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-address"
-                          >
-                            Address
-                          </label>
+                          <Label for="date-depart">
+                            Date de départ
+                          </Label>
                           <Input
-                            className="form-control-alternative"
-                            defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
-                            id="input-address"
-                            placeholder="Home Address"
-                            type="text"
+                            id="date-depart"
+                            name="date"
+                            placeholder="date"
+                            type="date"
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col md="6">
+                        <FormGroup>
+                          <Label for="duree">
+                            Durée
+                          </Label>
+                          <Input
+                            id="duree"
+                            name="datetitme"
+                            placeholder="duree en jours"
+                            type="datetime"
                           />
                         </FormGroup>
                       </Col>
                     </Row>
                     <Row>
-                      <Col lg="4">
+                      <Col md="6">
                         <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-city"
-                          >
-                            City
-                          </label>
+                          <Label for="date-depart">
+                            Date de fin
+                          </Label>
                           <Input
-                            className="form-control-alternative"
-                            defaultValue="New York"
-                            id="input-city"
-                            placeholder="City"
-                            type="text"
+                            id="date-depart"
+                            name="date"
+                            placeholder="date"
+                            type="date"
                           />
                         </FormGroup>
                       </Col>
-                      <Col lg="4">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-country"
-                          >
-                            Country
-                          </label>
+                      <Col md="6">
+                        <FormGroup>  
+                          <Label for="num-decision">
+                            Numero de Décision
+                          </Label>              
                           <Input
-                            className="form-control-alternative"
-                            defaultValue="United States"
-                            id="input-country"
-                            placeholder="Country"
-                            type="text"
-                          />
+                            className="mb-3"
+                            type="select"
+                            id="num-decision"
+                          >
+                            <option>Selectionner le numero de décision</option>
+                          </Input>
                         </FormGroup>
                       </Col>
-                      <Col lg="4">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-country"
-                          >
-                            Postal code
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-postal-code"
-                            placeholder="Postal code"
-                            type="number"
-                          />
-                        </FormGroup>
+                    </Row>
+                    <Row>
+                      <Col md="6">
+                        <Button
+                          color="primary"
+                        >
+                          Générer l'attestation
+                        </Button>
                       </Col>
                     </Row>
                   </div>
