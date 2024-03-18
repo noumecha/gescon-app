@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardBody,
   FormGroup,
+  FormText,
   Form,
   Input,
   Label,
@@ -31,18 +32,86 @@ import {
 } from "reactstrap";
 // core components
 import Header from "components/Headers/Header.js";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { PDFViewer,PDFDownloadLink } from '@react-pdf/renderer';
+import MyDocument from "documents/MyDocument";
 
 const Conges = () => {
-  const [formModal, setFormModal] = useState(false);
   const location = useLocation();
+  const [decision, setDecision] = useState([]);
+  const [typeConge, setTypeConge] = useState([]);
+  const [startDate, setStartDate] = useState("");
+  const [duration, setDuration] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [name, setName] = useState("");
+  const [matricule, setMatricule] = useState("");
+  const [type, setType] = useState("");
+  const [dec, setDec] = useState("");
 
-  const toggleModal = () => {
-    setFormModal(!formModal);
+  const handleDecChange = (e) => {
+    setDec(e.target.value)
   }
 
+  const handleTypeChange = (e) => {
+    setType(e.target.value)
+  }
+
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+  }
+
+  const handleMatriculeChange = (e) => {
+    setMatricule(e.target.value);
+  }
+
+  const handleStartDateChange = (e) => {
+    setStartDate(e.target.value);
+  }
+
+  const handleDurationChange = (e) => {
+    setDuration(e.target.value);
+  }
+
+  const handleSelectedTypeChange = (e) => {
+    setSelectedType(e.target.value);
+  }
+
+  useEffect(() => {
+    const calculateEndDate = () => {
+      if (startDate && duration) {
+        const start = new Date(startDate);
+        const end = new Date(start);
+        end.setDate(end.getDate() + parseInt(duration));
+        // Mettre à jour l'interface utilisateur avec la date de fin
+        setEndDate(end.toISOString().split("T")[0]);
+      }
+    };
+    calculateEndDate();
+  }, [startDate, duration]);
+
+  /** recuperation des attributs d'un personnel depuis personnel.js */
   const { selectedPerson } = location.state || {};
+
+  /** useeffect for common function and fetching */
+  useEffect(() => {
+    const func = async () => {
+        try {
+            window.electronAPI.getDecision();
+            await window.electronAPI.retrieveDecision((event, res) => {
+              setDecision(res);
+            })
+            window.electronAPI.getCongeType();
+            await window.electronAPI.retrieveCongeType((event, res) => {
+              setTypeConge(res);
+            })
+        } catch (error) {
+            console.error("Erreur : " + error.message);
+        }
+    }
+    func();
+  }, []);
 
   return (
     <>
@@ -76,8 +145,9 @@ const Conges = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue={selectedPerson ? selectedPerson.nom_prenom : "TCHUENTE"}
                             id="input-username"
+                            value={selectedPerson ? selectedPerson.nom_prenom : "TCHUENTE"}
+                            onChange={handleNameChange}
                             placeholder="Nom "
                             type="text"
                           />
@@ -112,8 +182,9 @@ const Conges = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue={selectedPerson ? selectedPerson.matricule : "XD3 566"}
                             id="input-matricule"
+                            value={selectedPerson ? selectedPerson.matricule : "XD3 566"}
+                            onChange={handleMatriculeChange}
                             placeholder="Matricule"
                             type="text"
                           />
@@ -180,6 +251,72 @@ const Conges = () => {
                     Information sur le congés
                   </h6>
                   <div className="pl-lg-4">
+                  <Row>
+                      <Col md="6">
+                        <FormGroup>  
+                          <Label for="type-conge">
+                            Type de congé
+                          </Label>              
+                          <Input
+                            className="mb-3"
+                            type="select"
+                            id="type-conge"
+                            onChange={handleSelectedTypeChange}
+                          >
+                            {typeConge && typeConge.length > 0 
+                              ? typeConge.map((t, i) => (
+                                <option key={i}>{t.libelle_type_conge}</option>
+                              ))
+                              : (<option>Selectionner le type de congé</option>)
+                            }
+                          </Input>
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col>  
+                        <FormGroup row>
+                          <Label
+                            for="demande-file"
+                            sm={2}
+                          >
+                            Demande Timbré
+                          </Label>
+                          <Input
+                            id="demande-file"
+                            name="file"
+                            type="file"
+                          />
+                          <FormText>
+                            selectionner la demande
+                          </FormText>
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    {selectedType === "congé maladie" || selectedType === "congé maternité" ? (
+                      <Row>
+                        <Col>
+                          <FormGroup row>
+                            <Label
+                              for="exampleFile"
+                              sm={2}
+                            >
+                              Document
+                            </Label>
+                            <Input
+                              id="exampleFile"
+                              name="file"
+                              type="file"
+                            />
+                            <FormText>
+                              Pièces à fournir comme justificatif
+                            </FormText>
+                          </FormGroup>
+                        </Col>
+                      </Row>
+                    ) : (
+                      ""
+                    )}
                     <Row>
                       <Col md="6">
                         <FormGroup>
@@ -189,6 +326,8 @@ const Conges = () => {
                           <Input
                             id="date-depart"
                             name="date"
+                            onChange={handleStartDateChange}
+                            value={startDate}
                             placeholder="date"
                             type="date"
                           />
@@ -197,13 +336,15 @@ const Conges = () => {
                       <Col md="6">
                         <FormGroup>
                           <Label for="duree">
-                            Durée
+                            {"Durée (en jours)"}
                           </Label>
                           <Input
                             id="duree"
+                            value={duration}
+                            onChange={handleDurationChange}
                             name="datetitme"
                             placeholder="duree en jours"
-                            type="datetime"
+                            type="number"
                           />
                         </FormGroup>
                       </Col>
@@ -211,14 +352,16 @@ const Conges = () => {
                     <Row>
                       <Col md="6">
                         <FormGroup>
-                          <Label for="date-depart">
+                          <Label for="date-fin">
                             Date de fin
                           </Label>
                           <Input
-                            id="date-depart"
+                            id="date-fin"
                             name="date"
+                            value={endDate}
                             placeholder="date"
                             type="date"
+                            readOnly
                           />
                         </FormGroup>
                       </Col>
@@ -231,8 +374,14 @@ const Conges = () => {
                             className="mb-3"
                             type="select"
                             id="num-decision"
+                            onChange={handleDecChange}
                           >
-                            <option>Selectionner le numero de décision</option>
+                            {decision && decision.length > 0 
+                              ? decision.map((d, i) => (
+                                <option key={i}>{d.numero_decision}</option>
+                              ))
+                              : (<option>Selectionner le numero de décision</option>)
+                            }
                           </Input>
                         </FormGroup>
                       </Col>
@@ -250,6 +399,18 @@ const Conges = () => {
                 </Form>
               </CardBody>
             </Card>
+          </Col>
+        </Row>
+        <Row>
+          <Col md="12">
+            <PDFViewer width="100%" height="100%">
+              <MyDocument name={name} matricule={matricule} type={type}/>
+            </PDFViewer>
+          </Col>
+          <Col md="12">
+            <PDFDownloadLink document={<MyDocument name={name} matricule={matricule} type={type} decision={dec} duration={duration} />} fileName="attestation_test.pdf">
+              {({ blob, url, loading, error }) => (loading ? 'Loading document...' : <Button color="primary">Télécharger l'attestation </Button>)}
+            </PDFDownloadLink>
           </Col>
         </Row>
       </Container>
