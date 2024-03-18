@@ -60,7 +60,7 @@ function addPersonnel(event, req) {
 function getPersonnel(event, arg) {
     pool.query('SELECT * FROM Personnel', (err, res) => {
         if (err) throw err;
-        event.sender.send('all-personnel', JSON.stringify(res));
+        event.sender.send('all-personnel', res);
     });
 }
 
