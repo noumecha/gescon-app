@@ -23,8 +23,8 @@ function createWindow() {
     mainWindow.setMenuBarVisibility(false);
 
     mainWindow.loadURL(
-        `http://localhost:3000`
-        //`file://${path.join(__dirname, '/../build/index.html')}`
+        //`http://localhost:3000`
+        `file://${path.join(__dirname, '../build/index.html')}`
         //isDev ? `http://localhost:3000` : `file://${path.join(__dirname, '/../build/index.html')}`
     );
 

@@ -31,8 +31,6 @@
     "compile:scss": "sass src/assets/scss/argon-dashboard-react.scss src/assets/css/argon-dashboard-react.css",
     "minify:scss": "sass src/assets/scss/argon-dashboard-react.scss src/assets/css/argon-dashboard-react.min.css --style compressed",
     "build:scss": "npm run compile:scss && npm run minify:scss && npm run map:scss",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
     "electron-build": "electron-builder",
     "build-all": "electron-builder -mwl",
     "postinstall": "electron-builder install-app-deps",
@@ -44,6 +42,9 @@
   "build": {
     "appId": "com.gesconapp.gescon",
     "productName": "GesconApp",
+    "directories" : {
+      "output": "dist"
+    },
     "win": {
       "target": [
         "portable"
@@ -53,13 +54,6 @@
       "build/**/*",
       "node_modules/**/*",
       "public/**/*"
-    ],
-    "directories": {
-      "buildRessources": "public"
-    },
-    "extraRessources": [
-      "./public/gescon_app.db",
-      "node_modules/crypto-browserify"
     ]
   },
   "browserslist": [
