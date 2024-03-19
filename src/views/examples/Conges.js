@@ -39,16 +39,24 @@ import MyDocument from "documents/MyDocument";
 
 const Conges = () => {
   const location = useLocation();
+  /** recuperation des attributs d'un personnel depuis personnel.js */
+  const { selectedPerson } = location.state || {};
   const [decision, setDecision] = useState([]);
   const [typeConge, setTypeConge] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [duration, setDuration] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [repriseDate, setRepriseDate] = useState("");
   const [selectedType, setSelectedType] = useState("");
-  const [name, setName] = useState("");
-  const [matricule, setMatricule] = useState("");
-  const [type, setType] = useState("");
+  const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom : "TCHUENTE");
+  const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule : "XD3 566");
+  const [type, setType] = useState(selectedPerson ? selectedPerson.type === 1 ? "Contractuelle" : "Fonctionnaire" : "Contractuelle");
   const [dec, setDec] = useState("");
+  const [struc, setStruc] = useState(selectedPerson ? selectedPerson.structure : "Service Général");
+
+  const handleStrucChange = (e) => {
+    setStruc(e.target.value);
+  }
 
   const handleDecChange = (e) => {
     setDec(e.target.value)
@@ -86,13 +94,13 @@ const Conges = () => {
         end.setDate(end.getDate() + parseInt(duration));
         // Mettre à jour l'interface utilisateur avec la date de fin
         setEndDate(end.toISOString().split("T")[0]);
+        const repDate = new Date(end);
+        repDate.setDate(end.getDate() + parseInt(1));
+        setRepriseDate(repDate.toISOString().split("T")[0]);
       }
     };
     calculateEndDate();
   }, [startDate, duration]);
-
-  /** recuperation des attributs d'un personnel depuis personnel.js */
-  const { selectedPerson } = location.state || {};
 
   /** useeffect for common function and fetching */
   useEffect(() => {
@@ -146,7 +154,7 @@ const Conges = () => {
                           <Input
                             className="form-control-alternative"
                             id="input-username"
-                            value={selectedPerson ? selectedPerson.nom_prenom : "TCHUENTE"}
+                            defaultValue={name}
                             onChange={handleNameChange}
                             placeholder="Nom "
                             type="text"
@@ -183,7 +191,7 @@ const Conges = () => {
                           <Input
                             className="form-control-alternative"
                             id="input-matricule"
-                            value={selectedPerson ? selectedPerson.matricule : "XD3 566"}
+                            defaultValue={matricule}
                             onChange={handleMatriculeChange}
                             placeholder="Matricule"
                             type="text"
@@ -219,8 +227,9 @@ const Conges = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue={selectedPerson ? selectedPerson.type === 1 ? "Contractuelle" : "Fonctionnaire" : "Fonctionnaire"}
+                            defaultValue={type}
                             id="input-type"
+                            onChange={handleTypeChange}
                             placeholder="type personnel"
                             type="text"
                           />
@@ -236,8 +245,9 @@ const Conges = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue={selectedPerson ? selectedPerson.structure : "Service Général"}
+                            defaultValue={struc}
                             id="input-structure"
+                            onChange={handleStrucChange}
                             placeholder="structure de travail"
                             type="text"
                           />
@@ -261,6 +271,7 @@ const Conges = () => {
                             className="mb-3"
                             type="select"
                             id="type-conge"
+                            defaultValue="choisir le type de congé"
                             onChange={handleSelectedTypeChange}
                           >
                             {typeConge && typeConge.length > 0 
@@ -404,11 +415,31 @@ const Conges = () => {
         <Row>
           <Col md="12">
             <PDFViewer width="100%" height="100%">
-              <MyDocument name={name} matricule={matricule} type={type}/>
+              <MyDocument 
+                name={name} 
+                matricule={matricule} 
+                type={type} 
+                decision={dec} 
+                duration={duration} 
+                structure={struc}
+                startDate={startDate}
+                endDate={endDate}
+                repriseDate={repriseDate}
+                typeConge={selectedType}
+              />
             </PDFViewer>
           </Col>
           <Col md="12">
-            <PDFDownloadLink document={<MyDocument name={name} matricule={matricule} type={type} decision={dec} duration={duration} />} fileName="attestation_test.pdf">
+            <PDFDownloadLink document={<MyDocument 
+              name={name} 
+              matricule={matricule} 
+              type={type} 
+              decision={dec} 
+              duration={duration} 
+              structure={struc}
+              startDate={startDate}
+              endDate={endDate}
+              repriseDate={repriseDate}/>} fileName="attestation_test.pdf">
               {({ blob, url, loading, error }) => (loading ? 'Loading document...' : <Button color="primary">Télécharger l'attestation </Button>)}
             </PDFDownloadLink>
           </Col>
