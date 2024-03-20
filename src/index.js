@@ -23,7 +23,7 @@ function App() {
         <Route path="/admin/*" element={ isLoggedIn ? <AdminLayout /> : <Navigate to="/auth/login"/>} />
         <Route path="/auth/*" element={ isLoggedIn ? <Navigate to="/admin/index"/> : <AuthLayout />} />
         <Route path="/register" element={ isLoggedIn ? <Navigate to="/auth/register"/> : <AuthLayout />} />
-        <Route path="*" element={ isLoggedIn ? <Navigate to="/admin/index" /> : <Navigate to="/auth/login"/>} />
+        {<Route path="*" element={ isLoggedIn ? <Navigate to="/admin/index" /> : <Navigate to="/auth/login"/>} />}
       </Routes>
     </HashRouter>
   );
