@@ -23,8 +23,8 @@ function createWindow() {
     mainWindow.setMenuBarVisibility(false);
 
     mainWindow.loadURL(
-        //`http://localhost:3000`
-        `file://${path.join(__dirname, '../build/index.html')}`
+        `http://localhost:3000`
+        //`file://${path.join(__dirname, '../build/index.html')}`
         //isDev ? `http://localhost:3000` : `file://${path.join(__dirname, '/../build/index.html')}`
     );
 
@@ -129,6 +129,21 @@ function getDocument(event, req) {
         event.sender.send('all-document', res);
     });
 }
+// function for add_users : 
+
+function addUser(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('user-added-success', { message: 'Utilisateur ajouté avec succès!' });
+    })
+}
+
+function getUsers(event, req) {
+    pool.query('SELECT * FROM utilisateur WHERE', (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-users', res);
+    })
+}
 
 /**
  * In this following code is the main 
@@ -160,6 +175,9 @@ app.whenReady().then(() => {
     // document à fournir : 
     ipcMain.on('get-document', getDocument);
     ipcMain.on('add-document', addDocument);
+    // for users :
+    ipcMain.on('get-users', getUsers);
+    ipcMain.on('add-user', addUser);
     // set the App title
     ipcMain.on('set-title', handleSetTitle);
     createWindow();
