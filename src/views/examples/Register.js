@@ -2,6 +2,9 @@ import {
   Button,
   Card,
   CardHeader,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   CardBody,
   FormGroup,
   Form,
@@ -21,10 +24,15 @@ const Register = () => {
 
   const [error, setError] = useState("");
   const [showPwd, setShowPwd] = useState(false);
+  const [showConfirmPwd, setShowConfirmPwd] = useState(false);
   const [success, setSuccess] = useState("");
 
   const toggleShowPwd = () => {
     setShowPwd(!showPwd);
+  }
+
+  const toggleShowConfirmPwd = () => {
+    setShowConfirmPwd(!showConfirmPwd);
   }
 
   const onSubmit = (e) => {
@@ -150,8 +158,8 @@ const Register = () => {
                             value={userData.telephone}
                             id="input-phone"
                             required
-                            placeholder="First name"
-                            type="text"
+                            placeholder="696879475"
+                            type="number"
                           />
                         </FormGroup>
                       </Col>
@@ -193,19 +201,26 @@ const Register = () => {
                           >
                             Mot de passe
                           </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-password"
-                            name="password"
-                            defaultValue={userData.password}
-                            onChange={handleChange}
-                            placeholder="mot_de_passe"
-                            type="password"
-                            required
-                          />
+                          <InputGroup className="input-group-alternative">
+                              <Input
+                                //className="form-control-alternative"
+                                id="input-password"
+                                onChange={handleChange}
+                                defaultValue={userData.password}
+                                name="password"
+                                placeholder="mot_de_passe"
+                                type={showPwd ? "text" : "password"}
+                                required
+                              />
+                              <InputGroupAddon addonType="prepend">
+                                <InputGroupText onClick={toggleShowPwd}>
+                                  <Icon className="absolute mr-10" icon={showPwd ? eye : eyeOff } size={18}/>
+                                </InputGroupText>
+                              </InputGroupAddon>
+                          </InputGroup>
                         </FormGroup>
                       </Col>
-                      <Col lg="6">
+                      <Col lg="6"> 
                         <FormGroup>
                           <label
                             className="form-control-label"
@@ -213,21 +228,23 @@ const Register = () => {
                           >
                             Confirmer le mot de passe 
                           </label>
-                          <div class="mb-4 flex">
-                            <Input
-                              className="form-control-alternative"
-                              id="input-password-confirm"
-                              onChange={handleChange}
-                              defaultValue={userData.confirmPassword}
-                              name="confirmPassword"
-                              placeholder="confirm_password"
-                              type={showPwd ? "text" : "password"}
-                              required
-                            />
-                            <span class="flex justify-around items-center" onClick={toggleShowPwd}>
-                              <Icon class="absolute mr-10" icon={showPwd ? eye : eyeOff } size={25}/>
-                            </span>
-                          </div>
+                          <InputGroup className="input-group-alternative">
+                              <Input
+                                //className="form-control-alternative"
+                                id="input-password-confirm"
+                                onChange={handleChange}
+                                defaultValue={userData.confirmPassword}
+                                name="confirmPassword"
+                                placeholder="confirm_password"
+                                type={showConfirmPwd ? "text" : "password"}
+                                required
+                              />
+                              <InputGroupAddon addonType="prepend">
+                                <InputGroupText onClick={toggleShowConfirmPwd}>
+                                  <Icon className="absolute mr-10" icon={showConfirmPwd ? eye : eyeOff } size={18}/>
+                                </InputGroupText>
+                              </InputGroupAddon>
+                          </InputGroup>
                         </FormGroup>
                       </Col>
                     </Row>
