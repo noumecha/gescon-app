@@ -228,7 +228,7 @@ const Sidebar = (props) => {
           <Nav className="mb-md-3" navbar>
             <NavItem>
               <NavLink 
-                to="/"
+                to="/admin/conges"
                 tag={NavLinkRRD}
                 onClick={closeCollapse}
               >
@@ -256,9 +256,7 @@ const Sidebar = (props) => {
                 Paramètres
               </NavLink>
             </NavItem>
-          </Nav>
-          <Nav className="mb-md-3" navbar>
-            <NavItem className="active-pro active">
+            <NavItem>
               <NavLink
                 tag={NavLinkRRD}
                 onClick={handleLogout}           

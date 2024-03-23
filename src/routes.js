@@ -11,6 +11,7 @@ import Permission from "views/examples/Permission";
 import Attestation from "views/examples/Attestation";
 import FichePersonnel from "views/examples/FichePersonnel";
 import ArchiveAttestation from "views/examples/ArchiveAttestation";
+import PersonnelDetails from "views/examples/PersonnelDetails";
 
 var routes = [
   {
@@ -20,13 +21,6 @@ var routes = [
     component: <Index />,
     layout: "/admin",
   },
-  /*{
-    path: "/icons",
-    name: "Icons",
-    icon: "ni ni-planet text-blue",
-    component: <Icons />,
-    layout: "/admin",
-  },*/
   {
     path: "/conges",
     name: "Congés",
@@ -46,6 +40,13 @@ var routes = [
     name: "Personnel",
     icon: "ni ni-single-02 text-blue",
     component: <Personnel />,
+    layout: "/admin",
+  },
+  {
+    path: "/admin/personnel-details/:id",
+    name: "Détails",
+    icon: "ni ni-circle-08 text-blue",
+    component: <PersonnelDetails />,
     layout: "/admin",
   },
   {
@@ -95,7 +96,7 @@ var routes = [
     name: "Ajouter des utilisateurs",
     icon: "ni ni-circle-08 text-blue",
     component: <Register />,
-    layout: "/auth",
+    layout: "/admin",
   },
 ];
 export default routes;
