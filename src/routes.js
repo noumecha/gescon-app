@@ -96,7 +96,7 @@ var routes = [
     name: "Ajouter des utilisateurs",
     icon: "ni ni-circle-08 text-blue",
     component: <Register />,
-    layout: "/auth",
+    layout: "/admin",
   },
 ];
 export default routes;
