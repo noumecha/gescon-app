@@ -50,7 +50,7 @@ const Conges = () => {
   const [selectedType, setSelectedType] = useState("");
   const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom : "TCHUENTE");
   const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule : "XD3 566");
-  const [type, setType] = useState(selectedPerson ? selectedPerson.type === 1 ? "Contractuelle" : "Fonctionnaire" : "Contractuelle");
+  const [type, setType] = useState(selectedPerson ? selectedPerson.type === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
   const [dec, setDec] = useState("");
   const [struc, setStruc] = useState(selectedPerson ? selectedPerson.structure : "Service Général");
 
