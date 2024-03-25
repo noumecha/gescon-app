@@ -1,6 +1,4 @@
-/* eslint-disable no-unused-vars */
 import {
-  Badge,
   Card,
   Button,
   CardHeader,
@@ -10,32 +8,16 @@ import {
   Form,
   Input,
   Label,
-  Modal,
-  InputGroupAddon,
-  InputGroupText,
-  InputGroup,
   Col,
-  CardFooter,
-  DropdownMenu,
-  DropdownItem,
-  UncontrolledDropdown,
-  DropdownToggle,
-  Media,
-  Pagination,
-  PaginationItem,
-  PaginationLink,
-  Progress,
-  Table,
   Container,
   Row,
-  UncontrolledTooltip,
 } from "reactstrap";
 // core components
 import Header from "components/Headers/Header.js";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { PDFViewer,PDFDownloadLink } from '@react-pdf/renderer';
-import MyDocument from "documents/MyDocument";
+import CongeDoc from "documents/CongeDoc";
 
 const Conges = () => {
   const location = useLocation();
@@ -53,38 +35,12 @@ const Conges = () => {
   const [type, setType] = useState(selectedPerson ? selectedPerson.type === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
   const [dec, setDec] = useState("");
   const [struc, setStruc] = useState(selectedPerson ? selectedPerson.structure : "Service Général");
+  const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste : "Contrôleur");
+  const sexe = selectedPerson ? selectedPerson.sexe : "M";
 
-  const handleStrucChange = (e) => {
-    setStruc(e.target.value);
-  }
-
-  const handleDecChange = (e) => {
-    setDec(e.target.value)
-  }
-
-  const handleTypeChange = (e) => {
-    setType(e.target.value)
-  }
-
-  const handleNameChange = (e) => {
-    setName(e.target.value);
-  }
-
-  const handleMatriculeChange = (e) => {
-    setMatricule(e.target.value);
-  }
-
-  const handleStartDateChange = (e) => {
-    setStartDate(e.target.value);
-  }
-
-  const handleDurationChange = (e) => {
-    setDuration(e.target.value);
-  }
-
-  const handleSelectedTypeChange = (e) => {
-    setSelectedType(e.target.value);
-  }
+  const handleInputChange = (setStateFunction) => (e) => {
+    setStateFunction(e.target.value);
+  };
 
   useEffect(() => {
     const calculateEndDate = () => {
@@ -119,7 +75,7 @@ const Conges = () => {
         }
     }
     func();
-  }, []);
+  }, [decision]);
 
   return (
     <>
@@ -127,7 +83,7 @@ const Conges = () => {
       {/* Page content */}
       <Container className="mt--7" fluid>
         <Row>
-          <Col className="order-xl-1" xl="8">
+          <Col className="order-xl-1" md="12" lg="12">
             <Card className="bg-secondary shadow">
               <CardHeader className="bg-white border-0">
                 <Row className="align-items-center">
@@ -155,7 +111,7 @@ const Conges = () => {
                             className="form-control-alternative"
                             id="input-username"
                             defaultValue={name}
-                            onChange={handleNameChange}
+                            onChange={handleInputChange(setName)}
                             placeholder="Nom "
                             type="text"
                           />
@@ -192,7 +148,7 @@ const Conges = () => {
                             className="form-control-alternative"
                             id="input-matricule"
                             defaultValue={matricule}
-                            onChange={handleMatriculeChange}
+                            onChange={handleInputChange(setMatricule)}
                             placeholder="Matricule"
                             type="text"
                           />
@@ -208,7 +164,8 @@ const Conges = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue={selectedPerson ? selectedPerson.poste : "SG"}
+                            defaultValue={poste}
+                            onChange={handleInputChange(setPoste)}
                             id="input-poste"
                             placeholder="poste"
                             type="text"
@@ -229,7 +186,7 @@ const Conges = () => {
                             className="form-control-alternative"
                             defaultValue={type}
                             id="input-type"
-                            onChange={handleTypeChange}
+                            onChange={handleInputChange(setType)}
                             placeholder="type personnel"
                             type="text"
                           />
@@ -247,7 +204,7 @@ const Conges = () => {
                             className="form-control-alternative"
                             defaultValue={struc}
                             id="input-structure"
-                            onChange={handleStrucChange}
+                            onChange={handleInputChange(setStruc)}
                             placeholder="structure de travail"
                             type="text"
                           />
@@ -272,7 +229,7 @@ const Conges = () => {
                             type="select"
                             id="type-conge"
                             defaultValue="choisir le type de congé"
-                            onChange={handleSelectedTypeChange}
+                            onChange={handleInputChange(setSelectedType)}
                           >
                             {typeConge && typeConge.length > 0 
                               ? typeConge.map((t, i) => (
@@ -286,10 +243,9 @@ const Conges = () => {
                     </Row>
                     <Row>
                       <Col>  
-                        <FormGroup row>
+                        <FormGroup>
                           <Label
                             for="demande-file"
-                            sm={2}
                           >
                             Demande Timbré
                           </Label>
@@ -307,10 +263,9 @@ const Conges = () => {
                     {selectedType === "congé maladie" || selectedType === "congé maternité" ? (
                       <Row>
                         <Col>
-                          <FormGroup row>
+                          <FormGroup>
                             <Label
                               for="exampleFile"
-                              sm={2}
                             >
                               Document
                             </Label>
@@ -337,7 +292,7 @@ const Conges = () => {
                           <Input
                             id="date-depart"
                             name="date"
-                            onChange={handleStartDateChange}
+                            onChange={handleInputChange(setStartDate)}
                             value={startDate}
                             placeholder="date"
                             type="date"
@@ -352,7 +307,7 @@ const Conges = () => {
                           <Input
                             id="duree"
                             value={duration}
-                            onChange={handleDurationChange}
+                            onChange={handleInputChange(setDuration)}
                             name="datetitme"
                             placeholder="duree en jours"
                             type="number"
@@ -385,7 +340,7 @@ const Conges = () => {
                             className="mb-3"
                             type="select"
                             id="num-decision"
-                            onChange={handleDecChange}
+                            onChange={handleInputChange(setDecision)}
                           >
                             {decision && decision.length > 0 
                               ? decision.map((d, i) => (
@@ -415,9 +370,11 @@ const Conges = () => {
         <Row>
           <Col md="12">
             <PDFViewer width="100%" height="100%">
-              <MyDocument 
+              <CongeDoc 
                 name={name} 
-                matricule={matricule} 
+                matricule={matricule}
+                sexe={sexe}
+                poste={poste} 
                 type={type} 
                 decision={dec} 
                 duration={duration} 
@@ -430,16 +387,19 @@ const Conges = () => {
             </PDFViewer>
           </Col>
           <Col md="12">
-            <PDFDownloadLink document={<MyDocument 
+            <PDFDownloadLink document={<CongeDoc 
               name={name} 
-              matricule={matricule} 
+              matricule={matricule}
+              sexe={sexe}
+              poste={poste} 
               type={type} 
               decision={dec} 
               duration={duration} 
               structure={struc}
               startDate={startDate}
               endDate={endDate}
-              repriseDate={repriseDate}/>} fileName="attestation_test.pdf">
+              repriseDate={repriseDate}
+              typeConge={selectedType}/>} fileName="attestation_test.pdf">
               {({ blob, url, loading, error }) => (loading ? 'Loading document...' : <Button color="primary">Télécharger l'attestation </Button>)}
             </PDFDownloadLink>
           </Col>

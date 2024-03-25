@@ -178,7 +178,7 @@ const PermissionDoc = (props) => {
                         CERTIFICAT OF DEPARTURE ON LEAVE
                     </Text>
                     <Text style={styles.pCertifText}>
-                        Le Directeur Général du Budget, sousigné, certifie que M/Mme {props.name}, 
+                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
                         {props.type} d'Administration, Mle {props.matricule}, en service au {props.structure} est bénéficiaire
                         d'un {props.typeConge}  consécutif de {props.duration} jours , accordé par décision N° {props.decision}
                          {/*du DATE_DEC*/} du Ministre des finances.

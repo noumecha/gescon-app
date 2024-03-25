@@ -86,9 +86,8 @@ const styles = StyleSheet.create({
 });
 
 // Create Document Component
-const MyDocument = (props) => {
+const CongeDoc = (props) => {
 
-    console.log("props doc : ",props);
     return (
         <Document>
         <Page size="A4" style={styles.page}>
@@ -180,7 +179,7 @@ const MyDocument = (props) => {
                     </Text>
                     <Text style={styles.pCertifText}>
                         Le Directeur Général du Budget, sousigné, certifie que M/Mme {props.name}, 
-                        {props.type} d'Administration, Mle {props.matricule}, en service au {props.structure} est bénéficiaire
+                        {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service au {props.structure} est bénéficiaire
                         d'un {props.typeConge}  consécutif de {props.duration} jours , accordé par décision N° {props.decision}
                          {/*du DATE_DEC*/} du Ministre des finances.
                     </Text>
@@ -222,4 +221,4 @@ const MyDocument = (props) => {
 
 };
 
-export default MyDocument;
+export default CongeDoc;
