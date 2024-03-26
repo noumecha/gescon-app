@@ -1,7 +1,30 @@
 // reactstrap components
 import { Card, CardBody, CardTitle, Container, Row, Col } from "reactstrap";
+import { useState, useEffect } from "react";
 
 const Header = () => {
+
+  const [demande, setDemande] = useState([]);
+  const [conge, setConge] = useState([]);
+
+  useEffect(() => {
+    const func = async () => {
+        try {
+            window.electronAPI.getDemande();
+            await window.electronAPI.retrieveDemande((event, res) => {
+              setDemande(res);
+            })
+            window.electronAPI.getConge();
+            await window.electronAPI.retrieveConge((event, res) => {
+              setConge(res);
+            })
+        } catch (error) {
+            console.error("Erreur : " + error.message);
+        }
+    }
+    func();
+  }, []);
+
   return (
     <>
       <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
@@ -21,7 +44,7 @@ const Header = () => {
                           Demandes de Congés
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
-                          350,897
+                          {demande ? demande.length : "" }
                         </span>
                       </div>
                       <Col className="col-auto">
@@ -32,7 +55,7 @@ const Header = () => {
                     </Row>
                     <p className="mt-3 mb-0 text-muted text-sm">
                       <span className="text-success mr-2">
-                        <i className="fa fa-arrow-up" /> 3.48%
+                        <i className="fa fa-arrow-up" /> 0%
                       </span>{" "}
                       <span className="text-nowrap">Depuis le dernier mois</span>
                     </p>
@@ -50,7 +73,9 @@ const Header = () => {
                         >
                           Congés accordés
                         </CardTitle>
-                        <span className="h2 font-weight-bold mb-0">924</span>
+                        <span className="h2 font-weight-bold mb-0">
+                          { conge ? conge.length : 0 }
+                        </span>
                       </div>
                       <Col className="col-auto">
                         <div className="icon icon-shape bg-yellow text-white rounded-circle shadow">
@@ -60,7 +85,7 @@ const Header = () => {
                     </Row>
                     <p className="mt-3 mb-0 text-muted text-sm">
                       <span className="text-warning mr-2">
-                        <i className="fas fa-arrow-down" /> 1.10%
+                        <i className="fas fa-arrow-down" /> 0%
                       </span>{" "}
                       <span className="text-nowrap">Depuis hier</span>
                     </p>
