@@ -4,85 +4,164 @@ import image from './docs-images/sceau-img.PNG';
 
 // Create styles
 const styles = StyleSheet.create({
-  page: {
-    flexDirection: 'column',
-    display: 'flex',
-    backgroundColor: 'white',
-    padding: 10,
-    overflow: 'hidden',
-    position: 'absolute',
-  },
-  container: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-  },
-  containerTwo: {
-    display: 'flex',
-    justifyContent: 'space-evenly',
-    flexDirection: 'column',
-  },
-  containerThree: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    justifyContent: 'space-evenly',
-    flexDirection: 'column',
-  },
-  section: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  h1CertifTitle: {
-    fontSize: 12,
-    marginTop: 3,
-    fontWeight: 'bold',
-    color: '#000000',
-    textAlign: 'center',
-    textDecoration: 'underline',
-  },
-  h2CertifSubtitle: {
-    fontSize: 11,
-    marginTop: 3,
-    fontWeight: 'normal',
-    color: '#000000',
-    textAlign: 'center',
-  },
-  pCertifText: {
-    marginTop: 3,
-    fontSize: 10,
-    textAlign: 'justify'
-  },
-  h1Title: {
-    fontSize: 12,
-    marginTop: 3,
-    fontWeight: 'bold',
-    color: '#000000',
-    textAlign: 'center'
-  },
-  h4Title: {
-    fontSize: 10,
-    marginTop: 1,
-    fontWeight: 'normal',
-    color: '#000000',
-    textAlign: 'center'
-  },
-  amTitle: {
-    fontSize: 10,
-    textAlign: 'left',
-    fontWeight: 'bold',
-    marginTop: 3,
-    textDecoration: 'underline',
-  },
-  amParagraph: {
-    fontSize: 10,    
-    marginTop: 3,
-    textTransform: 'uppercase',
-    fontWeight: 'bold',
-  },
-  imageSceau: {
-    height: 100,
-    width: 100,
-  }
+    // the container element
+    page: {
+      flexDirection: 'column',
+      display: 'flex',
+      backgroundColor: 'white',
+      overflow: 'hidden',
+      fontWeight: 'normal',
+      position: 'absolute',
+    },
+    container: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      flexDirection: 'row',
+      marginLeft: 10,
+      marginRight: 10,
+      marginTop: 40,
+    },
+    containerTwo: {
+      display: 'flex',
+      marginLeft: 30,
+      marginRight: 30,
+      justifyContent: 'space-evenly',
+      flexDirection: 'column',
+    },
+    containerThree: {
+      display: 'flex',
+      alignItems: 'flex-start',
+      marginTop: 30,
+      marginLeft: 30,
+      marginRight: 30,
+      justifyContent: 'space-evenly',
+      flexDirection: 'column',
+    },
+    // footer left section
+    sectionLeftBottom: {
+      display: 'flex',
+    },
+    section: {
+      display: 'flex',
+      alignItems: 'center',
+    },
+    topSection: {
+        alignItems: 'center',
+        flex: 1,
+    },
+    topSectionImage: {
+        alignItems: 'center',
+        flex: 1,
+        marginTop: -15,
+    },
+    // certif title
+    h1CertifTitle: {
+      fontSize: 14,
+      marginTop: 25,
+      display: 'flex',
+      fontWeight: 'bold',
+      color: '#000000',
+      textAlign: 'center',
+      textDecoration: 'underline',
+    },
+    h2CertifSubtitle: {
+      fontSize: 12,
+      marginTop: 3,
+      fontWeight: 'normal',
+      color: '#000000',
+      textAlign: 'center',
+    },
+    // paragraphStyle:
+    pCertifText: {
+      marginTop: 15,
+      fontSize: 12,
+      display: 'flex',
+      textAlign: 'justify'
+    },
+    // top text title
+    h1TitleFirst: {
+      fontSize: 10,
+      fontWeight: 'bold',
+      color: '#000000',
+      textAlign: 'center'
+    },
+    h1Title: {
+        fontSize: 10,
+        marginTop: -5,
+        fontWeight: 'bold',
+        color: '#000000',
+        textAlign: 'center'
+    },
+    h4Title: {
+        fontSize: 10,
+        marginTop: -5,
+        fontWeight: 'normal',
+        color: '#000000',
+        textAlign: 'center'
+    },
+    h4TitleNumber: {
+        fontSize: 10,
+        marginTop: 10,
+        fontWeight: 'bold',
+        color: '#000000',
+        textAlign: 'center'
+    },
+    h4TitleDate: {
+      fontSize: 10,
+      marginTop: 10,
+      fontWeight: 'bold',
+      color: '#000000',
+      textAlign: 'center'
+    },
+    // on footer ampliations text
+    amTitle: {
+      fontSize: 12,
+      textAlign: 'left',
+      fontWeight: 'bold',
+      marginTop: 3,
+      textDecoration: 'underline',
+    },  
+    amParagraph1: {
+      fontSize: 10, 
+      marginTop: 3,
+      marginLeft: 5,
+      textTransform: 'uppercase',
+      fontWeight: 'bold',
+    },
+    amParagraph2: {
+      fontSize: 10,    
+      marginTop: 3,
+      marginLeft: 10,
+      textTransform: 'uppercase',
+      fontWeight: 'bold',
+      textAlign: 'left',
+    },
+    amParagraph3: {
+      fontSize: 10,    
+      marginTop: 3,
+      marginLeft: 15,
+      textTransform: 'uppercase',
+      fontWeight: 'bold',
+    },
+    amParagraph4: {
+      fontSize: 10,    
+      marginTop: 3,
+      marginLeft: 20,
+      textTransform: 'uppercase',
+      fontWeight: 'bold',
+    },
+    amParagraph5: {
+        fontSize: 10,    
+        marginTop: 3,
+        marginLeft: 25,
+        textTransform: 'uppercase',
+        fontWeight: 'bold',
+    },
+    // center first section logo
+    imageSceau: {
+        height: 100,
+        width: 100,
+    }
 });
 
 // Create Document Component
@@ -94,8 +173,8 @@ const CongeDoc = (props) => {
             {/* first row : entete */}
             <View style={styles.container}>
                 {/* top left text */}
-                <View style={styles.section}>
-                    <Text style={styles.h1Title}>
+                <View style={styles.topSection}>
+                    <Text style={styles.h1TitleFirst}>
                         REPUBLIQUE DU CAMEROUN
                     </Text>
                     <Text>********</Text>
@@ -123,20 +202,17 @@ const CongeDoc = (props) => {
                         SERVICE DU PERSONNEL
                     </Text>
                     <Text>********</Text>
-                    <Text style={styles.h4Title}>
-                        N°__________________/CDC/MINFI/SG/DGB/SDAG/SP/AAN
+                    <Text style={styles.h4TitleNumber}>
+                        N°__________/CDC/MINFI/SG/DGB/SDAG/SP/AAN
                     </Text>
                 </View>
                 {/* image */}
-                <View style={styles.section}>
-                    <Image style={styles.imageSceau} src={image}/>
-                    {/*<Text style={styles.logoCenter}>
-                        Image center    
-                    </Text>*/}    
+                <View style={styles.topSectionImage}>
+                    <Image style={styles.imageSceau} src={image}/> 
                 </View>
                 {/* top right text */}
-                <View style={styles.section}>
-                    <Text style={styles.h1Title}>
+                <View style={styles.topSection}>
+                    <Text style={styles.h1TitleFirst}>
                         REPUBLIC OF CAMEROON
                     </Text>
                     <Text>********</Text>
@@ -164,8 +240,8 @@ const CongeDoc = (props) => {
                         PERSONNEL DEPARTEMENT
                     </Text>
                     <Text>********</Text>
-                    <Text style={styles.h4Title}>
-                        Yaoundé le 
+                    <Text style={styles.h4TitleDate}>
+                        Yaoundé le ___________________
                     </Text>
                 </View>
             </View>
@@ -194,24 +270,24 @@ const CongeDoc = (props) => {
                 </View>
             </View>
             <View style={styles.containerThree}>
-                <View style={styles.section}>
+                <View style={styles.sectionLeftBottom}>
                     <Text style={styles.amTitle}>
-                        Ampliations
+                        Ampliations :
                     </Text>
-                    <Text style={styles.amParagraph}>
+                    <Text style={styles.amParagraph1}>
                         - minfi/cab
                     </Text>
-                    <Text style={styles.amParagraph}>
-                            - minfi/sg/drh
+                    <Text style={styles.amParagraph2}>
+                        - minfi/sg/drh
                     </Text>
-                    <Text style={styles.amParagraph}>
-                                - dgb/sdag/cfs-fs/df
+                    <Text style={styles.amParagraph3}>
+                        - dgb/sdag/cfs-fs/df
                     </Text>
-                    <Text style={styles.amParagraph}>
-                                    - interessee/dossier
+                    <Text style={styles.amParagraph4}>
+                        - interessee/dossier
                     </Text>
-                    <Text style={styles.amParagraph}>
-                                            - chrono/archives
+                    <Text style={styles.amParagraph5}>
+                        - chrono/archives
                     </Text>
                 </View>
             </View>
