@@ -93,6 +93,7 @@
     "react-dom": "18.2.0",
     "react-icons-kit": "^2.0.0",
     "react-paginate": "^8.2.0",
+    "react-qr-code": "^2.0.12",
     "react-router-dom": "6.21.1",
     "react-scripts": "^5.0.1",
     "reactstrap": "8.10.0",

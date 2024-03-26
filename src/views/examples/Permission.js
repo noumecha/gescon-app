@@ -27,6 +27,7 @@ const Permission = () => {
     const [telephone, setTelephone] = useState(selectedPerson ? selectedPerson.telephone : "653465348");
     const [startDate, setStartDate] = useState("");
     const [decision, setDecision] = useState([]);
+    const [selectedDec, setSelectedDec] = useState("");
     const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule : "XD3 566");
     const [type, setType] = useState(selectedPerson ? selectedPerson.type === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
     const [structure, setStructure] = useState(selectedPerson ? selectedPerson.structure : "Service Général");
@@ -38,6 +39,14 @@ const Permission = () => {
         setStateFunction(e.target.value);
     };
 
+    const addPersmission = async (e) => {
+        e.preventDefault();
+        try {
+            
+        } catch (error) {
+            
+        }
+    }
 
     useEffect(() => {
         const calculateEndDate = () => {
@@ -288,7 +297,7 @@ const Permission = () => {
                                         className="mb-3"
                                         type="select"
                                         id="num-decision"
-                                        onChange={handleInputChange(setDecision)}
+                                        onChange={handleInputChange(setSelectedDec)}
                                     >
                                         {decision && decision.length > 0 
                                         ? decision.map((d, i) => (
@@ -303,9 +312,11 @@ const Permission = () => {
                             <Row>
                                 <Col md="6">
                                     <Button
-                                    color="primary"
+                                        color="primary"
+                                        onClick={addPersmission}
+                                        onSubmit={addPersmission}
                                     >
-                                    Générer l'attestation
+                                        Générer l'attestation
                                     </Button>
                                 </Col>
                             </Row>
@@ -319,32 +330,33 @@ const Permission = () => {
                 <Col md="12">
                     <PDFViewer width="100%" height="100%">
                         <PermissionDoc 
-                            name="{name}"
-                            matricule="{matricule}"
+                            name={name}
+                            matricule={matricule}
                             sexe={sexe}
-                            type="{type}" 
-                            decision="{dec}" 
-                            duration="{duration}" 
-                            structure="{struc}"
-                            startDate="{startDate}"
-                            endDate="{endDate}"
-                            repriseDate="{repriseDate}"
-                            typeConge="{selectedType}"
+                            type={type}
+                            poste={poste}
+                            decision={selectedDec} 
+                            duration={duration} 
+                            structure={structure}
+                            startDate={startDate}
+                            endDate={endDate}
+                            repriseDate={repDate}
                         />
                     </PDFViewer>
                 </Col>
                 <Col md="12">
                 <PDFDownloadLink document={<PermissionDoc 
-                    name="{name}"
-                    matricule="{matricule}"
-                    type="{type}" 
-                    decision="{dec}" 
-                    duration="{duration}" 
-                    structure="{struc}"
-                    startDate="{startDate}"
-                    endDate="{endDate}"
-                    repriseDate="{repriseDate}"
-                    typeConge="{selectedType}"
+                    name={name}
+                    matricule={matricule}
+                    sexe={sexe}
+                    type={type}
+                    poste={poste}
+                    decision={selectedDec} 
+                    duration={duration} 
+                    structure={structure}
+                    startDate={startDate}
+                    endDate={endDate}
+                    repriseDate={repDate}
                 />} fileName="attestation_test.pdf">
                 {({ blob, url, loading, error }) => (loading ? 'Loading document...' : <Button color="primary">Télécharger l'attestation </Button>)}
                 </PDFDownloadLink>
