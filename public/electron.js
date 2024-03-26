@@ -60,7 +60,7 @@ function getPersonnel(event, arg) {
 
 // function for decision : 
 function getDecision(event, arg) {
-    pool.query('SELECT * FROM decision', (err, res) => {
+    pool.query('SELECT id_decision,numero_decision,objet_decision,signataire_decision,date_decision,libelle_type_personnel FROM decision,type_personnel WHERE decision.type_personnel = type_personnel.id_type_personnel', (err, res) => {
         if (err) throw err;
         event.sender.send('all-decision', res);
     });
@@ -70,6 +70,13 @@ function addDecision(event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
         event.sender.send('decision-added-success', { message: 'Decision ajouté avec succès!' });
+    })
+}
+
+function deleteDecision(event, req) {
+    pool.query(req, (err) =>{
+        if (err) throw err;
+        event.sender.send('decision-deleted-success', { message: 'Decision supprimée avec succès!' });
     })
 }
 
@@ -163,6 +170,7 @@ app.whenReady().then(() => {
     // decision data get : 
     ipcMain.on('get-decision', getDecision);
     ipcMain.on('add-decision', addDecision);
+    ipcMain.on('delete-decision', deleteDecision);
     // conge type data get : 
     ipcMain.on('get-conge-type', getCongeType);
     ipcMain.on('add-conge-type', addCongeType);
