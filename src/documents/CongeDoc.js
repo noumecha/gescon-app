@@ -191,11 +191,11 @@ const CongeDoc = (props) => {
                     </Text>
                     <Text>********</Text>
                     <Text style={styles.h1Title}>
-                        DIRECTION GENERAL DU BUDGET
+                        DIRECTION GENERALE DU BUDGET
                     </Text>
                     <Text>********</Text>
                     <Text style={styles.h1Title}>
-                        SOUS-DIRECTION DES AFFAIRES GENERAL
+                        SOUS-DIRECTION DES AFFAIRES GENERALES
                     </Text>
                     <Text>********</Text>
                     <Text style={styles.h1Title}>
@@ -203,7 +203,7 @@ const CongeDoc = (props) => {
                     </Text>
                     <Text>********</Text>
                     <Text style={styles.h4TitleNumber}>
-                        N°__________/CDC/MINFI/SG/DGB/SDAG/SP/AAN
+                        N°__________/CDC/MINFI/SG/DGB/SDAG/SP
                     </Text>
                 </View>
                 {/* image */}
@@ -254,17 +254,17 @@ const CongeDoc = (props) => {
                         CERTIFICAT OF DEPARTURE ON LEAVE
                     </Text>
                     <Text style={styles.pCertifText}>
-                        Le Directeur Général du Budget, sousigné, certifie que M/Mme {props.name}, 
+                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
                         {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service au {props.structure} est bénéficiaire
-                        d'un {props.typeConge}  consécutif de {props.duration} jours , accordé par décision N° {props.decision}
+                        d'un {props.typeConge} de {props.duration} jours , accordé par décision N° {props.decision}
                          {/*du DATE_DEC*/} du Ministre des finances.
                     </Text>
                     <Text style={styles.pCertifText}>
-                        L'intéressé{"(e)"} jouira dudit congé pendant la période du {props.startDate} au {props.endDate} et 
-                        reprendra le service {props.repriseDate} à 7 heures 30 précises.
+                        L'intéressé{props.sexe === "M" ? "" : "e"} jouira dudit congé pendant la période du {props.startDate} au {props.endDate} et 
+                        reprendra le service le {props.repriseDate} à 7 heures 30 précises.
                     </Text>
                     <Text style={styles.pCertifText}>
-                        En foi de quoi, le présent certificat est établi et délivrée à l'intéressé{"(e)"} pour
+                        En foi de quoi, le présent certificat est établi et délivré à l'intéressé{props.sexe === "M" ? "" : "e"} pour
                         servir et valoir ce que de droit./-
                     </Text>
                 </View>

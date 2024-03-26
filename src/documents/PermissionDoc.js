@@ -1,6 +1,7 @@
 import React from 'react';
 import { Page, Text, View, Document,Image, StyleSheet } from '@react-pdf/renderer';
 import image from './docs-images/sceau-img.PNG';
+//import QrCode from './QrCode';
 
 // Create styles
 const styles = StyleSheet.create({
@@ -30,16 +31,18 @@ const styles = StyleSheet.create({
     },
     containerThree: {
       display: 'flex',
-      alignItems: 'flex-start',
       marginTop: 30,
       marginLeft: 30,
       marginRight: 30,
-      justifyContent: 'space-evenly',
-      flexDirection: 'column',
+      justifyContent: 'space-between',
+      flexDirection: 'row',
     },
     // footer left section
     sectionLeftBottom: {
       display: 'flex',
+    },    
+    sectionRightBottom: {
+        display: 'flex',
     },
     section: {
       display: 'flex',
@@ -161,11 +164,20 @@ const styles = StyleSheet.create({
     imageSceau: {
         height: 100,
         width: 100,
+    },
+    qrCode: {
+        height: 100,
+        width: 100,
     }
 });
 
 // Create Document Component
 const PermissionDoc = (props) => {
+
+    /*const data = JSON.stringify({
+        name: props.name,
+        matricule : props.matricule,
+    })*/
 
     return (
         <Document>
@@ -191,11 +203,11 @@ const PermissionDoc = (props) => {
                     </Text>
                     <Text>********</Text>
                     <Text style={styles.h1Title}>
-                        DIRECTION GENERAL DU BUDGET
+                        DIRECTION GENERALE DU BUDGET
                     </Text>
                     <Text>********</Text>
                     <Text style={styles.h1Title}>
-                        SOUS-DIRECTION DES AFFAIRES GENERAL
+                        SOUS-DIRECTION DES AFFAIRES GENERALES
                     </Text>
                     <Text>********</Text>
                     <Text style={styles.h1Title}>
@@ -203,7 +215,7 @@ const PermissionDoc = (props) => {
                     </Text>
                     <Text>********</Text>
                     <Text style={styles.h4TitleNumber}>
-                        N°__________/CDC/MINFI/SG/DGB/SDAG/SP/AAN
+                        N°__________/CDC/MINFI/SG/DGB/SDAG/SP
                     </Text>
                 </View>
                 {/* image */}
@@ -255,16 +267,16 @@ const PermissionDoc = (props) => {
                     </Text>
                     <Text style={styles.pCertifText}>
                         Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
-                        {props.type} d'Administration, Mle {props.matricule}, en service au {props.structure} est bénéficiaire
-                        d'une permission consécutive de {props.duration} jours , accordé par décision N° {props.decision}
+                        {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service au {props.structure} est bénéficiaire
+                        d'une permission de {props.duration} jours , accordé par décision N° {props.decision}
                          {/*du DATE_DEC*/} du Ministre des finances.
                     </Text>
                     <Text style={styles.pCertifText}>
-                        L'intéressé{"(e)"} jouira dudit congé pendant la période du {props.startDate} au {props.endDate} et 
-                        reprendra le service {props.repriseDate} à 7 heures 30 précises.
+                        L'intéressé{props.sexe === "M" ? "" : "e"} jouira dudit congé pendant la période du {props.startDate} au {props.endDate} et 
+                        reprendra le service le {props.repriseDate} à 7 heures 30 précises.
                     </Text>
                     <Text style={styles.pCertifText}>
-                        En foi de quoi, le présent certificat est établi et délivrée à l'intéressé{"(e)"} pour
+                        En foi de quoi, le présent certificat est établi et délivré à l'intéressé{props.sexe === "M" ? "" : "e"} pour
                         servir et valoir ce que de droit./-
                     </Text>
                 </View>
@@ -290,6 +302,9 @@ const PermissionDoc = (props) => {
                         - chrono/archives
                     </Text>
                 </View>
+                {/*<View style={styles.sectionRightBottom}>
+                    <Image src={QrCode} style={styles.qrCode} />
+                </View>*/}
             </View>
         </Page>
       </Document>

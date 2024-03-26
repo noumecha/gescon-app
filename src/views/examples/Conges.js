@@ -33,7 +33,7 @@ const Conges = () => {
   const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom : "TCHUENTE");
   const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule : "XD3 566");
   const [type, setType] = useState(selectedPerson ? selectedPerson.type === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
-  const [dec, setDec] = useState("");
+  const [selectedDec, setSelectedDec] = useState("");
   const [struc, setStruc] = useState(selectedPerson ? selectedPerson.structure : "Service Général");
   const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste : "Contrôleur");
   const sexe = selectedPerson ? selectedPerson.sexe : "M";
@@ -58,7 +58,7 @@ const Conges = () => {
     calculateEndDate();
   }, [startDate, duration]);
 
-  /** useeffect for common function and fetching */
+  /** useEffect for common function and fetching */
   useEffect(() => {
     const func = async () => {
         try {
@@ -75,7 +75,7 @@ const Conges = () => {
         }
     }
     func();
-  }, [decision]);
+  }, []);
 
   return (
     <>
@@ -340,14 +340,14 @@ const Conges = () => {
                             className="mb-3"
                             type="select"
                             id="num-decision"
-                            onChange={handleInputChange(setDecision)}
+                            onChange={handleInputChange(setSelectedDec)}
                           >
                             {decision && decision.length > 0 
                               ? decision.map((d, i) => (
                                 <option key={i}>{d.numero_decision}</option>
                               ))
                               : (<option>Selectionner le numero de décision</option>)
-                            }
+                              }
                           </Input>
                         </FormGroup>
                       </Col>
@@ -376,7 +376,7 @@ const Conges = () => {
                 sexe={sexe}
                 poste={poste} 
                 type={type} 
-                decision={dec} 
+                decision={selectedDec} 
                 duration={duration} 
                 structure={struc}
                 startDate={startDate}
@@ -393,7 +393,7 @@ const Conges = () => {
               sexe={sexe}
               poste={poste} 
               type={type} 
-              decision={dec} 
+              decision={selectedDec} 
               duration={duration} 
               structure={struc}
               startDate={startDate}
