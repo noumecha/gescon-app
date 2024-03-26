@@ -24,6 +24,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     // decision : 
     decisionAddedSuccess: (callback) => ipcRenderer.on('decision-added-success', callback),
     addDecision: (req) => ipcRenderer.send('add-decision', req),
+    deleteDecisionSuccess: (callback) => ipcRenderer.on('decision-deleted-success', callback),
+    deleteDecision: (req) => ipcRenderer.send('delete-decision', req),
     getDecision: () => ipcRenderer.send('get-decision'),
     retrieveDecision: (callback) => ipcRenderer.on('all-decision', callback),
     // demande :

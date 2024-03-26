@@ -316,7 +316,6 @@ const Personnel = () => {
                                                                 Nouvelle permission
                                                             </DropdownItem>
                                                             <DropdownItem
-                                                                href="#pablo"
                                                                 onClick={(e) => e.preventDefault()}
                                                             >
                                                                 Détails
