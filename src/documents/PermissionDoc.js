@@ -168,6 +168,27 @@ const styles = StyleSheet.create({
     qrCode: {
         height: 100,
         width: 100,
+    },
+    // center text : 
+    containerQr: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        flexDirection: 'column',
+        marginLeft: 10,
+        marginRight: 10,
+        marginTop: 40,
+    },
+    sectionQr: {
+      display: 'flex',
+      alignItems: 'center',
+    },
+    qrText: {
+        textAlign: 'center',
+        fontSize: 10, 
+        marginTop: 3,
+        marginLeft: 5,
+        textTransform: 'uppercase',
+        fontWeight: 'bold',
     }
 });
 
@@ -178,6 +199,8 @@ const PermissionDoc = (props) => {
         name: props.name,
         matricule : props.matricule,
     })*/
+
+    const d = new Date();
 
     return (
         <Document>
@@ -268,11 +291,11 @@ const PermissionDoc = (props) => {
                     <Text style={styles.pCertifText}>
                         Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
                         {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service au {props.structure} est bénéficiaire
-                        d'une permission de {props.duration} jours , accordé par décision N° {props.decision}
+                        d'une permission de {props.duration} jours , accordée par décision N° {props.decision}
                          {/*du DATE_DEC*/} du Ministre des finances.
                     </Text>
                     <Text style={styles.pCertifText}>
-                        L'intéressé{props.sexe === "M" ? "" : "e"} jouira dudit congé pendant la période du {props.startDate} au {props.endDate} et 
+                        L'intéressé{props.sexe === "M" ? "" : "e"} jouira de ladite permission pendant la période du {props.startDate} au {props.endDate} et 
                         reprendra le service le {props.repriseDate} à 7 heures 30 précises.
                     </Text>
                     <Text style={styles.pCertifText}>
@@ -305,6 +328,13 @@ const PermissionDoc = (props) => {
                 {/*<View style={styles.sectionRightBottom}>
                     <Image src={QrCode} style={styles.qrCode} />
                 </View>*/}
+            </View>
+            <View style={styles.containerQr}>
+                <View style={styles.sectionQr}>
+                    <Text style={styles.qrText}>
+                        GESCON-APP - {d.getTime()} - {d.getFullYear()}
+                    </Text>
+                </View>
             </View>
         </Page>
       </Document>

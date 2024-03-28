@@ -33,7 +33,7 @@ const Conges = () => {
   const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom : "TCHUENTE");
   const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule : "XD3 566");
   const [type, setType] = useState(selectedPerson ? selectedPerson.type === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
-  const [selectedDec, setSelectedDec] = useState("");
+  const [selectedDec, setSelectedDec] = useState(type === "Fonctionnaire" ? "00000664/D/MINFI/SG/DRH/SDP/SPF" : "00000083/D/MINFI/SG/DRH/SDP/SPF");
   const [struc, setStruc] = useState(selectedPerson ? selectedPerson.structure : "Service Général");
   const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste : "Contrôleur");
   const sexe = selectedPerson ? selectedPerson.sexe : "M";
@@ -88,6 +88,7 @@ const Conges = () => {
               <CardHeader className="bg-white border-0">
                 <Row className="align-items-center">
                   <Col xs="8">
+                    {/*decision.length > 0 && <>{JSON.stringify(decision[0].numero_decision)}</>*/}
                     <h3 className="mb-0">Définir un nouveau congé</h3>
                   </Col>
                 </Row>
@@ -340,14 +341,17 @@ const Conges = () => {
                             className="mb-3"
                             type="select"
                             id="num-decision"
+                            defaultValue={selectedDec}
+                            //onLoad={handleInputChange(setSelectedDec)}
                             onChange={handleInputChange(setSelectedDec)}
                           >
-                            {decision && decision.length > 0 
+                            {type !== "" ? type === "Fonctionnaire" ? decision.length > 0 && <option>{JSON.stringify(decision[0].numero_decision)}</option> : decision.length > 0 && <option>{JSON.stringify(decision[1].numero_decision)}</option> : <option>Selectionner le numero de décision</option>}
+                            {/*decision && decision.length > 0 
                               ? decision.map((d, i) => (
                                 <option key={i}>{d.numero_decision}</option>
                               ))
                               : (<option>Selectionner le numero de décision</option>)
-                              }
+                              */}
                           </Input>
                         </FormGroup>
                       </Col>
@@ -376,7 +380,7 @@ const Conges = () => {
                 sexe={sexe}
                 poste={poste} 
                 type={type} 
-                decision={selectedDec} 
+                decision={type === "Fonctionnaire" ? "00000664/D/MINFI/SG/DRH/SDP/SPF" : "00000083/D/MINFI/SG/DRH/SDP/SPF"} 
                 duration={duration} 
                 structure={struc}
                 startDate={startDate}
@@ -393,7 +397,7 @@ const Conges = () => {
               sexe={sexe}
               poste={poste} 
               type={type} 
-              decision={selectedDec} 
+              decision={type === "Fonctionnaire" ? "00000664/D/MINFI/SG/DRH/SDP/SPF" : "00000083/D/MINFI/SG/DRH/SDP/SPF"} 
               duration={duration} 
               structure={struc}
               startDate={startDate}

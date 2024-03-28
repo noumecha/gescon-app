@@ -161,11 +161,34 @@ const styles = StyleSheet.create({
     imageSceau: {
         height: 100,
         width: 100,
+    }, 
+    // center text : 
+    containerQr: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        flexDirection: 'column',
+        marginLeft: 10,
+        marginRight: 10,
+        marginTop: 40,
+    },
+    sectionQr: {
+      display: 'flex',
+      alignItems: 'center',
+    },
+    qrText: {
+        textAlign: 'center',
+        fontSize: 10, 
+        marginTop: 3,
+        marginLeft: 5,
+        textTransform: 'uppercase',
+        fontWeight: 'bold',
     }
 });
 
 // Create Document Component
 const CongeDoc = (props) => {
+
+    const d = new Date();
 
     return (
         <Document>
@@ -288,6 +311,13 @@ const CongeDoc = (props) => {
                     </Text>
                     <Text style={styles.amParagraph5}>
                         - chrono/archives
+                    </Text>
+                </View>
+            </View>
+            <View style={styles.containerQr}>
+                <View style={styles.sectionQr}>
+                    <Text style={styles.qrText}>
+                        GESCON-APP - {d.getTime()} - {d.getFullYear()}
                     </Text>
                 </View>
             </View>

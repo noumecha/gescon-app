@@ -90,7 +90,7 @@ const Permission = () => {
                     <CardHeader className="bg-white border-0">
                         <Row className="align-items-center">
                         <Col xs="8">
-                            <h3 className="mb-0">Définir un nouveau congé</h3>
+                            <h3 className="mb-0">Définir une nouvelle Permission</h3>
                         </Col>
                         </Row>
                     </CardHeader>
