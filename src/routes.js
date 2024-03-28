@@ -29,7 +29,7 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/Permission",
+    path: "/permission",
     name: "Permissions",
     icon: "ni ni-single-copy-04 text-blue",
     component: <Permission />,
@@ -96,7 +96,7 @@ var routes = [
     name: "Ajouter des utilisateurs",
     icon: "ni ni-circle-08 text-blue",
     component: <Register />,
-    layout: "/auth",
+    layout: "/admin",
   },
 ];
 export default routes;

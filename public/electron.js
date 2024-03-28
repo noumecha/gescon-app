@@ -60,7 +60,7 @@ function getPersonnel(event, arg) {
 
 // function for decision : 
 function getDecision(event, arg) {
-    pool.query('SELECT * FROM decision', (err, res) => {
+    pool.query('SELECT id_decision,numero_decision,objet_decision,signataire_decision,date_decision,libelle_type_personnel FROM decision,type_personnel WHERE decision.type_personnel = type_personnel.id_type_personnel', (err, res) => {
         if (err) throw err;
         event.sender.send('all-decision', res);
     });
@@ -70,6 +70,13 @@ function addDecision(event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
         event.sender.send('decision-added-success', { message: 'Decision ajouté avec succès!' });
+    })
+}
+
+function deleteDecision(event, req) {
+    pool.query(req, (err) =>{
+        if (err) throw err;
+        event.sender.send('decision-deleted-success', { message: 'Decision supprimée avec succès!' });
     })
 }
 
@@ -129,6 +136,21 @@ function getDocument(event, req) {
         event.sender.send('all-document', res);
     });
 }
+// function for add_users : 
+
+function addUser(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('user-added-success', { message: 'Utilisateur ajouté avec succès!' });
+    })
+}
+
+function getUsers(event, req) {
+    pool.query('SELECT * FROM utilisateur WHERE', (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-users', res);
+    })
+}
 
 /**
  * In this following code is the main 
@@ -148,6 +170,7 @@ app.whenReady().then(() => {
     // decision data get : 
     ipcMain.on('get-decision', getDecision);
     ipcMain.on('add-decision', addDecision);
+    ipcMain.on('delete-decision', deleteDecision);
     // conge type data get : 
     ipcMain.on('get-conge-type', getCongeType);
     ipcMain.on('add-conge-type', addCongeType);
@@ -160,6 +183,9 @@ app.whenReady().then(() => {
     // document à fournir : 
     ipcMain.on('get-document', getDocument);
     ipcMain.on('add-document', addDocument);
+    // for users :
+    ipcMain.on('get-users', getUsers);
+    ipcMain.on('add-user', addUser);
     // set the App title
     ipcMain.on('set-title', handleSetTitle);
     createWindow();

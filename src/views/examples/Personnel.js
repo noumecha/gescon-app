@@ -149,9 +149,15 @@ const Personnel = () => {
     }
 
     /** for the current selected personnle page */
-    const handleDetailsClick = (person) => {
+    const handleCongeClick = (person) => {
         console.log("person selected", person);
         navigate("/admin/conges", {state: {selectedPerson: person}});
+        setSelectedPerson(person);
+    }
+
+    const handlePermissionClick = (person) => {
+        console.log("person selected", person);
+        navigate("/admin/permission", {state: {selectedPerson: person}});
         setSelectedPerson(person);
     }
 
@@ -300,12 +306,16 @@ const Personnel = () => {
                                                         </DropdownToggle>
                                                         <DropdownMenu className="dropdown-menu-arrow" right>
                                                             <DropdownItem
-                                                                onClick={() => handleDetailsClick(person)}
+                                                                onClick={() => handleCongeClick(person)}
                                                             >
                                                                 Nouveau Congé
                                                             </DropdownItem>
                                                             <DropdownItem
-                                                                href="#pablo"
+                                                                onClick={() => handlePermissionClick(person)}
+                                                            >
+                                                                Nouvelle permission
+                                                            </DropdownItem>
+                                                            <DropdownItem
                                                                 onClick={(e) => e.preventDefault()}
                                                             >
                                                                 Détails

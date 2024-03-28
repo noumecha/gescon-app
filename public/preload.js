@@ -24,6 +24,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     // decision : 
     decisionAddedSuccess: (callback) => ipcRenderer.on('decision-added-success', callback),
     addDecision: (req) => ipcRenderer.send('add-decision', req),
+    deleteDecisionSuccess: (callback) => ipcRenderer.on('decision-deleted-success', callback),
+    deleteDecision: (req) => ipcRenderer.send('delete-decision', req),
     getDecision: () => ipcRenderer.send('get-decision'),
     retrieveDecision: (callback) => ipcRenderer.on('all-decision', callback),
     // demande :
@@ -41,4 +43,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
     addPersonnel : (req) => ipcRenderer.send('add-personnel', req),// to add personnel in the db
     getPersonnel: () => ipcRenderer.send('get-personnel'), // execute select all personnel
     receivePersonnel: (callback) => ipcRenderer.on('all-personnel', callback), // get all personnel form the getPersonnel function
+    // for users : 
+    userAddedSuccess: (callback) => ipcRenderer.on('user-added-success', callback),
+    addUsers: (req) => ipcRenderer.send('add-user', req),
+    getUsers: () => ipcRenderer.send('get-users'),
+    retrieveUsers: (callback) => ipcRenderer.on('all-users', callback)
 });
