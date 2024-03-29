@@ -23,7 +23,7 @@ const Conges = () => {
   const location = useLocation();
   /** recuperation des attributs d'un personnel depuis personnel.js */
   const { selectedPerson } = location.state || {};
-  const [decision, setDecision] = useState([]);
+  //const [decision, setDecision] = useState([]);
   const [typeConge, setTypeConge] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [duration, setDuration] = useState("");
@@ -33,7 +33,7 @@ const Conges = () => {
   const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom : "TCHUENTE");
   const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule : "XD3 566");
   const [type, setType] = useState(selectedPerson ? selectedPerson.type === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
-  const [selectedDec, setSelectedDec] = useState(type === "Fonctionnaire" ? "00000664/D/MINFI/SG/DRH/SDP/SPF" : "00000083/D/MINFI/SG/DRH/SDP/SPF");
+  const [selectedDec, setSelectedDec] = useState("nothing");
   const [struc, setStruc] = useState(selectedPerson ? selectedPerson.structure : "Service Général");
   const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste : "Contrôleur");
   const sexe = selectedPerson ? selectedPerson.sexe : "M";
@@ -62,9 +62,14 @@ const Conges = () => {
   useEffect(() => {
     const func = async () => {
         try {
-            window.electronAPI.getDecision();
+            /*window.electronAPI.getDecision();
             await window.electronAPI.retrieveDecision((event, res) => {
               setDecision(res);
+            })*/
+            window.electronAPI.getSpecificDec(selectedPerson ? selectedPerson.type : 1);
+            await window.electronAPI.retrieveSpecificDec((event, res) => {
+              const specific_dec = res;
+              setSelectedDec(specific_dec[0].numero_decision);
             })
             window.electronAPI.getCongeType();
             await window.electronAPI.retrieveCongeType((event, res) => {
@@ -75,7 +80,7 @@ const Conges = () => {
         }
     }
     func();
-  }, []);
+  }, [selectedPerson]);
 
   return (
     <>
@@ -88,7 +93,6 @@ const Conges = () => {
               <CardHeader className="bg-white border-0">
                 <Row className="align-items-center">
                   <Col xs="8">
-                    {/*decision.length > 0 && <>{JSON.stringify(decision[0].numero_decision)}</>*/}
                     <h3 className="mb-0">Définir un nouveau congé</h3>
                   </Col>
                 </Row>
@@ -229,7 +233,7 @@ const Conges = () => {
                             className="mb-3"
                             type="select"
                             id="type-conge"
-                            defaultValue="choisir le type de congé"
+                            //defaultValue={typeConge}
                             onChange={handleInputChange(setSelectedType)}
                           >
                             {typeConge && typeConge.length > 0 
@@ -248,7 +252,7 @@ const Conges = () => {
                           <Label
                             for="demande-file"
                           >
-                            Demande Timbré
+                            Demande de Congé Timbré
                           </Label>
                           <Input
                             id="demande-file"
@@ -276,7 +280,7 @@ const Conges = () => {
                               type="file"
                             />
                             <FormText>
-                              Pièces à fournir comme justificatif
+                              Pièces à fournir comme justificatif en fonction du type de congé (maladie ou maternité)
                             </FormText>
                           </FormGroup>
                         </Col>
@@ -339,19 +343,17 @@ const Conges = () => {
                           </Label>              
                           <Input
                             className="mb-3"
-                            type="select"
+                            type="text"
                             id="num-decision"
-                            defaultValue={selectedDec}
-                            //onLoad={handleInputChange(setSelectedDec)}
-                            onChange={handleInputChange(setSelectedDec)}
+                            value={selectedDec}
+                            readOnly
                           >
-                            {type !== "" ? type === "Fonctionnaire" ? decision.length > 0 && <option>{JSON.stringify(decision[0].numero_decision)}</option> : decision.length > 0 && <option>{JSON.stringify(decision[1].numero_decision)}</option> : <option>Selectionner le numero de décision</option>}
                             {/*decision && decision.length > 0 
                               ? decision.map((d, i) => (
                                 <option key={i}>{d.numero_decision}</option>
                               ))
                               : (<option>Selectionner le numero de décision</option>)
-                              */}
+                            */}
                           </Input>
                         </FormGroup>
                       </Col>
@@ -380,7 +382,7 @@ const Conges = () => {
                 sexe={sexe}
                 poste={poste} 
                 type={type} 
-                decision={type === "Fonctionnaire" ? "00000664/D/MINFI/SG/DRH/SDP/SPF" : "00000083/D/MINFI/SG/DRH/SDP/SPF"} 
+                decision={selectedDec} 
                 duration={duration} 
                 structure={struc}
                 startDate={startDate}
@@ -397,7 +399,7 @@ const Conges = () => {
               sexe={sexe}
               poste={poste} 
               type={type} 
-              decision={type === "Fonctionnaire" ? "00000664/D/MINFI/SG/DRH/SDP/SPF" : "00000083/D/MINFI/SG/DRH/SDP/SPF"} 
+              decision={selectedDec} 
               duration={duration} 
               structure={struc}
               startDate={startDate}

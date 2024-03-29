@@ -238,7 +238,7 @@ const PermissionDoc = (props) => {
                     </Text>
                     <Text>********</Text>
                     <Text style={styles.h4TitleNumber}>
-                        N°__________/CDC/MINFI/SG/DGB/SDAG/SP
+                        N°__________/MINFI/SG/DGB/SDAG/SP
                     </Text>
                 </View>
                 {/* image */}
@@ -283,23 +283,22 @@ const PermissionDoc = (props) => {
             <View style={styles.containerTwo}>
                 <View style={styles.section}>
                     <Text style={styles.h1CertifTitle}>
-                        CERTIFICAT DE PERMISSION
+                        ATTESTATION DE PERMISSION D'ABSCENCE
                     </Text>
                     <Text style={styles.h2CertifSubtitle}>
-                        CERTIFICAT OF PERMISSION
+                        ABSENCE PERMISSION CERTIFICATE
                     </Text>
                     <Text style={styles.pCertifText}>
                         Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
                         {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service au {props.structure} est bénéficiaire
-                        d'une permission de {props.duration} jours , accordée par décision N° {props.decision}
-                         {/*du DATE_DEC*/} du Ministre des finances.
+                        d'une permission de {props.duration} jours.
                     </Text>
                     <Text style={styles.pCertifText}>
                         L'intéressé{props.sexe === "M" ? "" : "e"} jouira de ladite permission pendant la période du {props.startDate} au {props.endDate} et 
                         reprendra le service le {props.repriseDate} à 7 heures 30 précises.
                     </Text>
                     <Text style={styles.pCertifText}>
-                        En foi de quoi, le présent certificat est établi et délivré à l'intéressé{props.sexe === "M" ? "" : "e"} pour
+                        En foi de quoi, la présente attestation est établie et délivrée à l'intéressé{props.sexe === "M" ? "" : "e"} pour
                         servir et valoir ce que de droit./-
                     </Text>
                 </View>
