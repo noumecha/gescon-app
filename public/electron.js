@@ -23,8 +23,8 @@ function createWindow() {
     mainWindow.setMenuBarVisibility(false);
 
     mainWindow.loadURL(
-        //`http://localhost:3000`
-        `file://${path.join(__dirname, '../build/index.html')}`
+        `http://localhost:3000`
+        //`file://${path.join(__dirname, '../build/index.html')}`
         //isDev ? `http://localhost:3000` : `file://${path.join(__dirname, '/../build/index.html')}`
     );
 
@@ -41,7 +41,7 @@ const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'gescon_app_db'
+    database: 'gescon_db'
 }) 
 
 // fucntion for the personnel : 
@@ -58,11 +58,18 @@ function getPersonnel(event, arg) {
     });
 }
 
-// function for decision : 
+// functions for decision : 
 function getDecision(event, arg) {
-    pool.query('SELECT * FROM decision', (err, res) => {
+    pool.query('SELECT id_decision,numero_decision,objet_decision,signataire_decision,date_decision,libelle_type_personnel FROM decision,type_personnel WHERE decision.id_type_personnel = type_personnel.id_type_personnel', (err, res) => {
         if (err) throw err;
         event.sender.send('all-decision', res);
+    });
+}
+
+function getSpecificDec(event, arg) {
+    pool.query('SELECT * FROM decision WHERE id_decision =?', [arg], (err, res) => {
+        if (err) throw err;
+        event.sender.send('specific-decision', res);
     });
 }
 
@@ -73,7 +80,14 @@ function addDecision(event, req) {
     })
 }
 
-// function for conge : 
+function deleteDecision(event, req) {
+    pool.query(req, (err) =>{
+        if (err) throw err;
+        event.sender.send('decision-deleted-success', { message: 'Decision supprimée avec succès!' });
+    })
+}
+
+// functions for conge : 
 function getConge(event, req) {
     pool.query('SELECT * FROM conge', (err, res) => {
         if (err) throw err;
@@ -88,7 +102,7 @@ function addConge(event, req) {
     })
 }
 
-// function for conge type :
+// functions for conge type :
 function getCongeType(event, res) {
     pool.query('SELECT * FROM type_conge', (err, res) => {
         if (err) throw err;
@@ -104,19 +118,19 @@ function addCongeType(event, req) {
 }
 
 // for demandes :
-function addDemande(event, req) {
+function addDemandeConge(event, req) {
     pool.query(req, (err, res) => {
         if (err) throw err;
-        event.sender.send('demande-added-success', { message: 'Demande ajouté avec succès!' });
+        event.sender.send('demande-added-success-conge', { message: 'Demande ajouté avec succès!' });
     });
 }
-function getDemande(event, req) {
-    pool.query('SELECT * FROM demande', (err, res) => {
+function getDemandeConge(event, req) {
+    pool.query('SELECT * FROM demande_conge', (err, res) => {
         if (err) throw err;
-        event.sender.send('all-demande', res);
+        event.sender.send('all-demande-conge', res);
     });
 }
-// for document : 
+// functions for document : 
 function addDocument(event, req) {
     pool.query(req, (err, res) => {
         if (err) throw err;
@@ -128,6 +142,21 @@ function getDocument(event, req) {
         if (err) throw err;
         event.sender.send('all-document', res);
     });
+}
+// functions for add_users : 
+
+function addUser(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('user-added-success', { message: 'Utilisateur ajouté avec succès!' });
+    })
+}
+
+function getUsers(event, req) {
+    pool.query('SELECT * FROM utilisateur WHERE', (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-users', res);
+    })
 }
 
 /**
@@ -148,6 +177,8 @@ app.whenReady().then(() => {
     // decision data get : 
     ipcMain.on('get-decision', getDecision);
     ipcMain.on('add-decision', addDecision);
+    ipcMain.on('delete-decision', deleteDecision);
+    ipcMain.on('get-specific-decision', getSpecificDec);
     // conge type data get : 
     ipcMain.on('get-conge-type', getCongeType);
     ipcMain.on('add-conge-type', addCongeType);
@@ -155,11 +186,14 @@ app.whenReady().then(() => {
     ipcMain.on('get-conge', getConge);
     ipcMain.on('add-conge', addConge);
     // demande data get :
-    ipcMain.on('get-demande', getDemande);
-    ipcMain.on('add-demande', addDemande);
+    ipcMain.on('get-demande-conge', getDemandeConge);
+    ipcMain.on('add-demande-conge', addDemandeConge);
     // document à fournir : 
     ipcMain.on('get-document', getDocument);
     ipcMain.on('add-document', addDocument);
+    // for users :
+    ipcMain.on('get-users', getUsers);
+    ipcMain.on('add-user', addUser);
     // set the App title
     ipcMain.on('set-title', handleSetTitle);
     createWindow();

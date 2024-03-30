@@ -10,7 +10,8 @@ import Decision from "views/examples/Decision.js";
 import Permission from "views/examples/Permission";
 import Attestation from "views/examples/Attestation";
 import FichePersonnel from "views/examples/FichePersonnel";
-import ArchiveAttestation from "views/examples/ArchiveAttestation";
+import ArchiveAttestationConge from "views/examples/ArchiveAttestationConge";
+import ArchiveAttestationPermission from "views/examples/ArchiveAttestationPermission";
 import PersonnelDetails from "views/examples/PersonnelDetails";
 
 var routes = [
@@ -29,7 +30,7 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/Permission",
+    path: "/permission",
     name: "Permissions",
     icon: "ni ni-single-copy-04 text-blue",
     component: <Permission />,
@@ -65,9 +66,16 @@ var routes = [
   },
   {
     path: "/archive",
-    name: "Attestations Archivés",
+    name: "Congés Archivés",
     icon: "ni ni-archive-2 text-blue",
-    component: <ArchiveAttestation />,
+    component: <ArchiveAttestationConge />,
+    layout: "/admin",
+  },
+  {
+    path: "/archive_permissions",
+    name: "Permisions Archivés",
+    icon: "ni ni-archive-2 text-blue",
+    component: <ArchiveAttestationPermission />,
     layout: "/admin",
   },
   {
@@ -96,7 +104,7 @@ var routes = [
     name: "Ajouter des utilisateurs",
     icon: "ni ni-circle-08 text-blue",
     component: <Register />,
-    layout: "/auth",
+    layout: "/admin",
   },
 ];
 export default routes;

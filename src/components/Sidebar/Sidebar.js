@@ -165,7 +165,7 @@ const Sidebar = (props) => {
                 <span>Support</span>
               </DropdownItem>
               <DropdownItem divider />
-              <DropdownItem href="#pablo" onClick={(e) => e.preventDefault()}>
+              <DropdownItem tag={NavLinkRRD} onClick={handleLogout}>
                 <i className="ni ni-user-run" />
                 <span>Deconnexion</span>
               </DropdownItem>
@@ -232,18 +232,18 @@ const Sidebar = (props) => {
                 tag={NavLinkRRD}
                 onClick={closeCollapse}
               >
-                <i className="ni ni-spaceship" />
+                <i className="ni ni-spaceship text-dark" />
                 Tutoriel
               </NavLink>
             </NavItem>
             <NavItem>
               <NavLink 
-                to="/"
+                to="/admin/register"
                 tag={NavLinkRRD}
                 onClick={closeCollapse}
               >
-                <i className="ni ni-palette" />
-                Autres
+                <i className="ni ni-circle-08 text-dark" />
+                Ajouter des utilisateurs
               </NavLink>
             </NavItem>
             <NavItem>
@@ -252,7 +252,7 @@ const Sidebar = (props) => {
                 tag={NavLinkRRD}
                 onClick={closeCollapse}
               >
-                <i className="ni ni-ui-04" />
+                <i className="ni ni-ui-04 text-dark" />
                 Paramètres
               </NavLink>
             </NavItem>
@@ -261,7 +261,7 @@ const Sidebar = (props) => {
                 tag={NavLinkRRD}
                 onClick={handleLogout}           
               >
-                <i className="ni ni-spaceship" />
+                <i className="ni ni-spaceship text-dark" />
                 Se Deconnecter
               </NavLink>
             </NavItem>

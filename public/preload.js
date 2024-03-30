@@ -24,13 +24,17 @@ contextBridge.exposeInMainWorld("electronAPI", {
     // decision : 
     decisionAddedSuccess: (callback) => ipcRenderer.on('decision-added-success', callback),
     addDecision: (req) => ipcRenderer.send('add-decision', req),
+    deleteDecisionSuccess: (callback) => ipcRenderer.on('decision-deleted-success', callback),
+    deleteDecision: (req) => ipcRenderer.send('delete-decision', req),
     getDecision: () => ipcRenderer.send('get-decision'),
     retrieveDecision: (callback) => ipcRenderer.on('all-decision', callback),
+    getSpecificDec: (arg) => ipcRenderer.send('get-specific-decision', arg),
+    retrieveSpecificDec: (callback) => ipcRenderer.on('specific-decision', callback),
     // demande :
-    demandeAddedSuccess: (callback) => ipcRenderer.on('demande-added-success', callback),
-    addDemande: (req) => ipcRenderer.send('add-demande',req),
-    getDemande: () => ipcRenderer.send('get-demande'),
-    retrieveDemande: (callback) => ipcRenderer.on('all-demande', callback),
+    demandeCongeAddedSuccess: (callback) => ipcRenderer.on('demande-added-success-conge', callback),
+    addDemandeConge: (req) => ipcRenderer.send('add-demande-conge',req),
+    getDemandeConge: () => ipcRenderer.send('get-demande-conge'),
+    retrieveDemandeConge: (callback) => ipcRenderer.on('all-demande-conge', callback),
     // document à fournir : 
     documentAddedSuccess: (callback) => ipcRenderer.on('document-added-success', callback),
     addDocument: (req) => ipcRenderer.send('add-document', req),
@@ -41,4 +45,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
     addPersonnel : (req) => ipcRenderer.send('add-personnel', req),// to add personnel in the db
     getPersonnel: () => ipcRenderer.send('get-personnel'), // execute select all personnel
     receivePersonnel: (callback) => ipcRenderer.on('all-personnel', callback), // get all personnel form the getPersonnel function
+    // for users : 
+    userAddedSuccess: (callback) => ipcRenderer.on('user-added-success', callback),
+    addUsers: (req) => ipcRenderer.send('add-user', req),
+    getUsers: () => ipcRenderer.send('get-users'),
+    retrieveUsers: (callback) => ipcRenderer.on('all-users', callback)
 });
