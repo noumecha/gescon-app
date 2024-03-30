@@ -60,7 +60,7 @@ function getPersonnel(event, arg) {
 
 // functions for decision : 
 function getDecision(event, arg) {
-    pool.query('SELECT id_decision,numero_decision,objet_decision,signataire_decision,date_decision,libelle_type_personnel FROM decision,type_personnel WHERE decision.type_personnel = type_personnel.id_type_personnel', (err, res) => {
+    pool.query('SELECT id_decision,numero_decision,objet_decision,signataire_decision,date_decision,libelle_type_personnel FROM decision,type_personnel WHERE decision.id_type_personnel = type_personnel.id_type_personnel', (err, res) => {
         if (err) throw err;
         event.sender.send('all-decision', res);
     });
@@ -125,7 +125,7 @@ function addDemandeConge(event, req) {
     });
 }
 function getDemandeConge(event, req) {
-    pool.query('SELECT * FROM demande', (err, res) => {
+    pool.query('SELECT * FROM demande_conge', (err, res) => {
         if (err) throw err;
         event.sender.send('all-demande-conge', res);
     });
