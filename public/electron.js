@@ -23,8 +23,8 @@ function createWindow() {
     mainWindow.setMenuBarVisibility(false);
 
     mainWindow.loadURL(
-        //`http://localhost:3000`
-        `file://${path.join(__dirname, '../build/index.html')}`
+        `http://localhost:3000`
+        //`file://${path.join(__dirname, '../build/index.html')}`
         //isDev ? `http://localhost:3000` : `file://${path.join(__dirname, '/../build/index.html')}`
     );
 
@@ -41,7 +41,7 @@ const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'gescon_app_db'
+    database: 'gescon_db'
 }) 
 
 // fucntion for the personnel : 
@@ -111,16 +111,16 @@ function addCongeType(event, req) {
 }
 
 // for demandes :
-function addDemande(event, req) {
+function addDemandeConge(event, req) {
     pool.query(req, (err, res) => {
         if (err) throw err;
-        event.sender.send('demande-added-success', { message: 'Demande ajouté avec succès!' });
+        event.sender.send('demande-added-success-conge', { message: 'Demande ajouté avec succès!' });
     });
 }
-function getDemande(event, req) {
+function getDemandeConge(event, req) {
     pool.query('SELECT * FROM demande', (err, res) => {
         if (err) throw err;
-        event.sender.send('all-demande', res);
+        event.sender.send('all-demande-conge', res);
     });
 }
 // for document : 
@@ -178,8 +178,8 @@ app.whenReady().then(() => {
     ipcMain.on('get-conge', getConge);
     ipcMain.on('add-conge', addConge);
     // demande data get :
-    ipcMain.on('get-demande', getDemande);
-    ipcMain.on('add-demande', addDemande);
+    ipcMain.on('get-demande-conge', getDemandeConge);
+    ipcMain.on('add-demande-conge', addDemandeConge);
     // document à fournir : 
     ipcMain.on('get-document', getDocument);
     ipcMain.on('add-document', addDocument);
