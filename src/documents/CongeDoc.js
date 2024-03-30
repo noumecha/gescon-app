@@ -226,7 +226,7 @@ const CongeDoc = (props) => {
                     </Text>
                     <Text>********</Text>
                     <Text style={styles.h4TitleNumber}>
-                        N°__________/CDC/MINFI/SG/DGB/SDAG/SP
+                        N°__________/MINFI/SG/DGB/SDAG/SP
                     </Text>
                 </View>
                 {/* image */}
@@ -278,7 +278,7 @@ const CongeDoc = (props) => {
                     </Text>
                     <Text style={styles.pCertifText}>
                         Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
-                        {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service au {props.structure} est bénéficiaire
+                        {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service (au/à la) {props.structure} est bénéficiaire
                         d'un {props.typeConge} de {props.duration} jours , accordé par décision N° {props.decision}
                          {/*du DATE_DEC*/} du Ministre des finances.
                     </Text>

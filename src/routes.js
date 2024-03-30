@@ -10,7 +10,8 @@ import Decision from "views/examples/Decision.js";
 import Permission from "views/examples/Permission";
 import Attestation from "views/examples/Attestation";
 import FichePersonnel from "views/examples/FichePersonnel";
-import ArchiveAttestation from "views/examples/ArchiveAttestation";
+import ArchiveAttestationConge from "views/examples/ArchiveAttestationConge";
+import ArchiveAttestationPermission from "views/examples/ArchiveAttestationPermission";
 import PersonnelDetails from "views/examples/PersonnelDetails";
 
 var routes = [
@@ -65,9 +66,16 @@ var routes = [
   },
   {
     path: "/archive",
-    name: "Attestations Archivés",
+    name: "Congés Archivés",
     icon: "ni ni-archive-2 text-blue",
-    component: <ArchiveAttestation />,
+    component: <ArchiveAttestationConge />,
+    layout: "/admin",
+  },
+  {
+    path: "/archive_permissions",
+    name: "Permisions Archivés",
+    icon: "ni ni-archive-2 text-blue",
+    component: <ArchiveAttestationPermission />,
     layout: "/admin",
   },
   {

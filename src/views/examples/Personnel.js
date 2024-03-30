@@ -261,18 +261,18 @@ const Personnel = () => {
                                         <tr>
                                             <th>Matricule</th>
                                             <th>Nom & Prenom</th>
-                                            <th>Grade</th>
+                                            {/*<th>Grade</th>*/}
                                             <th>Poste</th>
-                                            <th>Structure</th>
-                                            <th>Sexe</th>
-                                            <th>Date recrutement</th>
-                                            <th>Situation Matrimoniale</th>
-                                            <th>Region</th>
-                                            <th>Departement</th>
-                                            <th>Date de naissance</th>
-                                            <th>Telephone</th>
+                                            {/*<th>Structure</th>*/}
+                                            {/*<th>Sexe</th>*/}
+                                            {/*<th>Date recrutement</th>*/}
+                                            {/*<th>Situation Matrimoniale</th>*/}
+                                            {/*<th>Region</th>*/}
+                                            {/*<th>Departement</th>*/}
+                                            {/*<th>Date de naissance</th>*/}
+                                            {/*<th>Telephone</th>*/}
                                             <th>Categorie</th>
-                                            <th>Arrondissement</th>
+                                            {/*<th>Arrondissement</th>*/}
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -281,18 +281,18 @@ const Personnel = () => {
                                             <tr key={index}>
                                                 <td>{person.matricule}</td>    
                                                 <td>{person.nom_prenom}</td>    
-                                                <td>{person.grade}</td>    
+                                                {/*<td>{person.grade}</td>*/}    
                                                 <td>{person.poste}</td>    
-                                                <td>{person.structure}</td>    
-                                                <td>{person.sexe}</td>    
-                                                <td>{person.date_recrutement}</td>    
-                                                <td>{person.situration_matrimoniale}</td>    
-                                                <td>{person.region}</td>    
-                                                <td>{person.departement}</td>    
-                                                <td>{person.date_naiss}</td>    
-                                                <td>{person.telephone}</td>    
+                                                {/*<td>{person.structure}</td>*/}    
+                                                {/*<td>{person.sexe}</td>*/}
+                                                {/*<td>{person.date_recrutement}</td>*/}    
+                                                {/*<td>{person.situration_matrimoniale}</td>*/}    
+                                                {/*<td>{person.region}</td>*/}    
+                                                {/*<td>{person.departement}</td>*/}    
+                                                {/*<td>{person.date_naiss}</td>*/}    
+                                                {/*<td>{person.telephone}</td>*/}    
                                                 <td>{person.categorie}</td>    
-                                                <td>{person.arrondissement}</td>  
+                                                {/*<td>{person.arrondissement}</td>*/} 
                                                 <td className="text-right">
                                                     <UncontrolledDropdown>
                                                         <DropdownToggle
