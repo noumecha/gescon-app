@@ -34,18 +34,18 @@ const Decision = () => {
     const [dec, setDec] = useState({});
 
 
-    /*const handleDecisionEdit = (dec) => {
+    const handleDecisionEdit = (dec) => {
         console.log("decision selected", dec);
-        setNumeroDecision(dec.numero_decision);
+        /*setNumeroDecision(dec.numero_decision);
         setObjetDecision(dec.objet_decision);
         setSignataireDecision(dec.signataire_decision);
         const date = new Date(dec.date_decision);
         date.setDate(date.getDate() + parseInt(1))
         console.log("date: ",date);
         setDecisionDate(dec.date_decision.toISOString().split("T")[0]);
-        setDecisionType(dec.type_decision);
+        setDecisionType(dec.type_decision);*/
         setDec(dec);
-    }*/
+    }
 
     const handleDecisionDelete = (dec) => {
         //console.log("decision selected for deletion", dec);
@@ -169,7 +169,7 @@ const Decision = () => {
                                                     </DropdownToggle>
                                                     <DropdownMenu className="dropdown-menu-arrow" right>
                                                         <DropdownItem
-                                                            //onClick={() => handleDecisionEdit(decision)}
+                                                            onClick={() => handleDecisionEdit(decision)}
                                                         >
                                                             Modifier
                                                         </DropdownItem>
