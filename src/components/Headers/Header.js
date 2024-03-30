@@ -12,8 +12,8 @@ const Header = () => {
   useEffect(() => {
     const func = async () => {
         try {
-            window.electronAPI.getDemande();
-            await window.electronAPI.retrieveDemande((event, res) => {
+            window.electronAPI.getDemandeConge();
+            await window.electronAPI.retrieveDemandeConge((event, res) => {
               setDemande(res);
             })
             window.electronAPI.getConge();

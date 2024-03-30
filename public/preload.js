@@ -31,10 +31,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
     getSpecificDec: (arg) => ipcRenderer.send('get-specific-decision', arg),
     retrieveSpecificDec: (callback) => ipcRenderer.on('specific-decision', callback),
     // demande :
-    demandeAddedSuccess: (callback) => ipcRenderer.on('demande-added-success', callback),
-    addDemande: (req) => ipcRenderer.send('add-demande',req),
-    getDemande: () => ipcRenderer.send('get-demande'),
-    retrieveDemande: (callback) => ipcRenderer.on('all-demande', callback),
+    demandeCongeAddedSuccess: (callback) => ipcRenderer.on('demande-added-success-conge', callback),
+    addDemandeConge: (req) => ipcRenderer.send('add-demande-conge',req),
+    getDemandeConge: () => ipcRenderer.send('get-demande-conge'),
+    retrieveDemandeConge: (callback) => ipcRenderer.on('all-demande-conge', callback),
     // document à fournir : 
     documentAddedSuccess: (callback) => ipcRenderer.on('document-added-success', callback),
     addDocument: (req) => ipcRenderer.send('add-document', req),
