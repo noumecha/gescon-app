@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // reactstrap components
 import { Card, CardBody, CardTitle, Container, Row, Col } from "reactstrap";
 import { useState, useEffect } from "react";
@@ -5,6 +6,7 @@ import { useState, useEffect } from "react";
 const Header = () => {
 
   const [demande, setDemande] = useState([]);
+  const [nberPersonnel, setNberPersonnel] = useState();
   const [conge, setConge] = useState([]);
 
   useEffect(() => {
@@ -18,6 +20,11 @@ const Header = () => {
             await window.electronAPI.retrieveConge((event, res) => {
               setConge(res);
             })
+            window.electronAPI.getPersonnel();
+            await window.electronAPI.receivePersonnel((event, res) => {
+              console.log("pers event : " + res.length);
+              setNberPersonnel(res.length);
+            });
         } catch (error) {
             console.error("Erreur : " + error.message);
         }
@@ -41,10 +48,10 @@ const Header = () => {
                           tag="h5"
                           className="text-uppercase text-muted mb-0"
                         >
-                          Demandes de Congés
+                          Personnel
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
-                          {demande ? demande.length : "" }
+                          {nberPersonnel ? nberPersonnel : "" }
                         </span>
                       </div>
                       <Col className="col-auto">
@@ -71,7 +78,7 @@ const Header = () => {
                           tag="h5"
                           className="text-uppercase text-muted mb-0"
                         >
-                          Congés accordés
+                          Personnels en Congés
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
                           { conge ? conge.length : 0 }

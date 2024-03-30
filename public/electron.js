@@ -58,11 +58,18 @@ function getPersonnel(event, arg) {
     });
 }
 
-// function for decision : 
+// functions for decision : 
 function getDecision(event, arg) {
     pool.query('SELECT id_decision,numero_decision,objet_decision,signataire_decision,date_decision,libelle_type_personnel FROM decision,type_personnel WHERE decision.type_personnel = type_personnel.id_type_personnel', (err, res) => {
         if (err) throw err;
         event.sender.send('all-decision', res);
+    });
+}
+
+function getSpecificDec(event, arg) {
+    pool.query('SELECT * FROM decision WHERE id_decision =?', [arg], (err, res) => {
+        if (err) throw err;
+        event.sender.send('specific-decision', res);
     });
 }
 
@@ -80,7 +87,7 @@ function deleteDecision(event, req) {
     })
 }
 
-// function for conge : 
+// functions for conge : 
 function getConge(event, req) {
     pool.query('SELECT * FROM conge', (err, res) => {
         if (err) throw err;
@@ -95,7 +102,7 @@ function addConge(event, req) {
     })
 }
 
-// function for conge type :
+// functions for conge type :
 function getCongeType(event, res) {
     pool.query('SELECT * FROM type_conge', (err, res) => {
         if (err) throw err;
@@ -123,7 +130,7 @@ function getDemandeConge(event, req) {
         event.sender.send('all-demande-conge', res);
     });
 }
-// for document : 
+// functions for document : 
 function addDocument(event, req) {
     pool.query(req, (err, res) => {
         if (err) throw err;
@@ -136,7 +143,7 @@ function getDocument(event, req) {
         event.sender.send('all-document', res);
     });
 }
-// function for add_users : 
+// functions for add_users : 
 
 function addUser(event, req) {
     pool.query(req, (err, res) => {
@@ -171,6 +178,7 @@ app.whenReady().then(() => {
     ipcMain.on('get-decision', getDecision);
     ipcMain.on('add-decision', addDecision);
     ipcMain.on('delete-decision', deleteDecision);
+    ipcMain.on('get-specific-decision', getSpecificDec);
     // conge type data get : 
     ipcMain.on('get-conge-type', getCongeType);
     ipcMain.on('add-conge-type', addCongeType);

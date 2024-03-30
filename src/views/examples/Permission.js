@@ -227,7 +227,7 @@ const Permission = () => {
                                         <Label
                                             for="demande-file"
                                         >
-                                            Demande Timbré
+                                            Demande de Permision Timbré
                                         </Label>
                                         <Input
                                             id="demande-file"

@@ -4,7 +4,7 @@ import {
   } from "reactstrap";
 import Header from "components/Headers/Header.js";
 
-const ArchiveAttestation = () => {
+const ArchiveAttestationConge = () => {
 
     return (
         <>
@@ -24,4 +24,4 @@ const ArchiveAttestation = () => {
     );
 }
 
-export default ArchiveAttestation;
+export default ArchiveAttestationConge;
