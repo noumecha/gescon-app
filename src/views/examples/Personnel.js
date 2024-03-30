@@ -19,6 +19,8 @@ import {
     Table,
     Container,
     Row,
+    Col,
+    Alert,
     Nav,
     UncontrolledTooltip,
   } from "reactstrap";
@@ -39,6 +41,7 @@ const Personnel = () => {
     const [perPage] = useState(100);
     const [filter, setFilter] = useState("");
     const [search, setSearch] = useState("");
+    const [success, setSuccess] = useState("");
     const [selectedPerson, setSelectedPerson] = useState(null);
     const navigate = useNavigate();
 
@@ -85,20 +88,27 @@ const Personnel = () => {
         try {
             for (let i = 0; i < excelData.length; i++) {
                 const type = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 1 : 2;
+                const statut = "en poste"; // en permission, en congé
+                const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
+                const nb_jours_permission = 10;
                 const req = `
                 INSERT INTO personnel 
-                (ordre, matricule, nom_prenom, grade, poste, structure, sexe, date_recrutement, situation_matrimoniale,
-                region, departement, date_naiss, telephone,type, categorie, arrondissement)
+                (ordre_personnel, matricule_personnel, nom_prenom_personnel, grade_personnel, poste_personnel, structure_personnel, sexe_personnel, date_recrutement_personnel, situation_matrimoniale_personnel,
+                region_personnel, departement_personnel, date_naiss_personnel, telephone_personnel,id_type_personnel, categorie_personnel, arrondissement_personnel,nb_jours_permission,nb_jours_conges,statut_personnel)
                 VALUES 
                 (${excelData[i].ORDRE},"${excelData[i].MATRICULE}","${excelData[i].NOM_PRENOM}",
                 "${excelData[i].GRADE}","${excelData[i].POSTE}","${excelData[i].STRUCTURE}","${excelData[i].SEXE}",
                 "${excelData[i].DATE_RECRUTEMENT}","${excelData[i].SITUATION_MATRIMONIALE}","${excelData[i].REGION}",
                 "${excelData[i].DEPARTEMENT}","${excelData[i].DATE_NAISSANCE}","${excelData[i].TELEPHONE}","${type}",
-                "${excelData[i].CATEGORIE}","${excelData[i].ARRONDISSEMENT}");`;
+                "${excelData[i].CATEGORIE}","${excelData[i].ARRONDISSEMENT}","${nb_jours_permission}","${nb_jours_conges}","${statut}");`;
                 window.electronAPI.addPersonnel(req);
             }
-            //ARRONDISSEMENT,CATEGORIE,DATE_NAISSANCE,DATE_RECRUTEMENT,DEPARTEMENT,GRADE,MATRICULE,NOM_PRENOM,
-            //ORDRE,POSTE,REGION,SEXE,SITUATION_MATRIMONIALE,STRUCTURE,TELEPHONE
+            window.electronAPI.personnelAddedSuccess(() => {
+                setSuccess("Personnel ajouté avec succès");
+            });
+            setTimeout(() => {
+                setSuccess("");
+            }, 3000)
         } catch (err) {
             console.error("Erreur Trouvé : " + err.message);
         }
@@ -108,10 +118,6 @@ const Personnel = () => {
     useEffect(() => {
         const func = async () => {
             try {
-                await window.electronAPI.personnelAddedSuccess((event, res) => {
-                    console.log("resultat requete : " + JSON.stringify(res));
-                    alert("resultat requete : " + res)
-                });
                 window.electronAPI.getPersonnel();
                 await window.electronAPI.receivePersonnel((event, res) => {
                     //console.log("pers event : " + JSON.stringify(event));
@@ -165,7 +171,16 @@ const Personnel = () => {
         <>
         <Header />
         {/* Page content */}
-        <Container className="mt--7" fluid>
+        <Container className="mt--7" fluid>  
+            <Row>
+                <Col lg="12">
+                    { success && 
+                        <Alert className="text-center" color="success">
+                            {success}
+                        </Alert>
+                    }
+                </Col>
+            </Row>
             {/* Table */}
             <Row>
                 <div className="col p-0">
@@ -181,9 +196,9 @@ const Personnel = () => {
                 </div>
             </Row>
             <Row>
-                <div className="col p-0">
+                <div className="col">
                     {excelData ? (
-                        <div className="col p-0">
+                        <div className="col">
                             <div className="mt-3 alert alert-success" role="alert">
                                 <h3 className="mb-0 text-center text-white"> Fichier importer avec succès ! </h3>
                             </div>
@@ -213,7 +228,7 @@ const Personnel = () => {
                             </Card>
                         </div>
                     ) : (  
-                        <div className="col p-0">
+                        <div className="col">
                             <div className="mt-3 alert alert-danger" role="alert">
                                 <h3 className="mb-0 text-center text-white"> Aucun Fichier importer ! </h3>
                             </div>
@@ -237,6 +252,17 @@ const Personnel = () => {
                             <option value="B2">B2</option>
                             <option value="C">C</option>
                             <option value="D">D</option>
+                            <option value="D">1</option>
+                            <option value="D">2</option>
+                            <option value="D">3</option>
+                            <option value="D">4</option>
+                            <option value="D">5</option>
+                            <option value="D">6</option>
+                            <option value="D">7</option>
+                            <option value="D">8</option>
+                            <option value="D">9</option>
+                            <option value="D">10</option>
+                            <option value="D">11</option>
                         </Input>
                         <Input
                             type="text"
@@ -273,26 +299,28 @@ const Personnel = () => {
                                             {/*<th>Telephone</th>*/}
                                             <th>Categorie</th>
                                             {/*<th>Arrondissement</th>*/}
+                                            <th>Statut</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {filterPersonnel.slice(offset, offset + perPage).map((person, index) => (
                                             <tr key={index}>
-                                                <td>{person.matricule}</td>    
-                                                <td>{person.nom_prenom}</td>    
-                                                {/*<td>{person.grade}</td>*/}    
-                                                <td>{person.poste}</td>    
-                                                {/*<td>{person.structure}</td>*/}    
-                                                {/*<td>{person.sexe}</td>*/}
-                                                {/*<td>{person.date_recrutement}</td>*/}    
-                                                {/*<td>{person.situration_matrimoniale}</td>*/}    
-                                                {/*<td>{person.region}</td>*/}    
-                                                {/*<td>{person.departement}</td>*/}    
-                                                {/*<td>{person.date_naiss}</td>*/}    
-                                                {/*<td>{person.telephone}</td>*/}    
-                                                <td>{person.categorie}</td>    
-                                                {/*<td>{person.arrondissement}</td>*/} 
+                                                <td>{person.matricule_personnel}</td>    
+                                                <td>{person.nom_prenom_personnel}</td>    
+                                                {/*<td>{person.grade_personnel}</td>*/}    
+                                                <td>{person.poste_personnel}</td>    
+                                                {/*<td>{person.structure_personnel}</td>*/}    
+                                                {/*<td>{person.sexe_personnel}</td>*/}
+                                                {/*<td>{person.date_recrutement_personnel}</td>*/}    
+                                                {/*<td>{person.situration_matrimoniale_personnel}</td>*/}    
+                                                {/*<td>{person.region_personnel}</td>*/}    
+                                                {/*<td>{person.departement_personnel}</td>*/}    
+                                                {/*<td>{person.date_naiss_personnel}</td>*/}    
+                                                {/*<td>{person.telephone_personnel}</td>*/}    
+                                                <td>{person.categorie_personnel}</td>    
+                                                {/*<td>{person._personnel}</td>*/} 
+                                                <td>{person.statut_personnel}</td> 
                                                 <td className="text-right">
                                                     <UncontrolledDropdown>
                                                         <DropdownToggle

@@ -30,13 +30,13 @@ const Conges = () => {
   const [endDate, setEndDate] = useState("");
   const [repriseDate, setRepriseDate] = useState("");
   const [selectedType, setSelectedType] = useState("");
-  const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom : "TCHUENTE");
-  const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule : "XD3 566");
-  const [type, setType] = useState(selectedPerson ? selectedPerson.type === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
+  const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom_personnel : "TCHUENTE");
+  const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule_personnel : "XD3 566");
+  const [type, setType] = useState(selectedPerson ? selectedPerson.id_type_personnel === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
   const [selectedDec, setSelectedDec] = useState("nothing");
-  const [struc, setStruc] = useState(selectedPerson ? selectedPerson.structure : "Service Général");
-  const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste : "Contrôleur");
-  const sexe = selectedPerson ? selectedPerson.sexe : "M";
+  const [struc, setStruc] = useState(selectedPerson ? selectedPerson.structure_personnel : "Service Général");
+  const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste_personnel : "Contrôleur");
+  const sexe = selectedPerson ? selectedPerson.sexe_personnel : "M";
 
   const handleInputChange = (setStateFunction) => (e) => {
     setStateFunction(e.target.value);
@@ -66,7 +66,7 @@ const Conges = () => {
             await window.electronAPI.retrieveDecision((event, res) => {
               setDecision(res);
             })*/
-            window.electronAPI.getSpecificDec(selectedPerson ? selectedPerson.type : 1);
+            window.electronAPI.getSpecificDec(selectedPerson ? selectedPerson.id_type_personnel : 1);
             await window.electronAPI.retrieveSpecificDec((event, res) => {
               const specific_dec = res;
               setSelectedDec(specific_dec[0].numero_decision);
@@ -133,7 +133,7 @@ const Conges = () => {
                           <Input
                             className="form-control-alternative"
                             id="input-phone"
-                            defaultValue={selectedPerson ? selectedPerson.telephone : 696879475}
+                            defaultValue={selectedPerson ? selectedPerson.telephone_personnel : 696879475}
                             placeholder=""
                             type="phone"
                           />
