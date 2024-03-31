@@ -16,9 +16,8 @@ const styles = StyleSheet.create({
     container: {
       display: 'flex',
       justifyContent: 'space-between',
+      position: 'relative',
       flexDirection: 'row',
-      marginLeft: 10,
-      marginRight: 10,
       marginTop: 40,
     },
     containerTwo: {
@@ -45,14 +44,20 @@ const styles = StyleSheet.create({
       display: 'flex',
       alignItems: 'center',
     },
-    topSection: {
-        alignItems: 'center',
+    topSectionOne: {
         flex: 1,
+        textAlign: 'center',
+        marginLeft: -50,
+    },
+    topSectionTwo: {
+        flex: 1,
+        textAlign: 'center',
+        marginRight: -65,
     },
     topSectionImage: {
-        alignItems: 'center',
-        flex: 1,
-        marginTop: -15,
+        position: 'absolute',
+        marginTop: -20,
+        left: "44%",
     },
     // certif title
     h1CertifTitle: {
@@ -196,7 +201,7 @@ const CongeDoc = (props) => {
             {/* first row : entete */}
             <View style={styles.container}>
                 {/* top left text */}
-                <View style={styles.topSection}>
+                <View style={styles.topSectionOne}>
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIQUE DU CAMEROUN
                     </Text>
@@ -234,7 +239,7 @@ const CongeDoc = (props) => {
                     <Image style={styles.imageSceau} src={image}/> 
                 </View>
                 {/* top right text */}
-                <View style={styles.topSection}>
+                <View style={styles.topSectionTwo}>
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIC OF CAMEROON
                     </Text>
