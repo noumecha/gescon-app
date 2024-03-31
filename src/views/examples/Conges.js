@@ -16,7 +16,7 @@ import {
 import Header from "components/Headers/Header.js";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { PDFViewer,PDFDownloadLink } from '@react-pdf/renderer';
+import { PDFViewer,PDFDownloadLink,BlobProvider } from '@react-pdf/renderer';
 import CongeDoc from "documents/CongeDoc";
 
 const Conges = () => {
@@ -42,7 +42,18 @@ const Conges = () => {
     setStateFunction(e.target.value);
   };
 
+  const handleLoad = (blob) => {
+    console.log("pdf : " + JSON.stringify(blob));
+  }
+
+  const generateFile = () => {
+    console.log("created doc : ");
+  }
+
   useEffect(() => {
+    if (typeConge && typeConge.length > 0) {
+      setSelectedType(typeConge[0].libelle_type_conge);
+    }
     const calculateEndDate = () => {
       if (startDate && duration) {
         const start = new Date(startDate);
@@ -56,7 +67,7 @@ const Conges = () => {
       }
     };
     calculateEndDate();
-  }, [startDate, duration]);
+  }, [startDate, duration,typeConge]);
 
   /** useEffect for common function and fetching */
   useEffect(() => {
@@ -233,7 +244,7 @@ const Conges = () => {
                             className="mb-3"
                             type="select"
                             id="type-conge"
-                            //defaultValue={typeConge}
+                            value={selectedType}
                             onChange={handleInputChange(setSelectedType)}
                           >
                             {typeConge && typeConge.length > 0 
@@ -362,6 +373,7 @@ const Conges = () => {
                       <Col md="6">
                         <Button
                           color="primary"
+                          onClick={() => generateFile()}
                         >
                           Générer l'attestation
                         </Button>
@@ -405,9 +417,33 @@ const Conges = () => {
               startDate={startDate}
               endDate={endDate}
               repriseDate={repriseDate}
-              typeConge={selectedType}/>} fileName="attestation_test.pdf">
+              typeConge={selectedType}/>} fileName={`attestation_${matricule}.pdf`}>
               {({ blob, url, loading, error }) => (loading ? 'Loading document...' : <Button color="primary">Télécharger l'attestation </Button>)}
             </PDFDownloadLink>
+          </Col>
+          <Col md="12">
+            <BlobProvider
+                document={<CongeDoc 
+                name={name} 
+                matricule={matricule}
+                sexe={sexe}
+                poste={poste} 
+                type={type} 
+                decision={selectedDec} 
+                duration={duration} 
+                structure={struc}
+                startDate={startDate}
+                endDate={endDate}
+                repriseDate={repriseDate}
+                typeConge={selectedType}
+              />}
+            >
+              {({ blob, url, loading, error }) =>(
+                <div>
+                  {loading ? 'Loading document ...' : <a href={url} onClick={() => handleLoad(blob)} download="blob.pdf">Download PDF</a>}
+                </div>
+              )}
+            </BlobProvider>
           </Col>
         </Row>
       </Container>

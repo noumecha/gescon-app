@@ -141,8 +141,8 @@ const Personnel = () => {
     /** for the filter and the search bar */
 
     const filterPersonnel = filter !== "" || search !== ""
-        ? personnel.filter(personnel => personnel.categorie.includes(filter) && (
-            personnel.nom_prenom.toLowerCase().includes(search.toLowerCase()) || personnel.matricule.toLowerCase().includes(search.toLowerCase())
+        ? personnel.filter(personnel => personnel.categorie_personnel.includes(filter) && (
+            personnel.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) || personnel.matricule_personnel.toLowerCase().includes(search.toLowerCase())
         ))
         : personnel
 
@@ -158,6 +158,12 @@ const Personnel = () => {
     const handleCongeClick = (person) => {
         console.log("person selected", person);
         navigate("/admin/conges", {state: {selectedPerson: person}});
+        setSelectedPerson(person);
+    }
+
+    const handleDetailClick = (person) => {
+        console.log("personnel details :", person);
+        navigate("/admin/personnel-details", {state: {selectedPerson: person}});
         setSelectedPerson(person);
     }
 
@@ -252,17 +258,17 @@ const Personnel = () => {
                             <option value="B2">B2</option>
                             <option value="C">C</option>
                             <option value="D">D</option>
-                            <option value="D">1</option>
-                            <option value="D">2</option>
-                            <option value="D">3</option>
-                            <option value="D">4</option>
-                            <option value="D">5</option>
-                            <option value="D">6</option>
-                            <option value="D">7</option>
-                            <option value="D">8</option>
-                            <option value="D">9</option>
-                            <option value="D">10</option>
-                            <option value="D">11</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
                         </Input>
                         <Input
                             type="text"
@@ -344,7 +350,7 @@ const Personnel = () => {
                                                                 Nouvelle permission
                                                             </DropdownItem>
                                                             <DropdownItem
-                                                                onClick={(e) => e.preventDefault()}
+                                                                onClick={() => handleDetailClick(person)}
                                                             >
                                                                 Détails
                                                             </DropdownItem>
