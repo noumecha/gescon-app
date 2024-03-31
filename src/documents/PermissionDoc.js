@@ -48,14 +48,20 @@ const styles = StyleSheet.create({
       display: 'flex',
       alignItems: 'center',
     },
-    topSection: {
-        alignItems: 'center',
+    topSectionOne: {
         flex: 1,
+        textAlign: 'center',
+        marginLeft: -50,
+    },
+    topSectionTwo: {
+        flex: 1,
+        textAlign: 'center',
+        marginRight: -65,
     },
     topSectionImage: {
-        alignItems: 'center',
-        flex: 1,
-        marginTop: -15,
+        position: 'absolute',
+        marginTop: -20,
+        left: "44%",
     },
     // certif title
     h1CertifTitle: {
@@ -208,7 +214,7 @@ const PermissionDoc = (props) => {
             {/* first row : entete */}
             <View style={styles.container}>
                 {/* top left text */}
-                <View style={styles.topSection}>
+                <View style={styles.topSectionOne}>
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIQUE DU CAMEROUN
                     </Text>
@@ -246,7 +252,7 @@ const PermissionDoc = (props) => {
                     <Image style={styles.imageSceau} src={image}/> 
                 </View>
                 {/* top right text */}
-                <View style={styles.topSection}>
+                <View style={styles.topSectionTwo}>
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIC OF CAMEROON
                     </Text>
@@ -290,7 +296,7 @@ const PermissionDoc = (props) => {
                     </Text>
                     <Text style={styles.pCertifText}>
                         Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
-                        {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service au {props.structure} est bénéficiaire
+                        {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service (au/à la) {props.structure} est bénéficiaire
                         d'une permission de {props.duration} jours.
                     </Text>
                     <Text style={styles.pCertifText}>

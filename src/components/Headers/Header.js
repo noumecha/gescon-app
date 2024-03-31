@@ -22,7 +22,7 @@ const Header = () => {
             })
             window.electronAPI.getPersonnel();
             await window.electronAPI.receivePersonnel((event, res) => {
-              console.log("pers event : " + res.length);
+              //console.log("pers event : " + res.length);
               setNberPersonnel(res.length);
             });
         } catch (error) {

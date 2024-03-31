@@ -16,7 +16,7 @@ import {
 import Header from "components/Headers/Header.js";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { PDFViewer,PDFDownloadLink } from '@react-pdf/renderer';
+import { PDFViewer,PDFDownloadLink,BlobProvider } from '@react-pdf/renderer';
 import CongeDoc from "documents/CongeDoc";
 
 const Conges = () => {
@@ -30,19 +30,30 @@ const Conges = () => {
   const [endDate, setEndDate] = useState("");
   const [repriseDate, setRepriseDate] = useState("");
   const [selectedType, setSelectedType] = useState("");
-  const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom : "TCHUENTE");
-  const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule : "XD3 566");
-  const [type, setType] = useState(selectedPerson ? selectedPerson.type === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
+  const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom_personnel : "TCHUENTE");
+  const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule_personnel : "XD3 566");
+  const [type, setType] = useState(selectedPerson ? selectedPerson.id_type_personnel === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
   const [selectedDec, setSelectedDec] = useState("nothing");
-  const [struc, setStruc] = useState(selectedPerson ? selectedPerson.structure : "Service Général");
-  const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste : "Contrôleur");
-  const sexe = selectedPerson ? selectedPerson.sexe : "M";
+  const [struc, setStruc] = useState(selectedPerson ? selectedPerson.structure_personnel : "Service Général");
+  const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste_personnel : "Contrôleur");
+  const sexe = selectedPerson ? selectedPerson.sexe_personnel : "M";
 
   const handleInputChange = (setStateFunction) => (e) => {
     setStateFunction(e.target.value);
   };
 
+  const handleLoad = (blob) => {
+    console.log("pdf : " + JSON.stringify(blob));
+  }
+
+  const generateFile = () => {
+    console.log("created doc : ");
+  }
+
   useEffect(() => {
+    if (typeConge && typeConge.length > 0) {
+      setSelectedType(typeConge[0].libelle_type_conge);
+    }
     const calculateEndDate = () => {
       if (startDate && duration) {
         const start = new Date(startDate);
@@ -56,7 +67,7 @@ const Conges = () => {
       }
     };
     calculateEndDate();
-  }, [startDate, duration]);
+  }, [startDate, duration,typeConge]);
 
   /** useEffect for common function and fetching */
   useEffect(() => {
@@ -66,7 +77,7 @@ const Conges = () => {
             await window.electronAPI.retrieveDecision((event, res) => {
               setDecision(res);
             })*/
-            window.electronAPI.getSpecificDec(selectedPerson ? selectedPerson.type : 1);
+            window.electronAPI.getSpecificDec(selectedPerson ? selectedPerson.id_type_personnel : 1);
             await window.electronAPI.retrieveSpecificDec((event, res) => {
               const specific_dec = res;
               setSelectedDec(specific_dec[0].numero_decision);
@@ -133,7 +144,7 @@ const Conges = () => {
                           <Input
                             className="form-control-alternative"
                             id="input-phone"
-                            defaultValue={selectedPerson ? selectedPerson.telephone : 696879475}
+                            defaultValue={selectedPerson ? selectedPerson.telephone_personnel : 696879475}
                             placeholder=""
                             type="phone"
                           />
@@ -233,7 +244,7 @@ const Conges = () => {
                             className="mb-3"
                             type="select"
                             id="type-conge"
-                            //defaultValue={typeConge}
+                            value={selectedType}
                             onChange={handleInputChange(setSelectedType)}
                           >
                             {typeConge && typeConge.length > 0 
@@ -362,6 +373,7 @@ const Conges = () => {
                       <Col md="6">
                         <Button
                           color="primary"
+                          onClick={() => generateFile()}
                         >
                           Générer l'attestation
                         </Button>
@@ -405,9 +417,33 @@ const Conges = () => {
               startDate={startDate}
               endDate={endDate}
               repriseDate={repriseDate}
-              typeConge={selectedType}/>} fileName="attestation_test.pdf">
+              typeConge={selectedType}/>} fileName={`attestation_${matricule}.pdf`}>
               {({ blob, url, loading, error }) => (loading ? 'Loading document...' : <Button color="primary">Télécharger l'attestation </Button>)}
             </PDFDownloadLink>
+          </Col>
+          <Col md="12">
+            <BlobProvider
+                document={<CongeDoc 
+                name={name} 
+                matricule={matricule}
+                sexe={sexe}
+                poste={poste} 
+                type={type} 
+                decision={selectedDec} 
+                duration={duration} 
+                structure={struc}
+                startDate={startDate}
+                endDate={endDate}
+                repriseDate={repriseDate}
+                typeConge={selectedType}
+              />}
+            >
+              {({ blob, url, loading, error }) =>(
+                <div>
+                  {loading ? 'Loading document ...' : <a href={url} onClick={() => handleLoad(blob)} download="blob.pdf">Download PDF</a>}
+                </div>
+              )}
+            </BlobProvider>
           </Col>
         </Row>
       </Container>
