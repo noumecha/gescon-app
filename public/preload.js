@@ -31,9 +31,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
     getSpecificDec: (arg) => ipcRenderer.send('get-specific-decision', arg),
     retrieveSpecificDec: (callback) => ipcRenderer.on('specific-decision', callback),
     // demande :
-    demandeCongeAddedSuccess: (callback) => ipcRenderer.on('demande-added-success-conge', callback),
+    /*demandeCongeAddedSuccess: (callback) => ipcRenderer.on('demande-added-success-conge', callback),
     addDemandeConge: (req) => ipcRenderer.send('add-demande-conge',req),
-    getDemandeConge: () => ipcRenderer.send('get-demande-conge'),
+    getDemandeConge: () => ipcRenderer.send('get-demande-conge'),*/
     retrieveDemandeConge: (callback) => ipcRenderer.on('all-demande-conge', callback),
     // document à fournir : 
     documentAddedSuccess: (callback) => ipcRenderer.on('document-added-success', callback),
@@ -45,6 +45,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     addPersonnel : (req) => ipcRenderer.send('add-personnel', req),// to add personnel in the db
     getPersonnel: () => ipcRenderer.send('get-personnel'), // execute select all personnel
     receivePersonnel: (callback) => ipcRenderer.on('all-personnel', callback), // get all personnel form the getPersonnel function
+    updatePersonnelSuccess: (callback) => ipcRenderer.on('update-personnel-success', callback),
+    updatePersonnel: (req) => ipcRenderer.send('update-personnel', req),
     // for users : 
     userAddedSuccess: (callback) => ipcRenderer.on('user-added-success', callback),
     addUsers: (req) => ipcRenderer.send('add-user', req),

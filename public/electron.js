@@ -49,7 +49,7 @@ function addPersonnel(event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
         event.sender.send('personnel-added-success', { message: 'Personnel ajouté avec succès !' });
-    })
+    });
 }
 function getPersonnel(event, arg) {
     pool.query('SELECT * FROM Personnel', (err, res) => {
@@ -57,7 +57,12 @@ function getPersonnel(event, arg) {
         event.sender.send('all-personnel', res);
     });
 }
-
+function updatePersonnel(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('update-personnel-success', {message: 'Personnel mis à jour avec succès!'});
+    });
+}
 // functions for decision : 
 function getDecision(event, arg) {
     pool.query('SELECT id_decision,numero_decision,objet_decision,signataire_decision,date_decision,libelle_type_personnel FROM decision,type_personnel WHERE decision.id_type_personnel = type_personnel.id_type_personnel', (err, res) => {
@@ -118,7 +123,7 @@ function addCongeType(event, req) {
 }
 
 // for demandes :
-function addDemandeConge(event, req) {
+/*function addDemandeConge(event, req) {
     pool.query(req, (err, res) => {
         if (err) throw err;
         event.sender.send('demande-added-success-conge', { message: 'Demande ajouté avec succès!' });
@@ -129,7 +134,7 @@ function getDemandeConge(event, req) {
         if (err) throw err;
         event.sender.send('all-demande-conge', res);
     });
-}
+}*/
 // functions for document : 
 function addDocument(event, req) {
     pool.query(req, (err, res) => {
@@ -174,6 +179,7 @@ app.whenReady().then(() => {
     });
     ipcMain.on('add-personnel', addPersonnel);
     ipcMain.on('get-personnel', getPersonnel);
+    ipcMain.on('update-personnel', updatePersonnel);
     // decision data get : 
     ipcMain.on('get-decision', getDecision);
     ipcMain.on('add-decision', addDecision);
@@ -186,8 +192,8 @@ app.whenReady().then(() => {
     ipcMain.on('get-conge', getConge);
     ipcMain.on('add-conge', addConge);
     // demande data get :
-    ipcMain.on('get-demande-conge', getDemandeConge);
-    ipcMain.on('add-demande-conge', addDemandeConge);
+    //ipcMain.on('get-demande-conge', getDemandeConge);
+    //ipcMain.on('add-demande-conge', addDemandeConge);
     // document à fournir : 
     ipcMain.on('get-document', getDocument);
     ipcMain.on('add-document', addDocument);

@@ -339,16 +339,34 @@ const Personnel = () => {
                                                             <i className="fas fa-ellipsis-v" />
                                                         </DropdownToggle>
                                                         <DropdownMenu className="dropdown-menu-arrow" right>
-                                                            <DropdownItem
-                                                                onClick={() => handleCongeClick(person)}
-                                                            >
-                                                                Nouveau Congé
-                                                            </DropdownItem>
-                                                            <DropdownItem
-                                                                onClick={() => handlePermissionClick(person)}
-                                                            >
-                                                                Nouvelle permission
-                                                            </DropdownItem>
+                                                            {person.statut_personnel === "en congé" 
+                                                                ? 
+                                                                <DropdownItem
+                                                                    onClick={() => handleCongeClick(person)}
+                                                                >
+                                                                    Prolongé le congé
+                                                                </DropdownItem> 
+                                                                : 
+                                                                <DropdownItem
+                                                                    onClick={() => handleCongeClick(person)}
+                                                                >
+                                                                    Nouveau congé
+                                                                </DropdownItem>
+                                                            }
+                                                            {person.statut_personnel === "en permission" 
+                                                                ? 
+                                                                <DropdownItem
+                                                                    onClick={() => handlePermissionClick(person)}
+                                                                >
+                                                                    Prolongé la permission
+                                                                </DropdownItem>
+                                                                : 
+                                                                <DropdownItem
+                                                                    onClick={() => handlePermissionClick(person)}
+                                                                >
+                                                                    Nouvelle permission
+                                                                </DropdownItem>
+                                                            }
                                                             <DropdownItem
                                                                 onClick={() => handleDetailClick(person)}
                                                             >
