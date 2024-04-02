@@ -100,11 +100,39 @@ function getConge(event, req) {
     });
 }
 
+function getAttestationConge(even, req) {
+    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_conge,statut_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel', (err, res) => {
+        if (err) throw err;
+        even.sender.send('all-attestation-conge', res);
+    });
+}
+
 function addConge(event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
         event.sender.send('conge-added-success', { message: 'Conge ajouté avec succès!' });
     })
+}
+
+function updateConge(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('update-conge-success', {message: 'Conge mis à jour avec succès!'});
+    });
+}
+
+function addArchiveAttestationConge(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('attestation-conge-added-success', { message: 'Attestation de conge ajouté avec succès!' });
+    })
+}
+
+function getArchiveAttConge(event, req) {
+    pool.query('SELECT * FROM archive_attestation_conge', (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-archived-conge', res);
+    });
 }
 
 // functions for conge type :
@@ -122,19 +150,6 @@ function addCongeType(event, req) {
     });
 }
 
-// for demandes :
-/*function addDemandeConge(event, req) {
-    pool.query(req, (err, res) => {
-        if (err) throw err;
-        event.sender.send('demande-added-success-conge', { message: 'Demande ajouté avec succès!' });
-    });
-}
-function getDemandeConge(event, req) {
-    pool.query('SELECT * FROM demande_conge', (err, res) => {
-        if (err) throw err;
-        event.sender.send('all-demande-conge', res);
-    });
-}*/
 // functions for document : 
 function addDocument(event, req) {
     pool.query(req, (err, res) => {
@@ -190,7 +205,11 @@ app.whenReady().then(() => {
     ipcMain.on('add-conge-type', addCongeType);
     // conge data get : 
     ipcMain.on('get-conge', getConge);
+    ipcMain.on('add-archive-attestation-conge', addArchiveAttestationConge)
+    ipcMain.on('update-conge', updateConge);
     ipcMain.on('add-conge', addConge);
+    ipcMain.on('get-attestation-conge', getAttestationConge);
+    ipcMain.on('get-archive-att-conge', getArchiveAttConge);
     // demande data get :
     //ipcMain.on('get-demande-conge', getDemandeConge);
     //ipcMain.on('add-demande-conge', addDemandeConge);

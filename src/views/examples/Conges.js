@@ -48,7 +48,7 @@ const Conges = () => {
   const [document, setDocument] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const status = `${sexe === 'M' ? 'M' : 'Mme'} ${name} à droit à ${nb_jours_conges} ${nb_jours_conges > 1 ? "jours" : "jour"} de congés`
+  const [status, setStatus] = useState(`${sexe === 'M' ? 'M' : 'Mme'} ${name} à droit à ${nb_jours_conges} ${nb_jours_conges > 1 ? "jours" : "jour"} de congés`);
   const [visible, setVisible] = useState(true)
   const [deleteSuccess, seDeleteSuccess] = useState("");
   const [conge, setConge] = useState([]);
@@ -100,18 +100,18 @@ const Conges = () => {
           name: name,
           matricule: matricule,
           sexe: sexe,
-          poste: poste, 
+          poste: poste.replace("'", "`"), 
           type: type,
           decision: selectedDec, 
           duration: duration,
-          structure: struc,
+          structure: struc.replace("'", "`"),
           startDate: startDate,
           endDate: endDate,
           repriseDate: repriseDate,
           typeConge: selectedType,
         }
         const demandeFile = fileToArrayBuffer(demande);
-        console.log("demande file : " , demandeFile);
+        //console.log("demande file : " , demandeFile);
         const conge_data = {
           startDate : startDate,
           endDate : endDate,
@@ -119,18 +119,20 @@ const Conges = () => {
           id_personnel: selectedPerson.id_personnel,
           curr_date : new Date().toISOString().slice(0,19).replace('T',' '),
           demande : demandeFile,
-          id_type_conge : selectedType === "congé administratif partiel" ? 1 : selectedType === "congé administratif total" ? 2 : selectedType === "congé maternité" ? 3 : selectedType === "congé maladie" ? 4 : 0
+          id_type_conge : selectedType === "congé administratif partiel" ? 1 : selectedType === "congé administratif total" ? 2 : selectedType === "congé maternité" ? 3 : selectedType === "congé maladie" ? 4 : 0,
+          statut_conge : "non archivé"
         }
         //console.log("conge : " + JSON.stringify(conge_data));
-        //console.log("attestation : " , attestation);
+        //console.log("attestation : " , JSON.stringify(attestation));
         const req_conge = `INSERT INTO conge 
-          (date_debut_conge, date_fin_conge, duree_conge, created_at_conge,attestation_conge,id_type_conge,id_personnel,demande_conge) 
-          VALUES ("${conge_data.startDate}","${conge_data.endDate}",${conge_data.duration},"${conge_data.curr_date}",${JSON.stringify(attestation)},${conge_data.id_type_conge},${conge_data.id_personnel},"${conge_data.demandeFile}");`;
-        //const req_personnel = `UPDATE personnel SET statut_personnel = "en congé",nb_jours_conges = (nb_jours_conges - ${duration}) WHERE id_personnel = ${conge_data.id_personnel};`;
+          (date_debut_conge, date_fin_conge, duree_conge, created_at_conge,attestation_conge,id_type_conge,id_personnel,demande_conge,statut_conge) 
+          VALUES ("${conge_data.startDate}","${conge_data.endDate}",${conge_data.duration},"${conge_data.curr_date}",'${JSON.stringify(attestation)}',${conge_data.id_type_conge},${conge_data.id_personnel},"${conge_data.demandeFile}","${conge_data.statut_conge}");`;
+        const req_personnel = `UPDATE personnel SET statut_personnel = "en congé",nb_jours_conges = (nb_jours_conges - ${duration}) WHERE id_personnel = ${conge_data.id_personnel};`;
         window.electronAPI.addConge(req_conge);
-        //window.electronAPI.updatePersonnel(req_personnel);
+        window.electronAPI.updatePersonnel(req_personnel);
         window.electronAPI.congeAddedSuccess(() => {
           setSuccess("congé ajouté avec succès");
+          setStatus(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
         });
         setTimeout(() => {
             setSuccess("");
@@ -164,10 +166,6 @@ const Conges = () => {
   useEffect(() => {
     const func = async () => {
         try {
-          /*window.electronAPI.getDecision();
-          await window.electronAPI.retrieveDecision((event, res) => {
-            setDecision(res);
-          })*/
           window.electronAPI.getConge();
           await window.electronAPI.retrieveConge((event, res) => {
             setConge(res);
@@ -262,6 +260,7 @@ const Conges = () => {
                 </div>
             </div>
         </Row>
+        {/** Formulaire de Creation de Congé */}
         <Row className="mt-5">
           <Col className="order-xl-1" md="12" lg="12">
             <Card className="bg-secondary shadow">
