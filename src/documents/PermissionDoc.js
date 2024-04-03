@@ -48,14 +48,20 @@ const styles = StyleSheet.create({
       display: 'flex',
       alignItems: 'center',
     },
-    topSection: {
-        alignItems: 'center',
+    topSectionOne: {
         flex: 1,
+        textAlign: 'center',
+        marginLeft: -50,
+    },
+    topSectionTwo: {
+        flex: 1,
+        textAlign: 'center',
+        marginRight: -65,
     },
     topSectionImage: {
-        alignItems: 'center',
-        flex: 1,
-        marginTop: -15,
+        position: 'absolute',
+        marginTop: -20,
+        left: "44%",
     },
     // certif title
     h1CertifTitle: {
@@ -168,6 +174,27 @@ const styles = StyleSheet.create({
     qrCode: {
         height: 100,
         width: 100,
+    },
+    // center text : 
+    containerQr: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        flexDirection: 'column',
+        marginLeft: 10,
+        marginRight: 10,
+        marginTop: 40,
+    },
+    sectionQr: {
+      display: 'flex',
+      alignItems: 'center',
+    },
+    qrText: {
+        textAlign: 'center',
+        fontSize: 10, 
+        marginTop: 3,
+        marginLeft: 5,
+        textTransform: 'uppercase',
+        fontWeight: 'bold',
     }
 });
 
@@ -179,13 +206,15 @@ const PermissionDoc = (props) => {
         matricule : props.matricule,
     })*/
 
+    const d = new Date();
+
     return (
         <Document>
         <Page size="A4" style={styles.page}>
             {/* first row : entete */}
             <View style={styles.container}>
                 {/* top left text */}
-                <View style={styles.topSection}>
+                <View style={styles.topSectionOne}>
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIQUE DU CAMEROUN
                     </Text>
@@ -215,7 +244,7 @@ const PermissionDoc = (props) => {
                     </Text>
                     <Text>********</Text>
                     <Text style={styles.h4TitleNumber}>
-                        N°__________/CDC/MINFI/SG/DGB/SDAG/SP
+                        N°__________/MINFI/SG/DGB/SDAG/SP
                     </Text>
                 </View>
                 {/* image */}
@@ -223,7 +252,7 @@ const PermissionDoc = (props) => {
                     <Image style={styles.imageSceau} src={image}/> 
                 </View>
                 {/* top right text */}
-                <View style={styles.topSection}>
+                <View style={styles.topSectionTwo}>
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIC OF CAMEROON
                     </Text>
@@ -260,23 +289,22 @@ const PermissionDoc = (props) => {
             <View style={styles.containerTwo}>
                 <View style={styles.section}>
                     <Text style={styles.h1CertifTitle}>
-                        CERTIFICAT DE PERMISSION
+                        ATTESTATION DE PERMISSION D'ABSCENCE
                     </Text>
                     <Text style={styles.h2CertifSubtitle}>
-                        CERTIFICAT OF PERMISSION
+                        ABSENCE PERMISSION CERTIFICATE
                     </Text>
                     <Text style={styles.pCertifText}>
                         Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
-                        {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service au {props.structure} est bénéficiaire
-                        d'une permission de {props.duration} jours , accordé par décision N° {props.decision}
-                         {/*du DATE_DEC*/} du Ministre des finances.
+                        {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service (au/à la) {props.structure} est bénéficiaire
+                        d'une permission de {props.duration} jours.
                     </Text>
                     <Text style={styles.pCertifText}>
-                        L'intéressé{props.sexe === "M" ? "" : "e"} jouira dudit congé pendant la période du {props.startDate} au {props.endDate} et 
+                        L'intéressé{props.sexe === "M" ? "" : "e"} jouira de ladite permission pendant la période du {props.startDate} au {props.endDate} et 
                         reprendra le service le {props.repriseDate} à 7 heures 30 précises.
                     </Text>
                     <Text style={styles.pCertifText}>
-                        En foi de quoi, le présent certificat est établi et délivré à l'intéressé{props.sexe === "M" ? "" : "e"} pour
+                        En foi de quoi, la présente attestation est établie et délivrée à l'intéressé{props.sexe === "M" ? "" : "e"} pour
                         servir et valoir ce que de droit./-
                     </Text>
                 </View>
@@ -305,6 +333,13 @@ const PermissionDoc = (props) => {
                 {/*<View style={styles.sectionRightBottom}>
                     <Image src={QrCode} style={styles.qrCode} />
                 </View>*/}
+            </View>
+            <View style={styles.containerQr}>
+                <View style={styles.sectionQr}>
+                    <Text style={styles.qrText}>
+                        GESCON-APP - {d.getTime()} - {d.getFullYear()}
+                    </Text>
+                </View>
             </View>
         </Page>
       </Document>

@@ -8,9 +8,11 @@ import Personnel from "views/examples/Personnel.js";
 import Decision from "views/examples/Decision.js";
 //import Icons from "views/examples/Icons.js";
 import Permission from "views/examples/Permission";
-import Attestation from "views/examples/Attestation";
+import AttestationConge from "views/examples/AttestationConge";
+import AttestationPermission from "views/examples/AttestationPermission";
 import FichePersonnel from "views/examples/FichePersonnel";
-import ArchiveAttestation from "views/examples/ArchiveAttestation";
+import ArchiveAttestationConge from "views/examples/ArchiveAttestationConge";
+import ArchiveAttestationPermission from "views/examples/ArchiveAttestationPermission";
 import PersonnelDetails from "views/examples/PersonnelDetails";
 
 var routes = [
@@ -43,7 +45,7 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/admin/personnel-details/:id",
+    path: "/personnel-details",
     name: "Détails",
     icon: "ni ni-circle-08 text-blue",
     component: <PersonnelDetails />,
@@ -57,17 +59,31 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/attestation",
-    name: "Attestations",
+    path: "/attestation-conge",
+    name: "Attestations congés",
     icon: "ni ni-paper-diploma text-blue",
-    component: <Attestation />,
+    component: <AttestationConge />,
+    layout: "/admin",
+  },
+  {
+    path: "/attestation-permission",
+    name: "Attestations permission",
+    icon: "ni ni-paper-diploma text-blue",
+    component: <AttestationPermission />,
     layout: "/admin",
   },
   {
     path: "/archive",
-    name: "Attestations Archivés",
+    name: "Congés Archivés",
     icon: "ni ni-archive-2 text-blue",
-    component: <ArchiveAttestation />,
+    component: <ArchiveAttestationConge />,
+    layout: "/admin",
+  },
+  {
+    path: "/archive_permissions",
+    name: "Permisions Archivés",
+    icon: "ni ni-archive-2 text-blue",
+    component: <ArchiveAttestationPermission />,
     layout: "/admin",
   },
   {

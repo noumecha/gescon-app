@@ -16,9 +16,8 @@ const styles = StyleSheet.create({
     container: {
       display: 'flex',
       justifyContent: 'space-between',
+      position: 'relative',
       flexDirection: 'row',
-      marginLeft: 10,
-      marginRight: 10,
       marginTop: 40,
     },
     containerTwo: {
@@ -45,14 +44,20 @@ const styles = StyleSheet.create({
       display: 'flex',
       alignItems: 'center',
     },
-    topSection: {
-        alignItems: 'center',
+    topSectionOne: {
         flex: 1,
+        textAlign: 'center',
+        marginLeft: -50,
+    },
+    topSectionTwo: {
+        flex: 1,
+        textAlign: 'center',
+        marginRight: -65,
     },
     topSectionImage: {
-        alignItems: 'center',
-        flex: 1,
-        marginTop: -15,
+        position: 'absolute',
+        marginTop: -20,
+        left: "44%",
     },
     // certif title
     h1CertifTitle: {
@@ -161,11 +166,34 @@ const styles = StyleSheet.create({
     imageSceau: {
         height: 100,
         width: 100,
+    }, 
+    // center text : 
+    containerQr: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        flexDirection: 'column',
+        marginLeft: 10,
+        marginRight: 10,
+        marginTop: 40,
+    },
+    sectionQr: {
+      display: 'flex',
+      alignItems: 'center',
+    },
+    qrText: {
+        textAlign: 'center',
+        fontSize: 10, 
+        marginTop: 3,
+        marginLeft: 5,
+        textTransform: 'uppercase',
+        fontWeight: 'bold',
     }
 });
 
 // Create Document Component
 const CongeDoc = (props) => {
+
+    const d = new Date();
 
     return (
         <Document>
@@ -173,7 +201,7 @@ const CongeDoc = (props) => {
             {/* first row : entete */}
             <View style={styles.container}>
                 {/* top left text */}
-                <View style={styles.topSection}>
+                <View style={styles.topSectionOne}>
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIQUE DU CAMEROUN
                     </Text>
@@ -203,7 +231,7 @@ const CongeDoc = (props) => {
                     </Text>
                     <Text>********</Text>
                     <Text style={styles.h4TitleNumber}>
-                        N°__________/CDC/MINFI/SG/DGB/SDAG/SP
+                        N°__________/MINFI/SG/DGB/SDAG/SP
                     </Text>
                 </View>
                 {/* image */}
@@ -211,7 +239,7 @@ const CongeDoc = (props) => {
                     <Image style={styles.imageSceau} src={image}/> 
                 </View>
                 {/* top right text */}
-                <View style={styles.topSection}>
+                <View style={styles.topSectionTwo}>
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIC OF CAMEROON
                     </Text>
@@ -255,7 +283,7 @@ const CongeDoc = (props) => {
                     </Text>
                     <Text style={styles.pCertifText}>
                         Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
-                        {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service au {props.structure} est bénéficiaire
+                        {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service (au/à la) {props.structure} est bénéficiaire
                         d'un {props.typeConge} de {props.duration} jours , accordé par décision N° {props.decision}
                          {/*du DATE_DEC*/} du Ministre des finances.
                     </Text>
@@ -288,6 +316,13 @@ const CongeDoc = (props) => {
                     </Text>
                     <Text style={styles.amParagraph5}>
                         - chrono/archives
+                    </Text>
+                </View>
+            </View>
+            <View style={styles.containerQr}>
+                <View style={styles.sectionQr}>
+                    <Text style={styles.qrText}>
+                        GESCON-APP - {d.getTime()} - {d.getFullYear()}
                     </Text>
                 </View>
             </View>

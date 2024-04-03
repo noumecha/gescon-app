@@ -19,6 +19,8 @@ import {
     Table,
     Container,
     Row,
+    Col,
+    Alert,
     Nav,
     UncontrolledTooltip,
   } from "reactstrap";
@@ -39,6 +41,8 @@ const Personnel = () => {
     const [perPage] = useState(100);
     const [filter, setFilter] = useState("");
     const [search, setSearch] = useState("");
+    const [status, setStatus] = useState("");
+    const [success, setSuccess] = useState("");
     const [selectedPerson, setSelectedPerson] = useState(null);
     const navigate = useNavigate();
 
@@ -85,20 +89,27 @@ const Personnel = () => {
         try {
             for (let i = 0; i < excelData.length; i++) {
                 const type = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 1 : 2;
+                const statut = "en poste"; // en permission, en congé
+                const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
+                const nb_jours_permission = 10;
                 const req = `
                 INSERT INTO personnel 
-                (ordre, matricule, nom_prenom, grade, poste, structure, sexe, date_recrutement, situation_matrimoniale,
-                region, departement, date_naiss, telephone,type, categorie, arrondissement)
+                (ordre_personnel, matricule_personnel, nom_prenom_personnel, grade_personnel, poste_personnel, structure_personnel, sexe_personnel, date_recrutement_personnel, situation_matrimoniale_personnel,
+                region_personnel, departement_personnel, date_naiss_personnel, telephone_personnel,id_type_personnel, categorie_personnel, arrondissement_personnel,nb_jours_permission,nb_jours_conges,statut_personnel)
                 VALUES 
                 (${excelData[i].ORDRE},"${excelData[i].MATRICULE}","${excelData[i].NOM_PRENOM}",
                 "${excelData[i].GRADE}","${excelData[i].POSTE}","${excelData[i].STRUCTURE}","${excelData[i].SEXE}",
                 "${excelData[i].DATE_RECRUTEMENT}","${excelData[i].SITUATION_MATRIMONIALE}","${excelData[i].REGION}",
                 "${excelData[i].DEPARTEMENT}","${excelData[i].DATE_NAISSANCE}","${excelData[i].TELEPHONE}","${type}",
-                "${excelData[i].CATEGORIE}","${excelData[i].ARRONDISSEMENT}");`;
+                "${excelData[i].CATEGORIE}","${excelData[i].ARRONDISSEMENT}","${nb_jours_permission}","${nb_jours_conges}","${statut}");`;
                 window.electronAPI.addPersonnel(req);
             }
-            //ARRONDISSEMENT,CATEGORIE,DATE_NAISSANCE,DATE_RECRUTEMENT,DEPARTEMENT,GRADE,MATRICULE,NOM_PRENOM,
-            //ORDRE,POSTE,REGION,SEXE,SITUATION_MATRIMONIALE,STRUCTURE,TELEPHONE
+            window.electronAPI.personnelAddedSuccess(() => {
+                setSuccess("Personnel ajouté avec succès");
+            });
+            setTimeout(() => {
+                setSuccess("");
+            }, 3000)
         } catch (err) {
             console.error("Erreur Trouvé : " + err.message);
         }
@@ -108,10 +119,6 @@ const Personnel = () => {
     useEffect(() => {
         const func = async () => {
             try {
-                await window.electronAPI.personnelAddedSuccess((event, res) => {
-                    console.log("resultat requete : " + JSON.stringify(res));
-                    alert("resultat requete : " + res)
-                });
                 window.electronAPI.getPersonnel();
                 await window.electronAPI.receivePersonnel((event, res) => {
                     //console.log("pers event : " + JSON.stringify(event));
@@ -134,9 +141,10 @@ const Personnel = () => {
 
     /** for the filter and the search bar */
 
-    const filterPersonnel = filter !== "" || search !== ""
-        ? personnel.filter(personnel => personnel.categorie.includes(filter) && (
-            personnel.nom_prenom.toLowerCase().includes(search.toLowerCase()) || personnel.matricule.toLowerCase().includes(search.toLowerCase())
+    const filterPersonnel = filter !== "" || search !== "" || status !== ""
+        ? personnel.filter(personnel => personnel.categorie_personnel.includes(filter) && (
+            personnel.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
+            || personnel.matricule_personnel.toLowerCase().includes(search.toLowerCase())
         ))
         : personnel
 
@@ -148,10 +156,20 @@ const Personnel = () => {
         setSearch(e.target.value);
     }
 
+    const handleStatus = (e) => {
+        setStatus(e.target.value);
+    }
+
     /** for the current selected personnle page */
     const handleCongeClick = (person) => {
         console.log("person selected", person);
         navigate("/admin/conges", {state: {selectedPerson: person}});
+        setSelectedPerson(person);
+    }
+
+    const handleDetailClick = (person) => {
+        console.log("personnel details :", person);
+        navigate("/admin/personnel-details", {state: {selectedPerson: person}});
         setSelectedPerson(person);
     }
 
@@ -165,7 +183,16 @@ const Personnel = () => {
         <>
         <Header />
         {/* Page content */}
-        <Container className="mt--7" fluid>
+        <Container className="mt--7" fluid>  
+            <Row>
+                <Col lg="12">
+                    { success && 
+                        <Alert className="text-center" color="success">
+                            {success}
+                        </Alert>
+                    }
+                </Col>
+            </Row>
             {/* Table */}
             <Row>
                 <div className="col p-0">
@@ -181,63 +208,70 @@ const Personnel = () => {
                 </div>
             </Row>
             <Row>
-                <div className="col p-0">
+                <Col lg="12">
                     {excelData ? (
-                        <div className="col p-0">
+                        <div>
                             <div className="mt-3 alert alert-success" role="alert">
                                 <h3 className="mb-0 text-center text-white"> Fichier importer avec succès ! </h3>
                             </div>
                             <Card className="shadow">
-                                {/*<Table className="align-items-center table-flush" responsive>
-                                    <thead className="thead-light">
-                                        <tr>
-                                            {Object.keys(excelData[0]).map((key) => (
-                                                <th key={key}>
-                                                    {key}
-                                                </th>
-                                            ))}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {excelData.map((row, index) => (
-                                            <tr key={index}>
-                                                {Object.keys(row).map((key) => (
-                                                    <td key={key}>
-                                                        {row[key]}
-                                                    </td>
-                                                ))}
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                                </Table>*/}
                             </Card>
                         </div>
                     ) : (  
-                        <div className="col p-0">
+                        <div>
                             <div className="mt-3 alert alert-danger" role="alert">
                                 <h3 className="mb-0 text-center text-white"> Aucun Fichier importer ! </h3>
                             </div>
                         </div>
                     )}
-                </div>
+                </Col>
             </Row>
             <Row>
-                <div className="col">
+                <Col lg="6">
+                    <Input
+                        type="select"
+                        className="form-control"
+                        onChange={handleFilterChange}
+                        value={filter}
+                    >
+                        <option value="">Toutes les catégories</option>
+                        <option value="A1">A1</option>
+                        <option value="B1">B1</option>
+                        <option value="A2">A2</option>
+                        <option value="B2">B2</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                    </Input>
+                </Col>
+                <Col lg="6">
+                    <Input
+                        type="select"
+                        className="form-control"
+                        placeholder="Rechercher par nom ou matricule"
+                        onChange={handleStatus}
+                        value={status}
+                    >
+                        <option value="">Tous les statuts</option>
+                        <option value="en conge">en congé</option>
+                        <option value="en poste">en poste</option>
+                        <option value="en permission">en permission</option>
+                    </Input>
+                </Col>
+            </Row>
+            <Row>
+                <Col lg="12">
                     <div className="form-group custom-form">
-                        <Input
-                            type="select"
-                            className="form-control"
-                            onChange={handleFilterChange}
-                            value={filter}
-                        >
-                            <option value="">Toutes les catégories</option>
-                            <option value="A1">A1</option>
-                            <option value="B1">B1</option>
-                            <option value="A2">A2</option>
-                            <option value="B2">B2</option>
-                            <option value="C">C</option>
-                            <option value="D">D</option>
-                        </Input>
                         <Input
                             type="text"
                             className="form-control mt-3"
@@ -246,7 +280,7 @@ const Personnel = () => {
                             value={search}
                         />
                     </div>
-                </div>
+                </Col>
             </Row>
             <Row>
                 <div className="col p-0">
@@ -261,38 +295,58 @@ const Personnel = () => {
                                         <tr>
                                             <th>Matricule</th>
                                             <th>Nom & Prenom</th>
-                                            <th>Grade</th>
+                                            {/*<th>Grade</th>*/}
                                             <th>Poste</th>
-                                            <th>Structure</th>
-                                            <th>Sexe</th>
-                                            <th>Date recrutement</th>
-                                            <th>Situation Matrimoniale</th>
-                                            <th>Region</th>
-                                            <th>Departement</th>
-                                            <th>Date de naissance</th>
-                                            <th>Telephone</th>
+                                            {/*<th>Structure</th>*/}
+                                            {/*<th>Sexe</th>*/}
+                                            {/*<th>Date recrutement</th>*/}
+                                            {/*<th>Situation Matrimoniale</th>*/}
+                                            {/*<th>Region</th>*/}
+                                            {/*<th>Departement</th>*/}
+                                            {/*<th>Date de naissance</th>*/}
+                                            {/*<th>Telephone</th>*/}
                                             <th>Categorie</th>
-                                            <th>Arrondissement</th>
+                                            {/*<th>Arrondissement</th>*/}
+                                            <th>Statut</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {filterPersonnel.slice(offset, offset + perPage).map((person, index) => (
                                             <tr key={index}>
-                                                <td>{person.matricule}</td>    
-                                                <td>{person.nom_prenom}</td>    
-                                                <td>{person.grade}</td>    
-                                                <td>{person.poste}</td>    
-                                                <td>{person.structure}</td>    
-                                                <td>{person.sexe}</td>    
-                                                <td>{person.date_recrutement}</td>    
-                                                <td>{person.situration_matrimoniale}</td>    
-                                                <td>{person.region}</td>    
-                                                <td>{person.departement}</td>    
-                                                <td>{person.date_naiss}</td>    
-                                                <td>{person.telephone}</td>    
-                                                <td>{person.categorie}</td>    
-                                                <td>{person.arrondissement}</td>  
+                                                <td>{person.matricule_personnel}</td>    
+                                                <td>{person.nom_prenom_personnel}</td>    
+                                                {/*<td>{person.grade_personnel}</td>*/}    
+                                                <td>{person.poste_personnel}</td>    
+                                                {/*<td>{person.structure_personnel}</td>*/}    
+                                                {/*<td>{person.sexe_personnel}</td>*/}
+                                                {/*<td>{person.date_recrutement_personnel}</td>*/}    
+                                                {/*<td>{person.situration_matrimoniale_personnel}</td>*/}    
+                                                {/*<td>{person.region_personnel}</td>*/}    
+                                                {/*<td>{person.departement_personnel}</td>*/}    
+                                                {/*<td>{person.date_naiss_personnel}</td>*/}    
+                                                {/*<td>{person.telephone_personnel}</td>*/}    
+                                                <td>{person.categorie_personnel}</td>    
+                                                {/*<td>{person._personnel}</td>*/} 
+                                                <td>
+                                                    {person.statut_personnel === "en congé" ?  
+                                                        <Badge color="danger">
+                                                            {person.statut_personnel}
+                                                        </Badge> 
+                                                        : person.statut_personnel === "en poste" ? 
+                                                        <Badge color="success">
+                                                            {person.statut_personnel}
+                                                        </Badge> 
+                                                        : person.statut_personnel === "en permission" ?
+                                                        <Badge color="primary">
+                                                            {person.statut_personnel}
+                                                        </Badge>
+                                                        : 
+                                                        <Badge color="danger">
+                                                            {person.statut_personnel}
+                                                        </Badge>
+                                                    }
+                                                </td> 
                                                 <td className="text-right">
                                                     <UncontrolledDropdown>
                                                         <DropdownToggle
@@ -305,18 +359,36 @@ const Personnel = () => {
                                                             <i className="fas fa-ellipsis-v" />
                                                         </DropdownToggle>
                                                         <DropdownMenu className="dropdown-menu-arrow" right>
+                                                            {person.statut_personnel === "en congé" 
+                                                                ? 
+                                                                <DropdownItem
+                                                                    onClick={() => handleCongeClick(person)}
+                                                                >
+                                                                    Prolongé le congé
+                                                                </DropdownItem> 
+                                                                : 
+                                                                <DropdownItem
+                                                                    onClick={() => handleCongeClick(person)}
+                                                                >
+                                                                    Nouveau congé
+                                                                </DropdownItem>
+                                                            }
+                                                            {person.statut_personnel === "en permission" 
+                                                                ? 
+                                                                <DropdownItem
+                                                                    onClick={() => handlePermissionClick(person)}
+                                                                >
+                                                                    Prolongé la permission
+                                                                </DropdownItem>
+                                                                : 
+                                                                <DropdownItem
+                                                                    onClick={() => handlePermissionClick(person)}
+                                                                >
+                                                                    Nouvelle permission
+                                                                </DropdownItem>
+                                                            }
                                                             <DropdownItem
-                                                                onClick={() => handleCongeClick(person)}
-                                                            >
-                                                                Nouveau Congé
-                                                            </DropdownItem>
-                                                            <DropdownItem
-                                                                onClick={() => handlePermissionClick(person)}
-                                                            >
-                                                                Nouvelle permission
-                                                            </DropdownItem>
-                                                            <DropdownItem
-                                                                onClick={(e) => e.preventDefault()}
+                                                                onClick={() => handleDetailClick(person)}
                                                             >
                                                                 Détails
                                                             </DropdownItem>

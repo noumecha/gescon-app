@@ -23,17 +23,15 @@ const Permission = () => {
     const { selectedPerson } = location.state || {};
     const [endDate, setEndDate] = useState("");
     const [repDate, setRepDate] = useState("");
-    const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom : "TCHUENTE");
-    const [telephone, setTelephone] = useState(selectedPerson ? selectedPerson.telephone : "653465348");
+    const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom_personnel : "TCHUENTE");
+    const [telephone, setTelephone] = useState(selectedPerson ? selectedPerson.telephone_personnel : "653465348");
     const [startDate, setStartDate] = useState("");
-    const [decision, setDecision] = useState([]);
-    const [selectedDec, setSelectedDec] = useState("");
-    const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule : "XD3 566");
-    const [type, setType] = useState(selectedPerson ? selectedPerson.type === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
-    const [structure, setStructure] = useState(selectedPerson ? selectedPerson.structure : "Service Général");
+    const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson._personnel : "XD3 566");
+    const [type, setType] = useState(selectedPerson ? selectedPerson.id_type_personnel === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
+    const [structure, setStructure] = useState(selectedPerson ? selectedPerson.structure_personnel : "Service Général");
     const [duration, setDuration] = useState("");
-    const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste : "Contrôleur");
-    const sexe = selectedPerson ? selectedPerson.sexe : "M"; 
+    const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste_personnel : "Contrôleur");
+    const sexe = selectedPerson ? selectedPerson.sexe_personnel : "M"; 
 
     const handleInputChange = (setStateFunction) => (e) => {
         setStateFunction(e.target.value);
@@ -65,20 +63,6 @@ const Permission = () => {
       }, [startDate, duration, repDate]);
 
     /** useeffect for fetching */
-    useEffect(() => {
-        const func = async () => {
-            try {
-                window.electronAPI.getDecision();
-                await window.electronAPI.retrieveDecision((event, res) => {
-                    setDecision(res);
-                })
-            } catch (error) {
-                console.error("Erreur : " + error.message);
-            }
-        }
-        func();
-    }, []);
-
     return (
         <>
         <Header />
@@ -90,7 +74,7 @@ const Permission = () => {
                     <CardHeader className="bg-white border-0">
                         <Row className="align-items-center">
                         <Col xs="8">
-                            <h3 className="mb-0">Définir un nouveau congé</h3>
+                            <h3 className="mb-0">Définir une nouvelle Permission</h3>
                         </Col>
                         </Row>
                     </CardHeader>
@@ -227,7 +211,7 @@ const Permission = () => {
                                         <Label
                                             for="demande-file"
                                         >
-                                            Demande Timbré
+                                            Demande de Permision Timbré
                                         </Label>
                                         <Input
                                             id="demande-file"
@@ -288,26 +272,6 @@ const Permission = () => {
                                     />
                                     </FormGroup>
                                 </Col>
-                                <Col md="6">
-                                    <FormGroup>  
-                                    <Label for="num-decision">
-                                        Numero de Décision
-                                    </Label>              
-                                    <Input
-                                        className="mb-3"
-                                        type="select"
-                                        id="num-decision"
-                                        onChange={handleInputChange(setSelectedDec)}
-                                    >
-                                        {decision && decision.length > 0 
-                                        ? decision.map((d, i) => (
-                                            <option key={i}>{d.numero_decision}</option>
-                                        ))
-                                        : (<option>Selectionner le numero de décision</option>)
-                                        }
-                                    </Input>
-                                    </FormGroup>
-                                </Col>
                             </Row>
                             <Row>
                                 <Col md="6">
@@ -335,7 +299,6 @@ const Permission = () => {
                             sexe={sexe}
                             type={type}
                             poste={poste}
-                            decision={selectedDec} 
                             duration={duration} 
                             structure={structure}
                             startDate={startDate}
@@ -351,7 +314,6 @@ const Permission = () => {
                     sexe={sexe}
                     type={type}
                     poste={poste}
-                    decision={selectedDec} 
                     duration={duration} 
                     structure={structure}
                     startDate={startDate}

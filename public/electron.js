@@ -41,7 +41,7 @@ const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'gescon_app_db'
+    database: 'gescon_db'
 }) 
 
 // fucntion for the personnel : 
@@ -49,7 +49,7 @@ function addPersonnel(event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
         event.sender.send('personnel-added-success', { message: 'Personnel ajouté avec succès !' });
-    })
+    });
 }
 function getPersonnel(event, arg) {
     pool.query('SELECT * FROM Personnel', (err, res) => {
@@ -57,12 +57,24 @@ function getPersonnel(event, arg) {
         event.sender.send('all-personnel', res);
     });
 }
-
-// function for decision : 
+function updatePersonnel(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('update-personnel-success', {message: 'Personnel mis à jour avec succès!'});
+    });
+}
+// functions for decision : 
 function getDecision(event, arg) {
-    pool.query('SELECT id_decision,numero_decision,objet_decision,signataire_decision,date_decision,libelle_type_personnel FROM decision,type_personnel WHERE decision.type_personnel = type_personnel.id_type_personnel', (err, res) => {
+    pool.query('SELECT id_decision,numero_decision,objet_decision,signataire_decision,date_decision,libelle_type_personnel FROM decision,type_personnel WHERE decision.id_type_personnel = type_personnel.id_type_personnel', (err, res) => {
         if (err) throw err;
         event.sender.send('all-decision', res);
+    });
+}
+
+function getSpecificDec(event, arg) {
+    pool.query('SELECT * FROM decision WHERE id_decision =?', [arg], (err, res) => {
+        if (err) throw err;
+        event.sender.send('specific-decision', res);
     });
 }
 
@@ -80,11 +92,18 @@ function deleteDecision(event, req) {
     })
 }
 
-// function for conge : 
+// functions for conge : 
 function getConge(event, req) {
-    pool.query('SELECT * FROM conge', (err, res) => {
+    pool.query('SELECT * FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel;', (err, res) => {
         if (err) throw err;
         event.sender.send('all-conge', res);
+    });
+}
+
+function getAttestationConge(even, req) {
+    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_conge,statut_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel', (err, res) => {
+        if (err) throw err;
+        even.sender.send('all-attestation-conge', res);
     });
 }
 
@@ -95,7 +114,41 @@ function addConge(event, req) {
     })
 }
 
-// function for conge type :
+function updateConge(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('update-conge-success', {message: 'Conge mis à jour avec succès!'});
+    });
+}
+
+function addArchiveAttestationConge(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('attestation-conge-added-success', { message: 'Attestation de conge ajouté avec succès!' });
+    })
+}
+
+function getArchiveAttConge(event, req) {
+    pool.query('SELECT archive_att_conge.id_conge,id_archive_att_conge,nom_prenom_personnel,matricule_personnel,created_at_arch_att_conge,fichier_archive_att_conge FROM conge,personnel,archive_att_conge WHERE conge.id_personnel = personnel.id_personnel AND conge.id_conge = archive_att_conge.id_conge;', (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-archived-conge', res);
+    });
+}
+
+function deleteArchiveAttConge(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('delete-archive-att-conge-success', { message: 'Archive supprimée avec succès!' });
+    })
+}
+
+// functions for conge type :
+function getSpecificCongeType (event, arg) {
+    pool.query('SELECT * FROM type_conge WHERE id_type_conge =?', [arg], (err, res) => {
+        if (err) throw err;
+        event.sender.send('specific-conge-type', res);
+    });
+}
 function getCongeType(event, res) {
     pool.query('SELECT * FROM type_conge', (err, res) => {
         if (err) throw err;
@@ -110,20 +163,7 @@ function addCongeType(event, req) {
     });
 }
 
-// for demandes :
-function addDemande(event, req) {
-    pool.query(req, (err, res) => {
-        if (err) throw err;
-        event.sender.send('demande-added-success', { message: 'Demande ajouté avec succès!' });
-    });
-}
-function getDemande(event, req) {
-    pool.query('SELECT * FROM demande', (err, res) => {
-        if (err) throw err;
-        event.sender.send('all-demande', res);
-    });
-}
-// for document : 
+// functions for document : 
 function addDocument(event, req) {
     pool.query(req, (err, res) => {
         if (err) throw err;
@@ -136,7 +176,7 @@ function getDocument(event, req) {
         event.sender.send('all-document', res);
     });
 }
-// function for add_users : 
+// functions for add_users : 
 
 function addUser(event, req) {
     pool.query(req, (err, res) => {
@@ -167,23 +207,28 @@ app.whenReady().then(() => {
     });
     ipcMain.on('add-personnel', addPersonnel);
     ipcMain.on('get-personnel', getPersonnel);
-    // decision data get : 
+    ipcMain.on('update-personnel', updatePersonnel);
+    // decision
     ipcMain.on('get-decision', getDecision);
     ipcMain.on('add-decision', addDecision);
     ipcMain.on('delete-decision', deleteDecision);
-    // conge type data get : 
+    ipcMain.on('get-specific-decision', getSpecificDec);
+    // conge type  
     ipcMain.on('get-conge-type', getCongeType);
     ipcMain.on('add-conge-type', addCongeType);
-    // conge data get : 
+    ipcMain.on('get-specific-conge-type', getSpecificCongeType);
+    // conge  
     ipcMain.on('get-conge', getConge);
+    ipcMain.on('add-archive-attestation-conge', addArchiveAttestationConge)
+    ipcMain.on('update-conge', updateConge);
     ipcMain.on('add-conge', addConge);
-    // demande data get :
-    ipcMain.on('get-demande', getDemande);
-    ipcMain.on('add-demande', addDemande);
+    ipcMain.on('get-attestation-conge', getAttestationConge);
+    ipcMain.on('get-archive-att-conge', getArchiveAttConge);
+    ipcMain.on('delete-archive-att-conge', deleteArchiveAttConge);
     // document à fournir : 
     ipcMain.on('get-document', getDocument);
     ipcMain.on('add-document', addDocument);
-    // for users :
+    // users :
     ipcMain.on('get-users', getUsers);
     ipcMain.on('add-user', addUser);
     // set the App title

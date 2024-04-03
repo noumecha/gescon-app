@@ -4,7 +4,7 @@ import {
   } from "reactstrap";
 import Header from "components/Headers/Header.js";
 
-const ArchiveAttestation = () => {
+const AttestationPermission = () => {
 
     return (
         <>
@@ -15,7 +15,7 @@ const ArchiveAttestation = () => {
             <Row>
                 <div className="col">
                     <div className="mt-3 alert alert-success" role="alert">
-                        Page des ArchiveAttestations
+                        Page des attestations de permissions
                     </div>
                 </div>
             </Row>
@@ -24,4 +24,4 @@ const ArchiveAttestation = () => {
     );
 }
 
-export default ArchiveAttestation;
+export default AttestationPermission;
