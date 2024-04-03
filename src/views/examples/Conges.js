@@ -43,7 +43,7 @@ const Conges = () => {
   const [selectedDec, setSelectedDec] = useState("nothing");
   const [struc, setStruc] = useState(selectedPerson ? selectedPerson.structure_personnel : "Service Général");
   const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste_personnel : "Contrôleur");
-  const sexe = selectedPerson ? selectedPerson.sexe_personnel : "M";
+  const [sexe, setSexe] = useState(selectedPerson ? selectedPerson.sexe_personnel : "M");
   const nb_jours_conges = selectedPerson ? selectedPerson.nb_jours_conges : 18
   const [telephone, setTelphone] = useState(selectedPerson ? selectedPerson.telephone_personnel : 696879475)
   const [demande, setDemande] = useState(null);
@@ -54,6 +54,12 @@ const Conges = () => {
   const [visible, setVisible] = useState(true)
   const [deleteSuccess, seDeleteSuccess] = useState("");
   const [conge, setConge] = useState([]);
+  const [congeData, setCongeData] = useState({});
+  const [attestationData, setAttestationData] = useState({});
+  const [reqUpdateConge, setReqUpdateConge] = useState("");
+  const [statutPersonnel, setStatutPersonnel] = useState("");
+  const [reqPersonnel, setReqPersonnel] = useState("");
+  const [stateUpdate, setStateUpdate] = useState(true);
   const curr_date = new Date();
 
   const onDismiss = () => setVisible(false)
@@ -82,14 +88,14 @@ const Conges = () => {
         },7000)
         return;
       }
-      if (!demande) {
+      /*if (!demande) {
         setError("Veuillez sélectionner une demande de congé.");
         setTimeout(() => {
           setError("");
         }, 7000);
         return;
-      }
-      if (typeConge === "" || name === "" || startDate === "" || endDate === "" || duration === "" || repriseDate === "" || selectedType === "" || matricule === "" || type === "" || selectedDec === "" || struc === "" || poste === "" || demande === "" || document === "") {
+      }*/
+      if (typeConge === "" || name === "" || startDate === "" || endDate === "" || duration === "" || repriseDate === "" || selectedType === "" || matricule === "" || type === "" || selectedDec === "" || struc === "" || poste === "") {
         setError('Veuillez remplir tous les champs');
         setTimeout(() => {
           setError("");
@@ -139,14 +145,73 @@ const Conges = () => {
     }
   }
 
+  const saveEditedConge = async (e) => {
+    e.preventDefault();
+    try {
+      if (duration > nb_jours_conges) {
+        setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return;
+      }
+      if (duration === 0) {
+        setError(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} n'a pas droit au congé`);
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return;
+      }
+      if (typeConge === "" || name === "" || startDate === "" || endDate === "" || duration === "" || repriseDate === "" || selectedType === "" || matricule === "" || type === "" || selectedDec === "" || struc === "" || poste === "") {
+        setError('Veuillez remplir tous les champs');
+        setTimeout(() => {
+          setError("");
+        }, 7000)
+        return;
+      } else {
+        window.electronAPI.addConge(reqUpdateConge);
+        window.electronAPI.updatePersonnel(reqPersonnel);
+        window.electronAPI.congeAddedSuccess(() => {
+          setSuccess("congé mis à jour succès");
+          setStatus(`Le statut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
+        });
+        setTimeout(() => {
+          setSuccess("");
+        }, 3000)
+        console.log("test update sucessfully");
+      } 
+    } catch (err) {
+      console.log("error on update conge : " + err.message);
+    }
+  }
+
+  const handleSetReqPersonnel = (t) => {
+    setReqPersonnel(t)
+  }
+
   const editConge = async (c) => {
     console.log("you want to edit conge : ", c);
+    const d = c.id_type_personnel === 1 ? 30 : 18 ;
+    const reqP = `UPDATE personnel SET nb_jours_conges = ${d} WHERE id_personnel = ${c.id_personnel};`;
+    handleSetReqPersonnel(reqP)
+    //setReqPersonnel(`UPDATE personnel SET nb_jours_conges = ${d} WHERE id_personnel = ${c.id_personnel};`);
+    console.log("reqpersonnl : ", reqPersonnel);
+    /*window.electronAPI.updatePersonnel(reqP);
+    window.electronAPI.updatePersonnelSuccess(() => {
+      setSuccess("nombres de jours de congés reinitialiser");
+    });
+    setTimeout(() => {
+      setSuccess("");
+    }, 3000)
+    setStateUpdate(false)
     setStatus(`Modification des paramètres du congé de ${c.sexe_personnel === 'M' ? 'M' : 'Mme'} ${c.nom_prenom_personnel}`);
     setName(c.nom_prenom_personnel);
     setPoste(c.poste_personnel);
     setMatricule(c.matricule_personnel);
     setType(c.id_type_personnel === 1 ? "Fonctionnaire" : "Contractuelle" );
     setStruc(c.structure_personnel);
+    setSexe(c.sexe_personnel);
+    setTelphone(c.telephone_personnel);
     window.electronAPI.getSpecificCongeType(c.id_type_conge);
     await window.electronAPI.retrieveSpecificCongeType((event, res) => {
       const specific_conge_type = res;
@@ -158,58 +223,54 @@ const Conges = () => {
     const end = new Date(c.date_debut_conge.toISOString().split("T")[0]);
     end.setDate(end.getDate() + parseInt(c.duree_conge));
     setEndDate(end.toISOString().split("T")[0]);
+    const repDate = new Date(end);
+    repDate.setDate(end.getDate() + parseInt(1));
+    setRepriseDate(repDate.toISOString().split("T")[0]);
     setDuration(c.duree_conge);
     window.electronAPI.getSpecificDec(c.id_type_personnel);
     await window.electronAPI.retrieveSpecificDec((event, res) => {
       const specific_dec = res;
       setSelectedDec(specific_dec[0].numero_decision);
     })
-    if (duration > nb_jours_conges) {
-      setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
-      setTimeout(() => {
-        setError("");
-      },7000)
-      return;
-    }
-    if (!demande) {
-      setError("Veuillez sélectionner une demande de congé.");
-      setTimeout(() => {
-        setError("");
-      }, 7000);
-      return;
-    }
-    if (typeConge === "" || name === "" || startDate === "" || endDate === "" || duration === "" || repriseDate === "" || selectedType === "" || matricule === "" || type === "" || selectedDec === "" || struc === "" || poste === "" || demande === "" || document === "") {
-      setError('Veuillez remplir tous les champs');
-      setTimeout(() => {
-        setError("");
-      }, 7000)
-      return;
-    } else {
-      const attestation = {
-        name: name,
-        matricule: matricule,
-        sexe: sexe,
-        poste: poste.replace("'", "`"), 
-        type: type,
-        decision: selectedDec, 
-        duration: duration,
-        structure: struc.replace("'", "`"),
-        startDate: startDate,
-        endDate: endDate,
-        repriseDate: repriseDate,
-        typeConge: selectedType,
-      }
-      const conge_data = {
-        startDate : startDate,
-        endDate : endDate,
-        duration : duration,
-        id_personnel: c.id_personnel,
-        curr_date : new Date().toISOString().slice(0,19).replace('T',' '),
-        demande : demande,
-        id_type_conge : selectedType === "congé administratif partiel" ? 1 : selectedType === "congé administratif total" ? 2 : selectedType === "congé maternité" ? 3 : selectedType === "congé maladie" ? 4 : 0,
-        statut_conge : "non archivé"
-      }
-    }
+    setAttestationData({
+      name: name,
+      matricule: matricule,
+      sexe: sexe,
+      poste: poste.replace("'", "`"), 
+      type: type,
+      decision: selectedDec, 
+      duration: duration,
+      structure: struc.replace("'", "`"),
+      startDate: startDate,
+      endDate: endDate,
+      repriseDate: repriseDate,
+      typeConge: selectedType,
+    })
+    setCongeData({
+      startDate : startDate,
+      endDate : endDate,
+      duration : duration,
+      id_personnel: c.id_personnel,
+      curr_date : new Date().toISOString().slice(0,19).replace('T',' '),
+      demande : c.demande_conge ? c.demande_conge : demande,
+      document : c.document_a_fournir ? c.document_a_fournir : document,
+      id_type_conge : selectedType === "congé administratif partiel" ? 1 : selectedType === "congé administratif total" ? 2 : selectedType === "congé maternité" ? 3 : selectedType === "congé maladie" ? 4 : 0,
+      statut_conge : c.statut_conge
+    })
+    setStatutPersonnel(curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? "en congé" : "en poste");
+    setReqUpdateConge(`UPDATE conge 
+    SET date_debut_conge = "${congeData.startDate}" ,
+      date_fin_conge = "${congeData.endDate}",
+      duree_conge = ${congeData.duration},
+      updated_at_conge = "${congeData.curr_date}",
+      attestation_conge = '${JSON.stringify(attestationData)}',
+      id_type_conge = ${congeData.id_type_conge},
+      demande_conge = "${congeData.demande}",
+      document_a_fournir = "${congeData.document}"
+    WHERE id_conge = ${c.id_conge}`);
+    console.log("req update conge : " + reqUpdateConge)
+    setReqPersonnel(`UPDATE personnel SET statut_personnel = "${statutPersonnel}",nb_jours_conges = (nb_jours_conges - ${congeData.duration}) WHERE id_personnel = ${congeData.id_personnel};`);
+    */
   }
 
   const stopConge = (c) => {
@@ -303,7 +364,7 @@ const Conges = () => {
                                         <td>{c.nom_prenom_personnel}</td>    
                                         <td>{c.date_debut_conge.getFullYear() + "-" + (parseInt(c.date_debut_conge.getMonth()+1) <= 9 ? "0"+parseInt(c.date_debut_conge.getMonth()+1) : parseInt(c.date_fin_conge.getMonth()+1)) + "-" + c.date_debut_conge.getDate()}</td>
                                         <td>{c.date_fin_conge.getFullYear() + "-" + (parseInt(c.date_fin_conge.getMonth()+1) <= 9 ? "0"+parseInt(c.date_fin_conge.getMonth()+1) : parseInt(c.date_fin_conge.getMonth()+1)) + "-" + c.date_fin_conge.getDate()}</td>
-                                        <td>{curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? c.date_debut_conge.getDate() - curr_date.getDate() : c.date_fin_conge.getDate() - c.date_debut_conge.getDate() }</td>
+                                        <td>{curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? c.date_fin_conge.getDate() - curr_date.getDate() : c.date_fin_conge.getDate() - c.date_debut_conge.getDate() }</td>
                                         <td>{curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge 
                                             ? <Badge color="success">
                                                 en cours
@@ -336,7 +397,7 @@ const Conges = () => {
                                                         Annuler le congé
                                                     </DropdownItem>
                                                     <DropdownItem
-                                                      disabled={curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? true : false}
+                                                      disabled={curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? false : true}
                                                       onClick={() => stopConge(c)}
                                                     >
                                                         Arreter le congé
@@ -653,12 +714,30 @@ const Conges = () => {
                       </Col>
                     </Row>
                     <Row className="mt-3">
-                      <Col md="6">
+                      <Col md="4">
                         <Button
                           color="primary"
                           onClick={(e) => saveConge(e)}
+                          disabled={selectedPerson ? !stateUpdate : stateUpdate ? stateUpdate : !stateUpdate}
                         >
                           Générer l'attestation
+                        </Button>
+                      </Col>
+                      <Col md="4">
+                        <Button
+                          color="success"
+                          onClick={(e) => saveEditedConge(e)}
+                          disabled={stateUpdate}
+                        >
+                          Mettre à jour le congé
+                        </Button>
+                      </Col>
+                      <Col md="4">
+                        <Button
+                          color="danger"
+                          onClick={() => {}}
+                        >
+                          Annuler
                         </Button>
                       </Col>
                     </Row>
