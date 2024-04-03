@@ -16,7 +16,8 @@ import {
   UncontrolledDropdown,
   DropdownToggle,
   DropdownMenu,
-  DropdownItem
+  DropdownItem,
+  Badge
 } from "reactstrap";
 // core components
 import Header from "components/Headers/Header.js";
@@ -44,6 +45,7 @@ const Conges = () => {
   const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste_personnel : "Contrôleur");
   const sexe = selectedPerson ? selectedPerson.sexe_personnel : "M";
   const nb_jours_conges = selectedPerson ? selectedPerson.nb_jours_conges : 18
+  const [telephone, setTelphone] = useState(selectedPerson ? selectedPerson.telephone_personnel : 696879475)
   const [demande, setDemande] = useState(null);
   const [document, setDocument] = useState(null);
   const [error, setError] = useState("");
@@ -52,6 +54,7 @@ const Conges = () => {
   const [visible, setVisible] = useState(true)
   const [deleteSuccess, seDeleteSuccess] = useState("");
   const [conge, setConge] = useState([]);
+  const curr_date = new Date();
 
   const onDismiss = () => setVisible(false)
 
@@ -60,16 +63,13 @@ const Conges = () => {
   };
 
   const handleFileChange = (setStateFunction) => (e) => {
-    setStateFunction(e.target.files[0]);
-  }
-
-  const fileToArrayBuffer = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
-    });
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onloadend = () => {
+        const base64 = reader.result;
+        setStateFunction(base64);
+    }
+    reader.readAsDataURL(file);
   }
 
   const saveConge = async (e) => {
@@ -110,20 +110,16 @@ const Conges = () => {
           repriseDate: repriseDate,
           typeConge: selectedType,
         }
-        const demandeFile = fileToArrayBuffer(demande);
-        //console.log("demande file : " , demandeFile);
         const conge_data = {
           startDate : startDate,
           endDate : endDate,
           duration : duration,
           id_personnel: selectedPerson.id_personnel,
           curr_date : new Date().toISOString().slice(0,19).replace('T',' '),
-          demande : demandeFile,
+          demande : demande,
           id_type_conge : selectedType === "congé administratif partiel" ? 1 : selectedType === "congé administratif total" ? 2 : selectedType === "congé maternité" ? 3 : selectedType === "congé maladie" ? 4 : 0,
           statut_conge : "non archivé"
         }
-        //console.log("conge : " + JSON.stringify(conge_data));
-        //console.log("attestation : " , JSON.stringify(attestation));
         const req_conge = `INSERT INTO conge 
           (date_debut_conge, date_fin_conge, duree_conge, created_at_conge,attestation_conge,id_type_conge,id_personnel,demande_conge,statut_conge) 
           VALUES ("${conge_data.startDate}","${conge_data.endDate}",${conge_data.duration},"${conge_data.curr_date}",'${JSON.stringify(attestation)}',${conge_data.id_type_conge},${conge_data.id_personnel},"${conge_data.demandeFile}","${conge_data.statut_conge}");`;
@@ -143,6 +139,87 @@ const Conges = () => {
     }
   }
 
+  const editConge = async (c) => {
+    console.log("you want to edit conge : ", c);
+    setStatus(`Modification des paramètres du congé de ${c.sexe_personnel === 'M' ? 'M' : 'Mme'} ${c.nom_prenom_personnel}`);
+    setName(c.nom_prenom_personnel);
+    setPoste(c.poste_personnel);
+    setMatricule(c.matricule_personnel);
+    setType(c.id_type_personnel === 1 ? "Fonctionnaire" : "Contractuelle" );
+    setStruc(c.structure_personnel);
+    window.electronAPI.getSpecificCongeType(c.id_type_conge);
+    await window.electronAPI.retrieveSpecificCongeType((event, res) => {
+      const specific_conge_type = res;
+      setSelectedType(specific_conge_type[0].libelle_type_conge);
+    })
+    const start = new Date(c.date_debut_conge.toISOString().split("T")[0]);
+    start.setDate(start.getDate() + parseInt(1));
+    setStartDate(start.toISOString().split("T")[0]);
+    const end = new Date(c.date_debut_conge.toISOString().split("T")[0]);
+    end.setDate(end.getDate() + parseInt(c.duree_conge));
+    setEndDate(end.toISOString().split("T")[0]);
+    setDuration(c.duree_conge);
+    window.electronAPI.getSpecificDec(c.id_type_personnel);
+    await window.electronAPI.retrieveSpecificDec((event, res) => {
+      const specific_dec = res;
+      setSelectedDec(specific_dec[0].numero_decision);
+    })
+    if (duration > nb_jours_conges) {
+      setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
+      setTimeout(() => {
+        setError("");
+      },7000)
+      return;
+    }
+    if (!demande) {
+      setError("Veuillez sélectionner une demande de congé.");
+      setTimeout(() => {
+        setError("");
+      }, 7000);
+      return;
+    }
+    if (typeConge === "" || name === "" || startDate === "" || endDate === "" || duration === "" || repriseDate === "" || selectedType === "" || matricule === "" || type === "" || selectedDec === "" || struc === "" || poste === "" || demande === "" || document === "") {
+      setError('Veuillez remplir tous les champs');
+      setTimeout(() => {
+        setError("");
+      }, 7000)
+      return;
+    } else {
+      const attestation = {
+        name: name,
+        matricule: matricule,
+        sexe: sexe,
+        poste: poste.replace("'", "`"), 
+        type: type,
+        decision: selectedDec, 
+        duration: duration,
+        structure: struc.replace("'", "`"),
+        startDate: startDate,
+        endDate: endDate,
+        repriseDate: repriseDate,
+        typeConge: selectedType,
+      }
+      const conge_data = {
+        startDate : startDate,
+        endDate : endDate,
+        duration : duration,
+        id_personnel: c.id_personnel,
+        curr_date : new Date().toISOString().slice(0,19).replace('T',' '),
+        demande : demande,
+        id_type_conge : selectedType === "congé administratif partiel" ? 1 : selectedType === "congé administratif total" ? 2 : selectedType === "congé maternité" ? 3 : selectedType === "congé maladie" ? 4 : 0,
+        statut_conge : "non archivé"
+      }
+    }
+  }
+
+  const stopConge = (c) => {
+    console.log("you want to stop conge : ", c);
+  }
+
+  const deleteConge = (c) => {
+    console.log("You want to delete conge : ", c);
+  }
+
   useEffect(() => {
     if (typeConge && typeConge.length > 0) {
       setSelectedType(typeConge[0].libelle_type_conge);
@@ -152,7 +229,6 @@ const Conges = () => {
         const start = new Date(startDate);
         const end = new Date(start);
         end.setDate(end.getDate() + parseInt(duration));
-        // Mettre à jour l'interface utilisateur avec la date de fin
         setEndDate(end.toISOString().split("T")[0]);
         const repDate = new Date(end);
         repDate.setDate(end.getDate() + parseInt(1));
@@ -211,22 +287,32 @@ const Conges = () => {
                         <Table className="align-items-center table-flush" responsive>
                             <thead className="thead-light">
                                 <tr>
-                                    <th>Numero</th>
-                                    <th>Objet</th>
-                                    <th>Signataire</th>
-                                    <th>Date</th>
-                                    <th>Type</th>
+                                    <th>Matricule</th>
+                                    <th>Nom</th>
+                                    <th>Date de debut</th>
+                                    <th>Date de fin</th>
+                                    <th>Nombre de jours restant</th>
+                                    <th>Statut</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {conge.map((c, index) => (
                                     <tr key={index}>
-                                        <td>{c.id_conge}</td>    
-                                        <td>{c.duree_conge}</td>    
-                                        <td>{c.id_personnel}</td>    
+                                        <td>{c.matricule_personnel}</td>    
+                                        <td>{c.nom_prenom_personnel}</td>    
+                                        <td>{c.date_debut_conge.getFullYear() + "-" + (parseInt(c.date_debut_conge.getMonth()+1) <= 9 ? "0"+parseInt(c.date_debut_conge.getMonth()+1) : parseInt(c.date_fin_conge.getMonth()+1)) + "-" + c.date_debut_conge.getDate()}</td>
                                         <td>{c.date_fin_conge.getFullYear() + "-" + (parseInt(c.date_fin_conge.getMonth()+1) <= 9 ? "0"+parseInt(c.date_fin_conge.getMonth()+1) : parseInt(c.date_fin_conge.getMonth()+1)) + "-" + c.date_fin_conge.getDate()}</td>
-                                        <td>{c.libelle_type_personnel}</td>
+                                        <td>{curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? c.date_debut_conge.getDate() - curr_date.getDate() : c.date_fin_conge.getDate() - c.date_debut_conge.getDate() }</td>
+                                        <td>{curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge 
+                                            ? <Badge color="success">
+                                                en cours
+                                              </Badge>
+                                            : <Badge color="warning">
+                                                programmé
+                                              </Badge>
+                                            }
+                                        </td>
                                         <td className="text-right">
                                             <UncontrolledDropdown>
                                                 <DropdownToggle
@@ -240,14 +326,20 @@ const Conges = () => {
                                                 </DropdownToggle>
                                                 <DropdownMenu className="dropdown-menu-arrow" right>
                                                     <DropdownItem
-                                                        onClick={(e) => e.preventDefault()}
+                                                      onClick={() => editConge(c)}
                                                     >
-                                                        Modifier
+                                                      Modifier le congé
                                                     </DropdownItem>
                                                     <DropdownItem
-                                                        onClick={(e) => e.preventDefault()}
+                                                      onClick={() => deleteConge(c)}
                                                     >
-                                                        Supprimer
+                                                        Annuler le congé
+                                                    </DropdownItem>
+                                                    <DropdownItem
+                                                      disabled={curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? true : false}
+                                                      onClick={() => stopConge(c)}
+                                                    >
+                                                        Arreter le congé
                                                     </DropdownItem>
                                                 </DropdownMenu>
                                             </UncontrolledDropdown>
@@ -298,7 +390,7 @@ const Conges = () => {
                           <Input
                             className="form-control-alternative"
                             id="input-username"
-                            defaultValue={name}
+                            value={name}
                             onChange={handleInputChange(setName)}
                             placeholder="Nom "
                             type="text"
@@ -316,7 +408,8 @@ const Conges = () => {
                           <Input
                             className="form-control-alternative"
                             id="input-phone"
-                            defaultValue={selectedPerson ? selectedPerson.telephone_personnel : 696879475}
+                            onChange={handleInputChange(setTelphone)}
+                            value={telephone}
                             placeholder=""
                             type="phone"
                           />
@@ -335,7 +428,7 @@ const Conges = () => {
                           <Input
                             className="form-control-alternative"
                             id="input-matricule"
-                            defaultValue={matricule}
+                            value={matricule}
                             onChange={handleInputChange(setMatricule)}
                             placeholder="Matricule"
                             type="text"
@@ -352,7 +445,7 @@ const Conges = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue={poste}
+                            value={poste}
                             onChange={handleInputChange(setPoste)}
                             id="input-poste"
                             placeholder="poste"
@@ -372,7 +465,7 @@ const Conges = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue={type}
+                            value={type}
                             id="input-type"
                             onChange={handleInputChange(setType)}
                             placeholder="type personnel"
@@ -390,7 +483,7 @@ const Conges = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue={struc}
+                            value={struc}
                             id="input-structure"
                             onChange={handleInputChange(setStruc)}
                             placeholder="structure de travail"
@@ -441,10 +534,11 @@ const Conges = () => {
                             id="demande-file"
                             name="file"
                             type="file"
+                            accept=".jpeg, .png, .jpg"
                             onChange={handleFileChange(setDemande)}
                           />
                           <FormText>
-                            selectionner la demande
+                            selectionner la demande (fichier accepté .jpeg, .png, .jpg)
                           </FormText>
                         </FormGroup>
                       </Col>
@@ -462,10 +556,11 @@ const Conges = () => {
                               id="exampleFile"
                               name="file"
                               type="file"
+                              accept=".jpeg, .png, .jpg"
                               onChange={handleFileChange(setDocument)}
                             />
                             <FormText>
-                              Pièces à fournir comme justificatif en fonction du type de congé (maladie ou maternité)
+                              Pièces à fournir comme justificatif en fonction du type de congé (fichier accepté .jpeg, .png, .jpg)
                             </FormText>
                           </FormGroup>
                         </Col>

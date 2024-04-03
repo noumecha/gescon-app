@@ -49,15 +49,6 @@ const AttestationConge = () => {
         setModal(!modal)
     }
 
-    /*const fileToArrayBuffer = (file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsArrayBuffer(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = error => reject(error);
-        });
-    }*/
-
     const handleArchiveChange = (e) => {
         const file = e.target.files[0];
         const reader = new FileReader();
@@ -68,10 +59,6 @@ const AttestationConge = () => {
         reader.readAsDataURL(file);
     };
 
-    /*const isImage = (file) => {
-        return file.type.startsWith('image');
-    }*/;
-
     const saveArchive = async (attestation_conge) => {
         if (!archive) {
             setErrorArchive("Veuillez sélectionner un fichier");
@@ -80,14 +67,6 @@ const AttestationConge = () => {
             }, 7000)
             return;
         }
-        /*if (!isImage(archive)) {
-            setErrorArchive("Le fichier sélectionné n'est pas une image.");
-            setTimeout(() => {
-            setErrorArchive("");
-            }, 7000)
-            return;
-        }*/
-        //console.log("archive file : ", archive);
         const date = new Date().toISOString().slice(0,19).replace('T',' ');
         const req = `INSERT INTO archive_att_conge (fichier_archive_att_conge,created_at_arch_att_conge,id_conge) VALUES ("${archive}","${date}",${attestation_conge.id_conge}) `;
         const req_conge = `UPDATE conge SET statut_conge ="archivé" WHERE id_conge = ${attestation_conge.id_conge}`;
@@ -285,7 +264,7 @@ const AttestationConge = () => {
                                                                                             onChange={(e) => handleArchiveChange(e)}
                                                                                         />
                                                                                         <FormText>
-                                                                                            selectionner l'attestion signé à archivé
+                                                                                            selectionner l'attestion signé à archivé (fichier accepté .jpeg, .png, .jpg)
                                                                                         </FormText>
                                                                                         </FormGroup>
                                                                                     </Col>

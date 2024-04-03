@@ -94,7 +94,7 @@ function deleteDecision(event, req) {
 
 // functions for conge : 
 function getConge(event, req) {
-    pool.query('SELECT * FROM conge', (err, res) => {
+    pool.query('SELECT * FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel;', (err, res) => {
         if (err) throw err;
         event.sender.send('all-conge', res);
     });
@@ -143,6 +143,12 @@ function deleteArchiveAttConge(event, req) {
 }
 
 // functions for conge type :
+function getSpecificCongeType (event, arg) {
+    pool.query('SELECT * FROM type_conge WHERE id_type_conge =?', [arg], (err, res) => {
+        if (err) throw err;
+        event.sender.send('specific-conge-type', res);
+    });
+}
 function getCongeType(event, res) {
     pool.query('SELECT * FROM type_conge', (err, res) => {
         if (err) throw err;
@@ -202,15 +208,16 @@ app.whenReady().then(() => {
     ipcMain.on('add-personnel', addPersonnel);
     ipcMain.on('get-personnel', getPersonnel);
     ipcMain.on('update-personnel', updatePersonnel);
-    // decision data get : 
+    // decision
     ipcMain.on('get-decision', getDecision);
     ipcMain.on('add-decision', addDecision);
     ipcMain.on('delete-decision', deleteDecision);
     ipcMain.on('get-specific-decision', getSpecificDec);
-    // conge type data get : 
+    // conge type  
     ipcMain.on('get-conge-type', getCongeType);
     ipcMain.on('add-conge-type', addCongeType);
-    // conge data get : 
+    ipcMain.on('get-specific-conge-type', getSpecificCongeType);
+    // conge  
     ipcMain.on('get-conge', getConge);
     ipcMain.on('add-archive-attestation-conge', addArchiveAttestationConge)
     ipcMain.on('update-conge', updateConge);
@@ -218,13 +225,10 @@ app.whenReady().then(() => {
     ipcMain.on('get-attestation-conge', getAttestationConge);
     ipcMain.on('get-archive-att-conge', getArchiveAttConge);
     ipcMain.on('delete-archive-att-conge', deleteArchiveAttConge);
-    // demande data get :
-    //ipcMain.on('get-demande-conge', getDemandeConge);
-    //ipcMain.on('add-demande-conge', addDemandeConge);
     // document à fournir : 
     ipcMain.on('get-document', getDocument);
     ipcMain.on('add-document', addDocument);
-    // for users :
+    // users :
     ipcMain.on('get-users', getUsers);
     ipcMain.on('add-user', addUser);
     // set the App title

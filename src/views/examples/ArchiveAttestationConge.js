@@ -76,28 +76,9 @@ const ArchiveAttestationConge = () => {
             try {
                 window.electronAPI.getArchiveAttConge();
                 await window.electronAPI.retrieveArchiveAttConge((event, res) => {
-                    for (let index = 0; index < res.length; index++) {
-                        console.log("archive : ", res[index].fichier_archive_att_conge)
-                    }
-                    console.log("res : " + JSON.stringify(res));
+                    //console.log("res : " + JSON.stringify(res));
                     setArchiveConge(res);
                 })
-                /*const archiveRes = await new Promise((resolve, reject) => {
-                    window.electronAPI.retrieveArchiveAttConge((event, res) => {
-                        if (res) {
-                            resolve(res);
-                        } else {
-                            reject(new Error("Errer lors de la recuperation des archives"));
-                        }
-                    })
-                });
-                const archivePromises = archiveRes.map(async archive => {
-                    const blobContent = await archive.fichier_archive_att_conge
-                    archive.fichier_archive_att_conge = URL.createObjectURL(new Blob([blobContent]))                                                
-                    return archive;
-                })
-                const resolvedArchives = await Promise.all(archivePromises);
-                setArchiveConge(resolvedArchives);*/
             } catch (error) {
                 console.error("Erreur : " + error.message);
             }

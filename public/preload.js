@@ -31,6 +31,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     retrieveArchiveAttConge: (callback) => ipcRenderer.on('all-archived-conge', callback),
     deleteArchiveAttConge: (req) => ipcRenderer.send('delete-archive-att-conge', req),
     deleteArchiveAttCongeSuccess: (callback) => ipcRenderer.on('delete-archive-att-conge-success', callback),
+    getSpecificCongeType: (arg) => ipcRenderer.send('get-specific-conge-type', arg),
+    retrieveSpecificCongeType: (callback) => ipcRenderer.on('specific-conge-type', callback),
     // decision : 
     decisionAddedSuccess: (callback) => ipcRenderer.on('decision-added-success', callback),
     addDecision: (req) => ipcRenderer.send('add-decision', req),
@@ -62,7 +64,4 @@ contextBridge.exposeInMainWorld("electronAPI", {
     addUsers: (req) => ipcRenderer.send('add-user', req),
     getUsers: () => ipcRenderer.send('get-users'),
     retrieveUsers: (callback) => ipcRenderer.on('all-users', callback),
-    // images saving : 
-    saveArchiveCongeSuccess: (callback) => ipcRenderer.on('save-archive-conge-success', callback),
-    saveArchiveConge: (file) => ipcRenderer.send('save-archive-conge', file),
 });
