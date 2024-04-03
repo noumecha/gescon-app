@@ -5,17 +5,17 @@ import { useState, useEffect } from "react";
 
 const Header = () => {
 
-  const [demande, setDemande] = useState([]);
+  //const [demande, setDemande] = useState([]);
   const [nberPersonnel, setNberPersonnel] = useState();
   const [conge, setConge] = useState([]);
 
   useEffect(() => {
     const func = async () => {
         try {
-            window.electronAPI.getDemandeConge();
+            /*window.electronAPI.getDemandeConge();
             await window.electronAPI.retrieveDemandeConge((event, res) => {
               setDemande(res);
-            })
+            })*/
             window.electronAPI.getConge();
             await window.electronAPI.retrieveConge((event, res) => {
               setConge(res);

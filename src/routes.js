@@ -8,7 +8,8 @@ import Personnel from "views/examples/Personnel.js";
 import Decision from "views/examples/Decision.js";
 //import Icons from "views/examples/Icons.js";
 import Permission from "views/examples/Permission";
-import Attestation from "views/examples/Attestation";
+import AttestationConge from "views/examples/AttestationConge";
+import AttestationPermission from "views/examples/AttestationPermission";
 import FichePersonnel from "views/examples/FichePersonnel";
 import ArchiveAttestationConge from "views/examples/ArchiveAttestationConge";
 import ArchiveAttestationPermission from "views/examples/ArchiveAttestationPermission";
@@ -58,10 +59,17 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/attestation",
-    name: "Attestations",
+    path: "/attestation-conge",
+    name: "Attestations congés",
     icon: "ni ni-paper-diploma text-blue",
-    component: <Attestation />,
+    component: <AttestationConge />,
+    layout: "/admin",
+  },
+  {
+    path: "/attestation-permission",
+    name: "Attestations permission",
+    icon: "ni ni-paper-diploma text-blue",
+    component: <AttestationPermission />,
     layout: "/admin",
   },
   {
