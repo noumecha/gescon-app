@@ -129,10 +129,17 @@ function addArchiveAttestationConge(event, req) {
 }
 
 function getArchiveAttConge(event, req) {
-    pool.query('SELECT * FROM archive_attestation_conge', (err, res) => {
+    pool.query('SELECT archive_att_conge.id_conge,id_archive_att_conge,nom_prenom_personnel,matricule_personnel,created_at_arch_att_conge,fichier_archive_att_conge FROM conge,personnel,archive_att_conge WHERE conge.id_personnel = personnel.id_personnel AND conge.id_conge = archive_att_conge.id_conge;', (err, res) => {
         if (err) throw err;
         event.sender.send('all-archived-conge', res);
     });
+}
+
+function deleteArchiveAttConge(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('delete-archive-att-conge-success', { message: 'Archive supprimée avec succès!' });
+    })
 }
 
 // functions for conge type :
@@ -210,6 +217,7 @@ app.whenReady().then(() => {
     ipcMain.on('add-conge', addConge);
     ipcMain.on('get-attestation-conge', getAttestationConge);
     ipcMain.on('get-archive-att-conge', getArchiveAttConge);
+    ipcMain.on('delete-archive-att-conge', deleteArchiveAttConge);
     // demande data get :
     //ipcMain.on('get-demande-conge', getDemandeConge);
     //ipcMain.on('add-demande-conge', addDemandeConge);

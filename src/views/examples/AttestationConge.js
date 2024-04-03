@@ -41,7 +41,7 @@ const AttestationConge = () => {
     const [modal, setModal] = useState(false);
     const [errorArchive, setErrorArchive] = useState("");
     const [successArchive, setSuccessArchive] = useState("");
-    const [archive, setArchive] = useState("");
+    const [archive, setArchive] = useState(null);
 
     // usefull functions : 
 
@@ -49,16 +49,30 @@ const AttestationConge = () => {
         setModal(!modal)
     }
 
-    const fileToArrayBuffer = (file) => {
+    /*const fileToArrayBuffer = (file) => {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.readAsArrayBuffer(file);
           reader.onload = () => resolve(reader.result);
           reader.onerror = error => reject(error);
         });
-    }
+    }*/
 
-    const saveArchive = (attestation_conge) => {
+    const handleArchiveChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64 = reader.result;
+            setArchive(base64);
+        }
+        reader.readAsDataURL(file);
+    };
+
+    /*const isImage = (file) => {
+        return file.type.startsWith('image');
+    }*/;
+
+    const saveArchive = async (attestation_conge) => {
         if (!archive) {
             setErrorArchive("Veuillez sélectionner un fichier");
             setTimeout(() => {
@@ -66,28 +80,30 @@ const AttestationConge = () => {
             }, 7000)
             return;
         }
-        console.log("current att : ", attestation_conge);
-        const archiveFile = fileToArrayBuffer(archive);
+        /*if (!isImage(archive)) {
+            setErrorArchive("Le fichier sélectionné n'est pas une image.");
+            setTimeout(() => {
+            setErrorArchive("");
+            }, 7000)
+            return;
+        }*/
+        //console.log("archive file : ", archive);
         const date = new Date().toISOString().slice(0,19).replace('T',' ');
-        const req = `INSERT INTO archive_att_conge (fichier_archive_att_conge,created_at_arch_att_conge,id_conge) VALUES ("${archiveFile}","${date}",${attestation_conge.id_conge}) `;
+        const req = `INSERT INTO archive_att_conge (fichier_archive_att_conge,created_at_arch_att_conge,id_conge) VALUES ("${archive}","${date}",${attestation_conge.id_conge}) `;
         const req_conge = `UPDATE conge SET statut_conge ="archivé" WHERE id_conge = ${attestation_conge.id_conge}`;
         window.electronAPI.addArchiveAttestaetionCong(req)
         window.electronAPI.addArchiveAttCongeSuccess((event, res) => {
-            console.log("event message: " + event.message);
-            //setAttestationConge(res);
             setSuccessArchive("attestation archivé avec succès")
             setTimeout(() => {
                 setSuccessArchive("");
-              }, 7000)
+            }, 7000)
         })
         window.electronAPI.updateConge(req_conge);
         window.electronAPI.updateCongeSuccess((event, res) => {
-            console.log("event message: " + event.message);
-            //setAttestationConge(res);
-            setSuccessArchive("attestation archivé avec succès")
+            setSuccessArchive("congé mis à jour avec succès")
             setTimeout(() => {
                 setSuccessArchive("");
-              }, 7000)
+            }, 7000)
         });
     }
 
@@ -131,6 +147,7 @@ const AttestationConge = () => {
         }
         func();
     }, []);
+    
     return (
         <>
         <Header />
@@ -264,7 +281,8 @@ const AttestationConge = () => {
                                                                                             id="demande-file"
                                                                                             name="file"
                                                                                             type="file"
-                                                                                            onChange={(e) => setArchive(e.target.files[0])}
+                                                                                            accept=".jpeg, .png, .jpg"
+                                                                                            onChange={(e) => handleArchiveChange(e)}
                                                                                         />
                                                                                         <FormText>
                                                                                             selectionner l'attestion signé à archivé
