@@ -8,6 +8,16 @@ const Header = () => {
   //const [demande, setDemande] = useState([]);
   const [nberPersonnel, setNberPersonnel] = useState();
   const [conge, setConge] = useState([]);
+  const [perf, setPerf] = useState(100);
+
+
+  useEffect(() => {
+    const func = async () => {
+      const prf = conge.length === 0 ? 100 : Number.parseFloat(100 - ((conge.length * 100)/nberPersonnel)).toFixed(2);
+      setPerf(prf);
+    }
+    func();
+  })
 
   useEffect(() => {
     const func = async () => {
@@ -110,7 +120,7 @@ const Header = () => {
                         >
                           Performance
                         </CardTitle>
-                        <span className="h2 font-weight-bold mb-0">49,65%</span>
+                        <span className="h2 font-weight-bold mb-0"> {perf}%</span>
                       </div>
                       <Col className="col-auto">
                         <div className="icon icon-shape bg-info text-white rounded-circle shadow">
