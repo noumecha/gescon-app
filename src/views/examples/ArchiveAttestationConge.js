@@ -142,7 +142,7 @@ const ArchiveAttestationConge = () => {
                                             <th>Matricule</th>
                                             <th>Nom & Prenom</th>
                                             <th>Archive</th>
-                                            <th>Statut</th>
+                                            <th>Date archivage</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>

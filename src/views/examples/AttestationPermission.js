@@ -38,6 +38,7 @@ const AttestationPermission = () => {
     const [perPage] = useState(100);
     const [filter, setFilter] = useState("");
     const [search, setSearch] = useState(""); 
+    const [modalData, setModalData] = useState(null); 
     const [modal, setModal] = useState(false);
     const [errorArchive, setErrorArchive] = useState("");
     const [successArchive, setSuccessArchive] = useState("");
@@ -48,6 +49,11 @@ const AttestationPermission = () => {
     const toggleModal = () => {
         setModal(!modal)
     }
+
+    const handleRowClick = (att_perm) => {
+        setModalData(att_perm);
+        toggleModal();
+    };
 
     const handleArchiveChange = (e) => {
         const file = e.target.files[0];
@@ -231,10 +237,10 @@ const AttestationPermission = () => {
                                                         </DropdownToggle>
                                                         <DropdownMenu className="dropdown-menu-arrow" right>
                                                             <DropdownItem
-                                                                onClick={() => toggleModal()}
+                                                                onClick={() => handleRowClick(att_perm)}
                                                             >
                                                                 Archiver ce document
-                                                                <Modal isOpen={modal} toggle={toggleModal} {...att_perm}>
+                                                                <Modal isOpen={modal} toggle={toggleModal} {...modalData}>
                                                                     <ModalHeader toggle={toggleModal}>
                                                                         <Row>
                                                                             <Col>
@@ -271,10 +277,10 @@ const AttestationPermission = () => {
                                                                                         <Button
                                                                                             color="success"
                                                                                             size="md"
-                                                                                            //onClick={() => saveArchive(att_perm)}
-                                                                                            onClick={() => {
+                                                                                            onClick={() => saveArchive(modalData)}
+                                                                                            /*onClick={() => {
                                                                                                 console.log("current archive : " + att_perm.nom_prenom_personnel)
-                                                                                            }}
+                                                                                            }}*/
                                                                                         >
                                                                                             Archiver
                                                                                         </Button>

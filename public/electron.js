@@ -181,7 +181,7 @@ function addArchiveAttestationPermission(event, req) {
 function getArchiveAttPermission(event, req) {
     pool.query('SELECT archive_att_permission.id_permission,id_arch_att_permission,nom_prenom_personnel,matricule_personnel,created_at_arch_permission,fichier_arch_att_permission FROM permission,personnel,archive_att_permission WHERE permission.id_personnel = personnel.id_personnel AND permission.id_permission = archive_att_permission.id_permission;', (err, res) => {
         if (err) throw err;
-        event.sender.send('all-archived-conge', res);
+        event.sender.send('all-archived-permission', res);
     });
 }
 

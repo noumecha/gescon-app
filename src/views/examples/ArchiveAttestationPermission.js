@@ -52,7 +52,7 @@ const ArchiveAttestationPermission = () => {
 
     const handleArchiveDelete = (arch) => {
         console.log(arch);
-        const req = `DELETE FROM archive_att_permission WHERE id_archive_att_permission = ${arch.id_archive_att_permission}`;
+        const req = `DELETE FROM archive_att_permission WHERE id_arch_att_permission  = ${arch.id_arch_att_permission}`;
         const req_conge = `UPDATE permission SET statut_permission ="non archivé" WHERE id_permission = ${arch.id_permission}`;
         window.electronAPI.deleteArchiveAttPermission(req);
         window.electronAPI.deleteArchiveAttPermissionSuccess(() => {
@@ -76,6 +76,7 @@ const ArchiveAttestationPermission = () => {
             try {
                 window.electronAPI.getArchiveAttPermission();
                 await window.electronAPI.retrieveArchiveAttPermission((event, res) => {
+                    console.log("archives : " + res);
                     setArchivePermission(res);
                 })
             } catch (error) {
@@ -141,7 +142,7 @@ const ArchiveAttestationPermission = () => {
                                             <th>Matricule</th>
                                             <th>Nom & Prenom</th>
                                             <th>Archive</th>
-                                            <th>Statut</th>
+                                            <th>Date archivage</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -154,14 +155,14 @@ const ArchiveAttestationPermission = () => {
                                                     {
                                                         <a
                                                             color="success"
-                                                            href={archive.fichier_archive_att_permission}
+                                                            href={archive.fichier_arch_att_permission}
                                                             download={`archive_attestation_${archive.matricule_personnel}.jpg`}
                                                         >
                                                             Télécharger l'archive 
                                                         </a>
                                                     }
                                                 </td> 
-                                                <td>{archive.created_at_arch_att_permission.getFullYear() + "-" + (parseInt(archive.created_at_arch_att_permission.getMonth()+1) <= 9 ? "0"+parseInt(archive.created_at_arch_att_permission.getMonth()+1) : parseInt(archive.created_at_arch_att_permission.getMonth()+1)) + "-" + archive.created_at_arch_att_permission.getDate()}</td> 
+                                                <td>{archive.created_at_arch_permission.getFullYear() + "-" + (parseInt(archive.created_at_arch_permission.getMonth()+1) <= 9 ? "0"+parseInt(archive.created_at_arch_permission.getMonth()+1) : parseInt(archive.created_at_arch_permission.getMonth()+1)) + "-" + archive.created_at_arch_permission.getDate()}</td> 
                                                 <td className="text-right">
                                                     <UncontrolledDropdown>
                                                         <DropdownToggle

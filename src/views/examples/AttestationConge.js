@@ -54,7 +54,7 @@ const AttestationConge = () => {
         // Gérer le clic sur une ligne du tableau pour ouvrir le modal avec les données spécifiques
         setModalData(att_con);
         toggleModal();
-      };
+    };
 
     const handleArchiveChange = (e) => {
         const file = e.target.files[0];
