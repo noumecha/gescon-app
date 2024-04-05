@@ -141,11 +141,21 @@ const Personnel = () => {
 
     /** for the filter and the search bar */
 
+    /*const filterPersonnel = personnel.filter(personnel => 
+        (filter !== "" || search !== "" || status !== "") 
+        && personnel.categorie_personnel.includes(filter) 
+        && (
+            personnel.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
+            || personnel.matricule_personnel.toLowerCase().includes(search.toLowerCase())
+        )
+        && personnel.statut_personnel.includes(status)
+    );*/
+
     const filterPersonnel = filter !== "" || search !== "" || status !== ""
         ? personnel.filter(personnel => personnel.categorie_personnel.includes(filter) && (
             personnel.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
             || personnel.matricule_personnel.toLowerCase().includes(search.toLowerCase())
-        ))
+        ) && personnel.statut_personnel.includes(status))
         : personnel
 
     const handleFilterChange = (e) => {
@@ -263,7 +273,7 @@ const Personnel = () => {
                         value={status}
                     >
                         <option value="">Tous les statuts</option>
-                        <option value="en conge">en congé</option>
+                        <option value="en congé">en congé</option>
                         <option value="en poste">en poste</option>
                         <option value="en permission">en permission</option>
                     </Input>
