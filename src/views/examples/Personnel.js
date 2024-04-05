@@ -91,7 +91,7 @@ const Personnel = () => {
                 const type = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 1 : 2;
                 const statut = "en poste"; // en permission, en congé
                 const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
-                const nb_jours_permission = 10;
+                const nb_jours_permission = 0;
                 const req = `
                 INSERT INTO personnel 
                 (ordre_personnel, matricule_personnel, nom_prenom_personnel, grade_personnel, poste_personnel, structure_personnel, sexe_personnel, date_recrutement_personnel, situation_matrimoniale_personnel,
@@ -141,11 +141,21 @@ const Personnel = () => {
 
     /** for the filter and the search bar */
 
+    /*const filterPersonnel = personnel.filter(personnel => 
+        (filter !== "" || search !== "" || status !== "") 
+        && personnel.categorie_personnel.includes(filter) 
+        && (
+            personnel.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
+            || personnel.matricule_personnel.toLowerCase().includes(search.toLowerCase())
+        )
+        && personnel.statut_personnel.includes(status)
+    );*/
+
     const filterPersonnel = filter !== "" || search !== "" || status !== ""
         ? personnel.filter(personnel => personnel.categorie_personnel.includes(filter) && (
             personnel.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
             || personnel.matricule_personnel.toLowerCase().includes(search.toLowerCase())
-        ))
+        ) && personnel.statut_personnel.includes(status))
         : personnel
 
     const handleFilterChange = (e) => {
@@ -263,7 +273,7 @@ const Personnel = () => {
                         value={status}
                     >
                         <option value="">Tous les statuts</option>
-                        <option value="en conge">en congé</option>
+                        <option value="en congé">en congé</option>
                         <option value="en poste">en poste</option>
                         <option value="en permission">en permission</option>
                     </Input>
