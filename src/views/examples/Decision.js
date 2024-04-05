@@ -66,36 +66,36 @@ const Decision = () => {
     const addDecision = async (e) => {
         e.preventDefault();
         try {
-            if (numeroDecision === "" || objetDecision === "" || signataireDecision === "" || decisionDate === "" || decisionType === "") {
-                setError('Veuillez remplir tous les champs');
-                setTimeout(() => {
-                  setError("");
-                }, 7000)
-                return;
-            } else {
-                setSuccess("Enregistré avec succès");
-                setTimeout(() => {
-                    setSuccess("");
-                }, 3000)
-            }
+          if (numeroDecision === "" || objetDecision === "" || signataireDecision === "" || decisionDate === "" || decisionType === "") {
+            setError('Veuillez remplir tous les champs');
+            setTimeout(() => {
+              setError("");
+            }, 7000)
+            return;
+          } else {
             const data = {
-                //id_decision: decision[Object.keys(decision)[Object.keys(decision).length - 1]].id_decision + 1,
-                numero_decision: numeroDecision.toUpperCase(),
-                objet_decision: objetDecision,
-                signataire_decision: signataireDecision,
-                date_decision: decisionDate,
-                type_decision: decisionType,
-                created_at : new Date().toISOString().slice(0,19).replace('T',' ')
+              //id_decision: decision[Object.keys(decision)[Object.keys(decision).length - 1]].id_decision + 1,
+              numero_decision: numeroDecision.toUpperCase(),
+              objet_decision: objetDecision,
+              signataire_decision: signataireDecision,
+              date_decision: decisionDate,
+              type_decision: decisionType,
+              created_at : new Date().toISOString().slice(0,19).replace('T',' ')
             }
-                decisionType === "Decision Fonctionnaire" ? data.type_decision = 1 : data.type_decision = 2;
-                const date = new Date(data.date_decision)
-                const d = date.toISOString().slice(0, 19).replace('T', ' ');
-                data.date_decision = d;
-                //console.log("decision date: " + d);
-                const req = `INSERT INTO decision (numero_decision,objet_decision,signataire_decision,id_type_personnel,date_decision,created_at_decision) VALUES ("${data.numero_decision}", "${data.objet_decision}", "${data.signataire_decision}", ${data.type_decision}, "${data.date_decision}","${data.created_at}")`;
-                //console.log("data: " + JSON.stringify(data));
-                //console.log("requete : " , req);
-                window.electronAPI.addDecision(req);
+            decisionType === "Decision Fonctionnaire" ? data.type_decision = 1 : data.type_decision = 2;
+            const date = new Date(data.date_decision)
+            const d = date.toISOString().slice(0, 19).replace('T', ' ');
+            data.date_decision = d;
+            //console.log("decision date: " + d);
+            const req = `INSERT INTO decision (numero_decision,objet_decision,signataire_decision,id_type_personnel,date_decision,created_at_decision) VALUES ("${data.numero_decision}", "${data.objet_decision}", "${data.signataire_decision}", ${data.type_decision}, "${data.date_decision}","${data.created_at}")`;
+            //console.log("data: " + JSON.stringify(data));
+            //console.log("requete : " , req);
+            window.electronAPI.addDecision(req);
+            setSuccess("Enregistré avec succès");
+            setTimeout(() => {
+                setSuccess("");
+            }, 3000)
+          }
         } catch (err) {
             console.error("Erreur Trouvé : " + err.message);
         }

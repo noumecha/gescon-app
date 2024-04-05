@@ -41,6 +41,7 @@ const Personnel = () => {
     const [perPage] = useState(100);
     const [filter, setFilter] = useState("");
     const [search, setSearch] = useState("");
+    const [status, setStatus] = useState("");
     const [success, setSuccess] = useState("");
     const [selectedPerson, setSelectedPerson] = useState(null);
     const navigate = useNavigate();
@@ -90,7 +91,7 @@ const Personnel = () => {
                 const type = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 1 : 2;
                 const statut = "en poste"; // en permission, en congé
                 const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
-                const nb_jours_permission = 10;
+                const nb_jours_permission = 0;
                 const req = `
                 INSERT INTO personnel 
                 (ordre_personnel, matricule_personnel, nom_prenom_personnel, grade_personnel, poste_personnel, structure_personnel, sexe_personnel, date_recrutement_personnel, situation_matrimoniale_personnel,
@@ -140,9 +141,10 @@ const Personnel = () => {
 
     /** for the filter and the search bar */
 
-    const filterPersonnel = filter !== "" || search !== ""
+    const filterPersonnel = filter !== "" || search !== "" || status !== ""
         ? personnel.filter(personnel => personnel.categorie_personnel.includes(filter) && (
-            personnel.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) || personnel.matricule_personnel.toLowerCase().includes(search.toLowerCase())
+            personnel.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
+            || personnel.matricule_personnel.toLowerCase().includes(search.toLowerCase())
         ))
         : personnel
 
@@ -152,6 +154,10 @@ const Personnel = () => {
 
     const handleSearch = (e) => {
         setSearch(e.target.value);
+    }
+
+    const handleStatus = (e) => {
+        setStatus(e.target.value);
     }
 
     /** for the current selected personnle page */
@@ -202,74 +208,70 @@ const Personnel = () => {
                 </div>
             </Row>
             <Row>
-                <div className="col">
+                <Col lg="12">
                     {excelData ? (
-                        <div className="col">
+                        <div>
                             <div className="mt-3 alert alert-success" role="alert">
                                 <h3 className="mb-0 text-center text-white"> Fichier importer avec succès ! </h3>
                             </div>
                             <Card className="shadow">
-                                {/*<Table className="align-items-center table-flush" responsive>
-                                    <thead className="thead-light">
-                                        <tr>
-                                            {Object.keys(excelData[0]).map((key) => (
-                                                <th key={key}>
-                                                    {key}
-                                                </th>
-                                            ))}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {excelData.map((row, index) => (
-                                            <tr key={index}>
-                                                {Object.keys(row).map((key) => (
-                                                    <td key={key}>
-                                                        {row[key]}
-                                                    </td>
-                                                ))}
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                                </Table>*/}
                             </Card>
                         </div>
                     ) : (  
-                        <div className="col">
+                        <div>
                             <div className="mt-3 alert alert-danger" role="alert">
                                 <h3 className="mb-0 text-center text-white"> Aucun Fichier importer ! </h3>
                             </div>
                         </div>
                     )}
-                </div>
+                </Col>
             </Row>
             <Row>
-                <div className="col">
+                <Col lg="6">
+                    <Input
+                        type="select"
+                        className="form-control"
+                        onChange={handleFilterChange}
+                        value={filter}
+                    >
+                        <option value="">Toutes les catégories</option>
+                        <option value="A1">A1</option>
+                        <option value="B1">B1</option>
+                        <option value="A2">A2</option>
+                        <option value="B2">B2</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                    </Input>
+                </Col>
+                <Col lg="6">
+                    <Input
+                        type="select"
+                        className="form-control"
+                        placeholder="Rechercher par nom ou matricule"
+                        onChange={handleStatus}
+                        value={status}
+                    >
+                        <option value="">Tous les statuts</option>
+                        <option value="en conge">en congé</option>
+                        <option value="en poste">en poste</option>
+                        <option value="en permission">en permission</option>
+                    </Input>
+                </Col>
+            </Row>
+            <Row>
+                <Col lg="12">
                     <div className="form-group custom-form">
-                        <Input
-                            type="select"
-                            className="form-control"
-                            onChange={handleFilterChange}
-                            value={filter}
-                        >
-                            <option value="">Toutes les catégories</option>
-                            <option value="A1">A1</option>
-                            <option value="B1">B1</option>
-                            <option value="A2">A2</option>
-                            <option value="B2">B2</option>
-                            <option value="C">C</option>
-                            <option value="D">D</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                            <option value="11">11</option>
-                        </Input>
                         <Input
                             type="text"
                             className="form-control mt-3"
@@ -278,7 +280,7 @@ const Personnel = () => {
                             value={search}
                         />
                     </div>
-                </div>
+                </Col>
             </Row>
             <Row>
                 <div className="col p-0">
@@ -326,7 +328,25 @@ const Personnel = () => {
                                                 {/*<td>{person.telephone_personnel}</td>*/}    
                                                 <td>{person.categorie_personnel}</td>    
                                                 {/*<td>{person._personnel}</td>*/} 
-                                                <td>{person.statut_personnel}</td> 
+                                                <td>
+                                                    {person.statut_personnel === "en congé" ?  
+                                                        <Badge color="danger">
+                                                            {person.statut_personnel}
+                                                        </Badge> 
+                                                        : person.statut_personnel === "en poste" ? 
+                                                        <Badge color="success">
+                                                            {person.statut_personnel}
+                                                        </Badge> 
+                                                        : person.statut_personnel === "en permission" ?
+                                                        <Badge color="primary">
+                                                            {person.statut_personnel}
+                                                        </Badge>
+                                                        : 
+                                                        <Badge color="danger">
+                                                            {person.statut_personnel}
+                                                        </Badge>
+                                                    }
+                                                </td> 
                                                 <td className="text-right">
                                                     <UncontrolledDropdown>
                                                         <DropdownToggle
@@ -339,16 +359,34 @@ const Personnel = () => {
                                                             <i className="fas fa-ellipsis-v" />
                                                         </DropdownToggle>
                                                         <DropdownMenu className="dropdown-menu-arrow" right>
-                                                            <DropdownItem
-                                                                onClick={() => handleCongeClick(person)}
-                                                            >
-                                                                Nouveau Congé
-                                                            </DropdownItem>
-                                                            <DropdownItem
-                                                                onClick={() => handlePermissionClick(person)}
-                                                            >
-                                                                Nouvelle permission
-                                                            </DropdownItem>
+                                                            {person.statut_personnel === "en congé" 
+                                                                ? 
+                                                                <DropdownItem
+                                                                    onClick={() => handleCongeClick(person)}
+                                                                >
+                                                                    Prolongé le congé
+                                                                </DropdownItem> 
+                                                                : 
+                                                                <DropdownItem
+                                                                    onClick={() => handleCongeClick(person)}
+                                                                >
+                                                                    Nouveau congé
+                                                                </DropdownItem>
+                                                            }
+                                                            {person.statut_personnel === "en permission" 
+                                                                ? 
+                                                                <DropdownItem
+                                                                    onClick={() => handlePermissionClick(person)}
+                                                                >
+                                                                    Prolongé la permission
+                                                                </DropdownItem>
+                                                                : 
+                                                                <DropdownItem
+                                                                    onClick={() => handlePermissionClick(person)}
+                                                                >
+                                                                    Nouvelle permission
+                                                                </DropdownItem>
+                                                            }
                                                             <DropdownItem
                                                                 onClick={() => handleDetailClick(person)}
                                                             >
