@@ -91,7 +91,7 @@ const Personnel = () => {
                 const type = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 1 : 2;
                 const statut = "en poste"; // en permission, en congé
                 const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
-                const nb_jours_permission = 10;
+                const nb_jours_permission = 0;
                 const req = `
                 INSERT INTO personnel 
                 (ordre_personnel, matricule_personnel, nom_prenom_personnel, grade_personnel, poste_personnel, structure_personnel, sexe_personnel, date_recrutement_personnel, situation_matrimoniale_personnel,
