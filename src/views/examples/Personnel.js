@@ -141,16 +141,6 @@ const Personnel = () => {
 
     /** for the filter and the search bar */
 
-    /*const filterPersonnel = personnel.filter(personnel => 
-        (filter !== "" || search !== "" || status !== "") 
-        && personnel.categorie_personnel.includes(filter) 
-        && (
-            personnel.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
-            || personnel.matricule_personnel.toLowerCase().includes(search.toLowerCase())
-        )
-        && personnel.statut_personnel.includes(status)
-    );*/
-
     const filterPersonnel = filter !== "" || search !== "" || status !== ""
         ? personnel.filter(personnel => personnel.categorie_personnel.includes(filter) && (
             personnel.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 

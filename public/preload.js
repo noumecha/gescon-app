@@ -16,9 +16,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
     addCongeType: (req) => ipcRenderer.send('add-conge-type', req),
     getCongeType: () => ipcRenderer.send('get-conge-type'),
     retrieveCongeType: (callback) => ipcRenderer.on('all-conge-type', callback),
-    // conge : 
-    congeAddedSuccess: (callback) => ipcRenderer.on('conge-added-success', callback),
+    // conge :  
     addConge: (req) => ipcRenderer.send('add-conge', req),
+    congeAddedSuccess: (callback) => ipcRenderer.on('conge-added-success', callback),    
     getConge: () => ipcRenderer.send('get-conge'),
     retrieveConge: (callback) => ipcRenderer.on('all-conge', callback),
     getAttestationConge: () => ipcRenderer.send('get-attestation-conge'),
@@ -70,6 +70,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     getDocument: () => ipcRenderer.send('get-document'),
     retrieveDocument: (callback) => ipcRenderer.on('all-document', callback),
     // personnel : 
+    getSpecificPersonnel: (req) => ipcRenderer.send('get-specific-personnel', req),
+    retrieveSpecificPersonnel: (callback) => ipcRenderer.on('specific-personnel', callback),
     personnelAddedSuccess: (callback) => ipcRenderer.on('personnel-added-success', callback),
     addPersonnel : (req) => ipcRenderer.send('add-personnel', req),// to add personnel in the db
     getPersonnel: () => ipcRenderer.send('get-personnel'), // execute select all personnel
