@@ -85,18 +85,18 @@ const Permission = () => {
         console.log("you want to stop the permission : ", p);
     }
 
-    function firstDateOfMonth(){
-		var date = new Date();
-        var y = date.getFullYear();
-        var m = date.getMonth();
+    function firstDateOfMonth(d){
+		//var date = new Date();
+        var y = d.getFullYear();
+        var m = d.getMonth();
 		var firstDay = new Date(y, m, 1);
 		return firstDay;
 	}
 
-    function lastDateOfMonth(){
-		var date = new Date();
-        var y = date.getFullYear();
-        var m = date.getMonth();
+    function lastDateOfMonth(d){
+		//var date = new Date();
+        var y = d.getFullYear();
+        var m = d.getMonth();
 		var lastDay = new Date(y, m + 1, 0);
 		return lastDay;
 
@@ -147,28 +147,51 @@ const Permission = () => {
             }
             if (lastPermission.length > 0) {
                 let dur = 0;
-                let fmd = firstDateOfMonth();
-                let lmd = lastDateOfMonth();
+                let total_duration = 0;
+                let fmd = firstDateOfMonth(curr_date);
+                let lmd = lastDateOfMonth(curr_date);
                 for (let i = 0; i < lastPermission.length; i++) {
-                    if ((lastPermission[i].date_debut_permission >= fmd && lastPermission[i].date_debut_permission <= lmd) && (lastPermission[i].date_fin_permission >= fmd && lastPermission[i].date_fin_permission <= lmd)) {
+                    if ((lastPermission[i].date_debut_permission.toISOString().slice(0,19).replace('T',' ') >= fmd && lastPermission[i].date_debut_permission.toISOString().slice(0,19).replace('T',' ') <= lmd) && (lastPermission[i].date_fin_permission.toISOString().slice(0,19).replace('T',' ') >= fmd && lastPermission[i].date_fin_permission.toISOString().slice(0,19).replace('T',' ') <= lmd)) {
                         dur += lastPermission[i].duree_permission;
-                    }
-                    if ((startDate >= lastPermission[i].date_debut_permission.toISOString().slice(0,19).replace('T',' ') && startDate <= lastPermission[i].date_fin_permission.toISOString().slice(0,19).replace('T',' ')) || (endDate >= lastPermission[i].date_debut_permission.toISOString().slice(0,19).replace('T',' ') && endDate <= lastPermission[i].date_fin_permission.toISOString().slice(0,19).replace('T',' '))) {
-                        setError("Vous avez déja pris une permission pour cette période");
+                        setError("Vous avez déja pris une permission pour ce mois");
                         setTimeout(() => {
                             setError("");
                         },7000)
                         return;
                     }
+                    if ((startDate >= lastPermission[i].date_debut_permission.toISOString().slice(0,19).replace('T',' ') && startDate <= lastPermission[i].date_fin_permission.toISOString().slice(0,19).replace('T',' ')) || (endDate >= lastPermission[i].date_debut_permission.toISOString().slice(0,19).replace('T',' ') && endDate <= lastPermission[i].date_fin_permission.toISOString().slice(0,19).replace('T',' '))) {
+                        setError("Vous avez déja pris une permission pour ce mois");
+                        setTimeout(() => {
+                            setError("");
+                        },7000)
+                        return;
+                    }
+                    console.log("last permission start date : " + lastPermission[i].date_debut_permission)
+                    console.log("last permission end date : " + lastPermission[i].date_fin_permission)
+                    console.log("start deate : " + startDate.toString())
+                    console.log("en date : " + endDate)
+                    console.log("en date : " + repDate)
+                    if ((startDate >= firstDateOfMonth(lastPermission[i].date_debut_permission) && startDate <= lastDateOfMonth(lastPermission[i].date_fin_permission)) && (endDate >= firstDateOfMonth(lastPermission[i].date_debut_permission) && endDate <= lastDateOfMonth(lastPermission[i].date_fin_permission))) {
+                        setError("Vous avez déja pris une permission pour ce mois");
+                        setTimeout(() => {
+                            setError("");
+                        },7000)
+                        return;
+                    }
+                    total_duration += lastPermission[i].duree_permission;
                 }
-                console.log("durée dernières permission : " ,dur);
-                if (dur === 3) {
+                console.log("Total duration " + total_duration);
+                if (total_duration > 10) {
+                    const req_personnel = `UPDATE personnel SET nb_jours_conge = (nb_jours_conge - ${total_duration - 10}) WHERE id_personnel = ${selectedPerson.id_personnel};`;
+                    window.electronAPI.updatePersonnel(req_personnel);
+                }
+                /*if (dur === 3) {
                     setError("Vous avez epuisé vos permsissions pour ce mois");
                     setTimeout(() => {
                       setError("");
                     },7000)
                     return;
-                }
+                }*/
                 if (dur < 3) {
                     setStatus(`${sexe === 'M' ? 'M' : 'Mme'} ${name} a encore droit à ${3 - dur > 0 ? 3 - dur + " jours de permissions" : 3 - dur + "jour permission"}`)
                     if (duration > (3 - dur)) {         
@@ -220,11 +243,11 @@ const Permission = () => {
                   (date_debut_permission, date_fin_permission, duree_permission, created_at_permission,attestation_permission,id_personnel,demande_permission,statut_permission) 
                   VALUES ("${permission_data.startDate}","${permission_data.endDate}",${permission_data.duration},"${permission_data.curr_date}",'${JSON.stringify(attestation)}',${permission_data.id_personnel},"${permission_data.demande}","${permission_data.statut_permission}");`;
                 const statut = curr_date >= permission_data.startDate && curr_date <= permission_data.endDate ? "en permission" : "en poste";
-                const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${duration}) WHERE id_personnel = ${permission_data.id_personnel};`;
+                //const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${duration}) WHERE id_personnel = ${permission_data.id_personnel};`;
                 window.electronAPI.addPermission(req_permission);
                 setSuccess("permission ajoutée avec succès");
                 setStatus(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
-                window.electronAPI.updatePersonnel(req_personnel);
+                //window.electronAPI.updatePersonnel(req_personnel);
                 /*window.electronAPI.permissionAddedSuccess(() => {
                     console.log("permission ajouter avec succès");
                 });*/
