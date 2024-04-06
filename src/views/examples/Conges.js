@@ -27,8 +27,8 @@ import {
 import Header from "components/Headers/Header.js";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { PDFViewer,PDFDownloadLink } from '@react-pdf/renderer';
-import CongeDoc from "documents/CongeDoc";
+//import { PDFViewer,PDFDownloadLink } from '@react-pdf/renderer';
+//import CongeDoc from "documents/CongeDoc";
 
 const Conges = () => {
   const location = useLocation();
@@ -66,18 +66,24 @@ const Conges = () => {
   const curr_date = new Date();
 
   const filterConge = search !== "" || status !== ""
-        ? conge.filter(conge => conge.statut_conge.includes(statutFilter) && (
-            conge.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
-            || conge.matricule_personnel.toLowerCase().includes(search.toLowerCase())
-        ))
-        : conge
+    ? conge.filter(conge => conge.statut_conge.includes(statutFilter) && (
+      conge.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
+      || conge.matricule_personnel.toLowerCase().includes(search.toLowerCase())
+    ))
+    : conge
   
   const pageCount = Math.ceil(conge.length/perPage);
   const offset = pageNumber * perPage;
 
 
   const handlePageChange = ({selected}) => {
-      setPageNumber(selected);
+    setPageNumber(selected);
+  }
+  const handlePagePrev = () => {
+    setPageNumber(pageCount <= 1 || pageNumber === 0 ? pageNumber : pageNumber - 1);
+  }
+  const handlePageNext = () => {
+    setPageNumber(pageCount <= 1 || pageCount === pageNumber + 1 ? pageNumber : pageNumber + 1);
   }
   const handleSearch = (e) => {
     setSearch(e.target.value);
@@ -142,11 +148,12 @@ const Conges = () => {
           demande : demande,
           document : document,
           id_type_conge : selectedType === "congé administratif partiel" ? 1 : selectedType === "congé administratif total" ? 2 : selectedType === "congé maternité" ? 3 : selectedType === "congé maladie" ? 4 : 0,
-          statut_conge : "non archivé",
+          statut_attestation_conge : "non archivé",
+          statut_conge : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en cours" : "programmé",
         }
         const req_conge = `INSERT INTO conge 
-          (date_debut_conge, date_fin_conge, duree_conge, created_at_conge,attestation_conge,id_type_conge,id_personnel,demande_conge,statut_conge,document_a_fournir) 
-          VALUES ("${conge_data.startDate}","${conge_data.endDate}",${conge_data.duration},"${conge_data.curr_date}",'${JSON.stringify(attestation)}',${conge_data.id_type_conge},${conge_data.id_personnel},"${conge_data.demandeFile}","${conge_data.statut_conge}","${conge_data.document}");`;
+          (date_debut_conge, date_fin_conge, duree_conge, created_at_conge,attestation_conge,id_type_conge,id_personnel,demande_conge,statut_conge,statut_attestation_conge,document_a_fournir) 
+          VALUES ("${conge_data.startDate}","${conge_data.endDate}",${conge_data.duration},"${conge_data.curr_date}",'${JSON.stringify(attestation)}',${conge_data.id_type_conge},${conge_data.id_personnel},"${conge_data.demandeFile}","${conge_data.statut_conge}","${conge_data.statut_attestation_conge}","${conge_data.document}");`;
         //const statut = curr_date >= conge_data.startDate && curr_date <= conge_data.endDate ? "en congé" : "en poste";
         const req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges - ${duration}) WHERE id_personnel = ${conge_data.id_personnel};`;
         window.electronAPI.addConge(req_conge);
@@ -291,8 +298,16 @@ const Conges = () => {
     try {
       console.log("you want to delete conge : ", c);
       const nb_jours_conges = c.id_type_personnel === 1 ? 30 : 18;
+      const delete_arch_conge = `DELETE FROM archive_att_conge WHERE id_conge= ${c.id_conge}`;
       const delete_conge = `DELETE FROM conge WHERE ${c.id_conge}`;
-      const update_personnel = `UPDATE personnel SET nb_jours_conges = ${nb_jours_conges} WHERE id_personnel = ${c.id_personnel}`;
+      const update_personnel = `UPDATE personnel SET nb_jours_conges = ${nb_jours_conges}, statut_personnel = "en poste" WHERE id_personnel = ${c.id_personnel}`;
+      window.electronAPI.addArchiveAttestationConge(delete_arch_conge)
+      window.electronAPI.addArchiveAttCongeSuccess(() => {
+          setDeleteSuccess("attestation supprimé avec succès")
+          setTimeout(() => {
+              setDeleteSuccess("");
+          }, 7000)
+      })
       window.electronAPI.updatePersonnel(update_personnel);
       window.electronAPI.addConge(delete_conge);
       window.electronAPI.congeAddedSuccess(() => {
@@ -444,12 +459,12 @@ const Conges = () => {
                               <td>{c.date_debut_conge.getFullYear() + "-" + (parseInt(c.date_debut_conge.getMonth()+1) <= 9 ? "0"+parseInt(c.date_debut_conge.getMonth()+1) : parseInt(c.date_fin_conge.getMonth()+1)) + "-" + c.date_debut_conge.getDate()}</td>
                               <td>{c.date_fin_conge.getFullYear() + "-" + (parseInt(c.date_fin_conge.getMonth()+1) <= 9 ? "0"+parseInt(c.date_fin_conge.getMonth()+1) : parseInt(c.date_fin_conge.getMonth()+1)) + "-" + c.date_fin_conge.getDate()}</td>
                               <td>{curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? Math.ceil((c.date_fin_conge - curr_date) / (1000 * 3600 * 24)) : Math.ceil((c.date_fin_conge - c.date_debut_conge)/ (1000 * 3600 * 24)) }</td>
-                              <td>{curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge 
+                              <td>{c.statut_conge === "en cours"
                                   ? <Badge color="success">
-                                      en cours
+                                      {c.statut_conge}
                                     </Badge>
                                   : <Badge color="warning">
-                                      programmé
+                                      {c.statut_conge}
                                     </Badge>
                                   }
                               </td>
@@ -483,13 +498,22 @@ const Conges = () => {
                       ))}
                   </tbody>
               </Table>
-              <Row className="m-0">
-                  <CardFooter className="py-4">
-                      <nav aria-label="...">
+              <Row className="m-0 justify-content-center">
+                  <CardFooter className="py-3 d-flex" >
+                      <nav className="ligna-items-center" aria-label="...">
                           <Pagination
-                              className="pagination justify-content-center"
-                              listClassName="justify-content-center"
+                            className="pagination justify-content-center"
+                            listClassName="justify-content-center"
                           >
+                            <PaginationItem>
+                              <PaginationLink
+                                onClick={() => handlePagePrev()}
+                                tabIndex="-1"
+                              >
+                                <i className="fas fa-angle-left" />
+                                <span className="sr-only">Previous</span>
+                              </PaginationLink>
+                            </PaginationItem>
                               {Array.from({length: pageCount}, (_, i) => (
                                   <PaginationItem key={i} active={i === pageNumber}>
                                       <PaginationLink onClick={() => handlePageChange({selected: i})}>
@@ -497,6 +521,14 @@ const Conges = () => {
                                       </PaginationLink>
                                   </PaginationItem>
                               ))}
+                            <PaginationItem>
+                              <PaginationLink
+                                onClick={() => handlePageNext()}
+                              >
+                                <i className="fas fa-angle-right" />
+                                <span className="sr-only">Next</span>
+                              </PaginationLink>
+                            </PaginationItem>
                           </Pagination>
                       </nav>
                   </CardFooter>
@@ -830,7 +862,7 @@ const Conges = () => {
             </Card>
           </Col>
         </Row>
-        <Row>
+        {/*<Row>
           <Col md="12">
             <PDFViewer width="100%" height="100%">
               <CongeDoc 
@@ -866,7 +898,7 @@ const Conges = () => {
               {({ blob, url, loading, error }) => (loading ? 'Loading document...' : <Button color="primary">Télécharger l'attestation </Button>)}
             </PDFDownloadLink>
           </Col>
-        </Row>
+            </Row>*/}
       </Container>
     </>
   );

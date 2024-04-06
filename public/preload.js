@@ -1,5 +1,6 @@
 const { contextBridge, ipcRenderer } = require("electron");
 const dev = "Spaker the TMC";
+ipcRenderer.setMaxListeners(1000);
 
 window.addEventListener('DOMContentLoaded', () => {
     console.log('Preload script loaded successfully!');
@@ -23,7 +24,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     retrieveConge: (callback) => ipcRenderer.on('all-conge', callback),
     getAttestationConge: () => ipcRenderer.send('get-attestation-conge'),
     retrieveAttestationConge: (callback) => ipcRenderer.on('all-attestation-conge', callback),
-    addArchiveAttestaetionCong: (req) => ipcRenderer.send('add-archive-attestation-conge' , req),
+    addArchiveAttestationConge: (req) => ipcRenderer.send('add-archive-attestation-conge' , req),
     addArchiveAttCongeSuccess: (callback) => ipcRenderer.on('attestation-conge-added-success', callback),
     updateConge: (req) => ipcRenderer.send('update-conge' , req),
     updateCongeSuccess: (callback) => ipcRenderer.on('update-conge-success', callback),

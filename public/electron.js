@@ -107,7 +107,7 @@ function getConge(event, req) {
 }
 
 function getAttestationConge(even, req) {
-    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_conge,statut_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel', (err, res) => {
+    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_conge,statut_attestation_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel', (err, res) => {
         if (err) throw err;
         even.sender.send('all-attestation-conge', res);
     });
