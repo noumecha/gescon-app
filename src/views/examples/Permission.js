@@ -1,5 +1,4 @@
 import {
-    Container,
     Card,
     Button,
     CardHeader,
@@ -10,6 +9,7 @@ import {
     Input,
     Label,
     Col,
+    Container,
     Row,
     Alert,
     Table,
@@ -17,13 +17,17 @@ import {
     DropdownToggle,
     DropdownMenu,
     DropdownItem,
-    Badge
+    Badge,
+    CardFooter,
+    Pagination,
+    PaginationItem,
+    PaginationLink
   } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import { useState,useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { PDFViewer,PDFDownloadLink } from '@react-pdf/renderer';
-import PermissionDoc from "documents/PermissionDoc";
+//import { PDFViewer,PDFDownloadLink } from '@react-pdf/renderer';
+//import PermissionDoc from "documents/PermissionDoc";
 
 const Permission = () => {
     const location = useLocation();
@@ -50,9 +54,39 @@ const Permission = () => {
     const [status, setStatus] = useState(`${sexe === 'M' ? 'M' : 'Mme'} ${name} à droit à ${nb_jours_permission} ${nb_jours_permission > 1 ? "jours" : "jour"} de permissions`);
     const [visible, setVisible] = useState(true);
     const [deleteSuccess, setDeleteSuccess] = useState("");
+    const [search, setSearch] = useState("");
+    const [statutFilter, setStatutFilter] = useState("");
+    const [pageNumber, setPageNumber] = useState(0);
+    const [perPage] = useState(100);
 
-
-    // usefull function 
+    // usefull function   
+    const filterPermission = search !== "" || status !== ""
+    ? permission.filter(permission => permission.statut_permission.includes(statutFilter) && (
+        permission.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
+        || permission.matricule_personnel.toLowerCase().includes(search.toLowerCase())
+      ))
+      : permission
+    
+    const pageCount = Math.ceil(permission.length/perPage);
+    const offset = pageNumber * perPage;
+  
+  
+    const handlePageChange = ({selected}) => {
+      setPageNumber(selected);
+    }
+    const handlePagePrev = () => {
+      setPageNumber(pageCount <= 1 || pageNumber === 0 ? pageNumber : pageNumber - 1);
+    }
+    const handlePageNext = () => {
+      setPageNumber(pageCount <= 1 || pageCount === pageNumber + 1 ? pageNumber : pageNumber + 1);
+    }
+    const handleSearch = (e) => {
+      setSearch(e.target.value);
+    }
+    
+    const handleStatutFilter = (e) => {
+      setStatutFilter(e.target.value);
+    }
 
     const onDismiss = () => setVisible(false)
 
@@ -79,10 +113,6 @@ const Permission = () => {
             setError("");
         },3000)
         return;
-    }
-
-    const stopPermission = (p) => {
-        console.log("you want to stop the permission : ", p);
     }
 
     function firstDateOfMonth(d){
@@ -237,20 +267,21 @@ const Permission = () => {
                 curr_date : new Date().toISOString().slice(0,19).replace('T',' '),
                 demande : demande,
                 document : document,
-                statut_permission : "non archivé"
+                statut_permission : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en cours" : "pogrammé",
+                statut_attestation_permission : "non archivé"
               }
                 const req_permission = `INSERT INTO permission 
-                  (date_debut_permission, date_fin_permission, duree_permission, created_at_permission,attestation_permission,id_personnel,demande_permission,statut_permission) 
-                  VALUES ("${permission_data.startDate}","${permission_data.endDate}",${permission_data.duration},"${permission_data.curr_date}",'${JSON.stringify(attestation)}',${permission_data.id_personnel},"${permission_data.demande}","${permission_data.statut_permission}");`;
-                //const statut = curr_date >= permission_data.startDate && curr_date <= permission_data.endDate ? "en permission" : "en poste";
-                //const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${duration}) WHERE id_personnel = ${permission_data.id_personnel};`;
+                  (date_debut_permission, date_fin_permission, duree_permission, created_at_permission,attestation_permission,id_personnel,demande_permission,statut_permission,statut_attestation_permission) 
+                  VALUES ("${permission_data.startDate}","${permission_data.endDate}",${permission_data.duration},"${permission_data.curr_date}",'${JSON.stringify(attestation)}',${permission_data.id_personnel},"${permission_data.demande}","${permission_data.statut_permission}","${permission_data.statut_attestation_permission}");`;
+                const statut = curr_date >= permission_data.startDate && curr_date <= permission_data.endDate ? "en permission" : "en poste";
+                const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission + ${duration}) WHERE id_personnel = ${permission_data.id_personnel};`;
                 window.electronAPI.addPermission(req_permission);
                 setSuccess("permission ajoutée avec succès");
                 setStatus(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
-                //window.electronAPI.updatePersonnel(req_personnel);
-                /*window.electronAPI.permissionAddedSuccess(() => {
+                window.electronAPI.updatePersonnel(req_personnel);
+                window.electronAPI.permissionAddedSuccess(() => {
                     console.log("permission ajouter avec succès");
-                });*/
+                });
                 setTimeout(() => {
                     setSuccess("");
                 }, 3000)
@@ -259,6 +290,7 @@ const Permission = () => {
             console.error("Erreur saving permission : " + error.message);
         }
     } 
+    
     /** useeffect for fetching */
     useEffect(() => {
         const func = async () => {
@@ -288,6 +320,35 @@ const Permission = () => {
         <Container className="mt--7" fluid>
         {/* Tableaux de Conges */}
         <Row>
+            <Col lg="12">
+              <Card>
+                <CardHeader>
+                  <Row>
+                    <Col lg="6">
+                      <Input
+                        type="select"
+                        className="form-control mt-2"
+                        onChange={handleStatutFilter}
+                        value={statutFilter}
+                      >
+                        <option value="">Tous les statuts</option>
+                        <option value="programmé">programmé</option>
+                        <option value="en cours">en cours</option>
+                      </Input>
+                    </Col>
+                    <Col lg="6">
+                      <Input
+                        type="text"
+                        className="form-control mt-2"
+                        placeholder="Rechercher par nom ou matricule"
+                        onChange={handleSearch}
+                        value={search}
+                      />
+                    </Col>
+                  </Row>
+                </CardHeader>
+              </Card>
+            </Col>
             <div className="col p-0">
                 <div className="col">
                     <Card className="shadow">
@@ -316,19 +377,19 @@ const Permission = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {permission.map((p, index) => (
+                                {filterPermission.slice(offset, offset + perPage).map((p, index) => (
                                     <tr key={index}>
                                         <td>{p.matricule_personnel}</td>    
                                         <td>{p.nom_prenom_personnel}</td>    
                                         <td>{p.date_debut_permission.getFullYear() + "-" + (parseInt(p.date_debut_permission.getMonth()+1) <= 9 ? "0"+parseInt(p.date_debut_permission.getMonth()+1) : parseInt(p.date_fin_permission.getMonth()+1)) + "-" + p.date_debut_permission.getDate()}</td>
                                         <td>{p.date_fin_permission.getFullYear() + "-" + (parseInt(p.date_fin_permission.getMonth()+1) <= 9 ? "0"+parseInt(p.date_fin_permission.getMonth()+1) : parseInt(p.date_fin_permission.getMonth()+1)) + "-" + p.date_fin_permission.getDate()}</td>
                                         <td>{curr_date >= p.date_debut_permission && curr_date <= p.date_fin_permission ? Math.ceil((p.date_fin_permission - curr_date) / (1000 * 3600 * 24)) : Math.ceil((p.date_fin_permission - p.date_debut_permission)/ (1000 * 3600 * 24)) }</td>
-                                        <td>{curr_date >= p.date_debut_permission && curr_date <= p.date_fin_permission 
+                                        <td>{p.statut_permission === "en cours"
                                             ? <Badge color="success">
-                                                en cours
+                                                {p.statut_permission}
                                               </Badge>
                                             : <Badge color="warning">
-                                                programmé
+                                                {p.statut_permission}
                                               </Badge>
                                             }
                                         </td>
@@ -345,21 +406,15 @@ const Permission = () => {
                                                 </DropdownToggle>
                                                 <DropdownMenu className="dropdown-menu-arrow" right>
                                                     <DropdownItem
-                                                      onClick={() => editPermission(p)}
-                                                      disabled
+                                                        onClick={() => editPermission(p)}
+                                                        disabled
                                                     >
-                                                      Modifier la permission
+                                                        Modifier la permission
                                                     </DropdownItem>
                                                     <DropdownItem
-                                                      onClick={() => deletePermission(p)}
+                                                        onClick={() => deletePermission(p)}
                                                     >
                                                         Annuler la permission
-                                                    </DropdownItem>
-                                                    <DropdownItem
-                                                      disabled={curr_date >= p.date_debut_permission && curr_date <= p.date_fin_permission ? false : true}
-                                                      onClick={() => stopPermission(p)}
-                                                    >
-                                                        Arreter la permission
                                                     </DropdownItem>
                                                 </DropdownMenu>
                                             </UncontrolledDropdown>
@@ -368,10 +423,46 @@ const Permission = () => {
                                 ))}
                             </tbody>
                         </Table>
+                        <Row className="m-0 justify-content-center">
+                            <CardFooter className="py-3 d-flex" >
+                                <nav className="ligna-items-center" aria-label="...">
+                                    <Pagination
+                                      className="pagination justify-content-center"
+                                      listClassName="justify-content-center"
+                                    >
+                                      <PaginationItem>
+                                        <PaginationLink
+                                          onClick={() => handlePagePrev()}
+                                          tabIndex="-1"
+                                        >
+                                          <i className="fas fa-angle-left" />
+                                          <span className="sr-only">Previous</span>
+                                        </PaginationLink>
+                                      </PaginationItem>
+                                        {Array.from({length: pageCount}, (_, i) => (
+                                            <PaginationItem key={i} active={i === pageNumber}>
+                                                <PaginationLink onClick={() => handlePageChange({selected: i})}>
+                                                    {i}
+                                                </PaginationLink>
+                                            </PaginationItem>
+                                        ))}
+                                      <PaginationItem>
+                                        <PaginationLink
+                                          onClick={() => handlePageNext()}
+                                        >
+                                          <i className="fas fa-angle-right" />
+                                          <span className="sr-only">Next</span>
+                                        </PaginationLink>
+                                      </PaginationItem>
+                                    </Pagination>
+                                </nav>
+                            </CardFooter>
+                        </Row>
                     </Card>
                 </div>
             </div>
         </Row>
+        {/** Fomulaire de création de permission */}
         <Row className="mt-5">
                 <Col className="order-xl-1" md="12" lg="12">
                     <Card className="bg-secondary shadow">
@@ -619,8 +710,8 @@ const Permission = () => {
                     </Card>
                 </Col>
         </Row>
-        <Row>
-                <Col md="12">
+        {/*<Row>
+            <Col md="12">
                     <PDFViewer width="100%" height="100%">
                         <PermissionDoc 
                             name={name}
@@ -635,8 +726,8 @@ const Permission = () => {
                             repriseDate={repDate}
                         />
                     </PDFViewer>
-                </Col>
-                <Col md="12">
+            </Col>
+            <Col md="12">
                 <PDFDownloadLink document={<PermissionDoc 
                     name={name}
                     matricule={matricule}
@@ -652,7 +743,7 @@ const Permission = () => {
                 {({ blob, url, loading, error }) => (loading ? 'Loading document...' : <Button color="primary">Télécharger l'attestation </Button>)}
                 </PDFDownloadLink>
             </Col>
-        </Row>
+            </Row>*/}
         </Container>
       </>
     );
