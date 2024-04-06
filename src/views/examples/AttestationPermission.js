@@ -75,7 +75,7 @@ const AttestationPermission = () => {
         }
         const date = new Date().toISOString().slice(0,19).replace('T',' ');
         const req = `INSERT INTO archive_att_permission (fichier_arch_att_permission,created_at_arch_permission,id_permission) VALUES ("${archive}","${date}",${attestation_permission.id_permission}) `;
-        const req_conge = `UPDATE permission SET statut_permission ="archivé" WHERE id_permission = ${attestation_permission.id_permission}`;
+        const req_conge = `UPDATE permission SET statut_attestation_permission ="archivé" WHERE id_permission = ${attestation_permission.id_permission}`;
         window.electronAPI.addArchiveAttestationPermission(req)
         window.electronAPI.addArchiveAttPermissionSuccess((event, res) => {
             setSuccessArchive("attestation archivé avec succès")
@@ -110,7 +110,7 @@ const AttestationPermission = () => {
     /** Filter */
 
     const filterAttestation = filter !== "" || search !== ""
-    ? attestation_permission.filter(attestation_permission => attestation_permission.statut_permission === filter && (
+    ? attestation_permission.filter(attestation_permission => attestation_permission.statut_attestation_permission === filter && (
         attestation_permission.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) || attestation_permission.matricule_personnel.toLowerCase().includes(search.toLowerCase())
     ))
     : attestation_permission
@@ -210,17 +210,17 @@ const AttestationPermission = () => {
                                                     </PDFDownloadLink>
                                                 </td> 
                                                 <td>
-                                                    {att_perm.statut_permission === "non archivé" ?  
+                                                    {att_perm.statut_attestation_permission === "non archivé" ?  
                                                         <Badge color="danger">
-                                                            {att_perm.statut_permission}
+                                                            {att_perm.statut_attestation_permission}
                                                         </Badge> 
-                                                        : att_perm.statut_permission === "archivé" ? 
+                                                        : att_perm.statut_attestation_permission === "archivé" ? 
                                                         <Badge color="success">
-                                                            {att_perm.statut_permission}
+                                                            {att_perm.statut_attestation_permission}
                                                         </Badge> 
                                                         : 
                                                         <Badge color="danger">
-                                                            {att_perm.statut_permission}
+                                                            {att_perm.statut_attestation_permission}
                                                         </Badge> 
                                                     }
                                                 </td> 
