@@ -86,19 +86,6 @@ const Index = (props) => {
                           <span className="d-md-none">M</span>
                         </NavLink>
                       </NavItem>
-                      <NavItem>
-                        <NavLink
-                          className={classnames("py-2 px-3", {
-                            active: activeNav === 2,
-                          })}
-                          data-toggle="tab"
-                          href="#pablo"
-                          onClick={(e) => toggleNavs(e, 2)}
-                        >
-                          <span className="d-none d-md-block">semaine</span>
-                          <span className="d-md-none">S</span>
-                        </NavLink>
-                      </NavItem>
                     </Nav>
                   </div>
                 </Row>

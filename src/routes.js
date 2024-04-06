@@ -2,11 +2,9 @@ import Index from "views/Index.js";
 import Profile from "views/examples/Profile.js";
 import Register from "views/examples/Register.js";
 import Login from "views/examples/Login.js";
-//import Tables from "views/examples/Tables.js";
 import Conges from "views/examples/Conges.js";
 import Personnel from "views/examples/Personnel.js";
 import Decision from "views/examples/Decision.js";
-//import Icons from "views/examples/Icons.js";
 import Permission from "views/examples/Permission";
 import AttestationConge from "views/examples/AttestationConge";
 import AttestationPermission from "views/examples/AttestationPermission";
@@ -14,6 +12,9 @@ import FichePersonnel from "views/examples/FichePersonnel";
 import ArchiveAttestationConge from "views/examples/ArchiveAttestationConge";
 import ArchiveAttestationPermission from "views/examples/ArchiveAttestationPermission";
 import PersonnelDetails from "views/examples/PersonnelDetails";
+import StructureStats from "views/examples/StructureStats";
+//import Tables from "views/examples/Tables";
+//import Icons from "views/examples/Icons";
 
 var routes = [
   {
@@ -86,6 +87,27 @@ var routes = [
     component: <ArchiveAttestationPermission />,
     layout: "/admin",
   },
+  {
+    path: "/structures",
+    name: "Structures",
+    icon: "ni ni-building text-blue",
+    component: <StructureStats />,
+    layout: "/admin",
+  },
+   /*{
+    path: "/tables",
+    name: "Tables",
+    icon: "ni ni-ruler-pencil text-blue",
+    component: <Tables />,
+    layout: "/admin",
+  },
+ {
+    path: "/icons",
+    name: "Structures",
+    icon: "ni ni-ruler-pencil text-blue",
+    component: <Icons />,
+    layout: "/admin",
+},*/
   {
     path: "/decision",
     name: "Decisions",

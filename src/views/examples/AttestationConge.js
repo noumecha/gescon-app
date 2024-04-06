@@ -76,8 +76,8 @@ const AttestationConge = () => {
         }
         const date = new Date().toISOString().slice(0,19).replace('T',' ');
         const req = `INSERT INTO archive_att_conge (fichier_archive_att_conge,created_at_arch_att_conge,id_conge) VALUES ("${archive}","${date}",${attestation_conge.id_conge}) `;
-        const req_conge = `UPDATE conge SET statut_conge ="archivé" WHERE id_conge = ${attestation_conge.id_conge}`;
-        window.electronAPI.addArchiveAttestaetionCong(req)
+        const req_conge = `UPDATE conge SET statut_attestation_conge ="archivé" WHERE id_conge = ${attestation_conge.id_conge}`;
+        window.electronAPI.addArchiveAttestationConge(req)
         window.electronAPI.addArchiveAttCongeSuccess((event, res) => {
             setSuccessArchive("attestation archivé avec succès")
             setTimeout(() => {
@@ -111,8 +111,9 @@ const AttestationConge = () => {
     /** Filter */
 
     const filterAttestation = filter !== "" || search !== ""
-    ? attestation_conge.filter(attestation_conge => attestation_conge.statut_conge === filter && (
-        attestation_conge.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) || attestation_conge.matricule_personnel.toLowerCase().includes(search.toLowerCase())
+    ? attestation_conge.filter(attestation_conge => attestation_conge.statut_attestation_conge === filter && (
+        attestation_conge.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
+        || attestation_conge.matricule_personnel.toLowerCase().includes(search.toLowerCase())
     ))
     : attestation_conge
 
@@ -147,7 +148,7 @@ const AttestationConge = () => {
                         onChange={handleFilterChange}
                         value={filter}
                     >
-                        <option value="">Tout les statut</option>
+                        <option value="">Tout les status</option>
                         <option value="archivé">archivé</option>
                         <option value="non archivé">non archivé</option>
                     </Input>
@@ -204,7 +205,7 @@ const AttestationConge = () => {
                                                         endDate={att_con.attestation_conge.endDate}
                                                         repriseDate={att_con.attestation_conge.repriseDate}
                                                         typeConge={att_con.attestation_conge.typeConge}
-                                                    />} fileName={`attestation_${att_con.matricule_personnel}.pdf`}>
+                                                    />} fileName={`attestation_conge_${att_con.nom_prenom_personnel}_du_${att_con.attestation_conge.startDate}_au_${att_con.attestation_conge.endDate}.pdf`}>
                                                     {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 
                                                         <Button
                                                             color="success"
@@ -214,17 +215,17 @@ const AttestationConge = () => {
                                                     </PDFDownloadLink>
                                                 </td> 
                                                 <td>
-                                                    {att_con.statut_conge === "non archivé" ?  
+                                                    {att_con.statut_attestation_conge === "non archivé" ?  
                                                         <Badge color="danger">
-                                                            {att_con.statut_conge}
+                                                            {att_con.statut_attestation_conge}
                                                         </Badge> 
-                                                        : att_con.statut_conge === "archivé" ? 
+                                                        : att_con.statut_attestation_conge === "archivé" ? 
                                                         <Badge color="success">
-                                                            {att_con.statut_conge}
+                                                            {att_con.statut_attestation_conge}
                                                         </Badge> 
                                                         : 
                                                         <Badge color="danger">
-                                                            {att_con.statut_conge}
+                                                            {att_con.statut_attestation_conge}
                                                         </Badge> 
                                                     }
                                                 </td> 

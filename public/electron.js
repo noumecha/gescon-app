@@ -51,6 +51,12 @@ function addPersonnel(event, req) {
         event.sender.send('personnel-added-success', { message: 'Personnel ajouté avec succès !' });
     });
 }
+function getSpecificPersonnel(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('specific-personnel', res);
+    })
+}
 function getPersonnel(event, arg) {
     pool.query('SELECT * FROM Personnel', (err, res) => {
         if (err) throw err;
@@ -101,7 +107,7 @@ function getConge(event, req) {
 }
 
 function getAttestationConge(even, req) {
-    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_conge,statut_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel', (err, res) => {
+    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_conge,statut_attestation_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel', (err, res) => {
         if (err) throw err;
         even.sender.send('all-attestation-conge', res);
     });
@@ -264,6 +270,7 @@ app.whenReady().then(() => {
     });
     ipcMain.on('add-personnel', addPersonnel);
     ipcMain.on('get-personnel', getPersonnel);
+    ipcMain.on('get-specific-personnel', getSpecificPersonnel);
     ipcMain.on('update-personnel', updatePersonnel);
     // decision
     ipcMain.on('get-decision', getDecision);

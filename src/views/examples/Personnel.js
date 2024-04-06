@@ -139,13 +139,20 @@ const Personnel = () => {
         setPageNumber(selected);
     }
 
+    const handlePagePrev = () => {
+        setPageNumber(pageCount <= 1 || pageNumber === 0? pageNumber : pageNumber - 1);
+    }
+    const handlePageNext = () => {
+        setPageNumber(pageCount <= 1 || pageCount === pageNumber + 1 ? pageNumber : pageNumber + 1);
+    }
+
     /** for the filter and the search bar */
 
     const filterPersonnel = filter !== "" || search !== "" || status !== ""
         ? personnel.filter(personnel => personnel.categorie_personnel.includes(filter) && (
             personnel.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
             || personnel.matricule_personnel.toLowerCase().includes(search.toLowerCase())
-        ))
+        ) && personnel.statut_personnel.includes(status))
         : personnel
 
     const handleFilterChange = (e) => {
@@ -263,7 +270,7 @@ const Personnel = () => {
                         value={status}
                     >
                         <option value="">Tous les statuts</option>
-                        <option value="en conge">en congé</option>
+                        <option value="en congé">en congé</option>
                         <option value="en poste">en poste</option>
                         <option value="en permission">en permission</option>
                     </Input>
@@ -359,34 +366,16 @@ const Personnel = () => {
                                                             <i className="fas fa-ellipsis-v" />
                                                         </DropdownToggle>
                                                         <DropdownMenu className="dropdown-menu-arrow" right>
-                                                            {person.statut_personnel === "en congé" 
-                                                                ? 
-                                                                <DropdownItem
-                                                                    onClick={() => handleCongeClick(person)}
-                                                                >
-                                                                    Prolongé le congé
-                                                                </DropdownItem> 
-                                                                : 
-                                                                <DropdownItem
-                                                                    onClick={() => handleCongeClick(person)}
-                                                                >
-                                                                    Nouveau congé
-                                                                </DropdownItem>
-                                                            }
-                                                            {person.statut_personnel === "en permission" 
-                                                                ? 
-                                                                <DropdownItem
-                                                                    onClick={() => handlePermissionClick(person)}
-                                                                >
-                                                                    Prolongé la permission
-                                                                </DropdownItem>
-                                                                : 
-                                                                <DropdownItem
-                                                                    onClick={() => handlePermissionClick(person)}
-                                                                >
-                                                                    Nouvelle permission
-                                                                </DropdownItem>
-                                                            }
+                                                            <DropdownItem
+                                                                onClick={() => handleCongeClick(person)}
+                                                            >
+                                                                Nouveau congé
+                                                            </DropdownItem>
+                                                            <DropdownItem
+                                                                onClick={() => handlePermissionClick(person)}
+                                                            >
+                                                                Nouvelle permission
+                                                            </DropdownItem>
                                                             <DropdownItem
                                                                 onClick={() => handleDetailClick(person)}
                                                             >
@@ -412,13 +401,22 @@ const Personnel = () => {
                     )}
                 </div>
             </Row>
-            <Row className="m-0">
-                <CardFooter className="py-4">
-                    <nav aria-label="...">
+            <Row className="m-0 justify-content-center">
+                <CardFooter className="py-3 d-flex" >
+                    <nav className="ligna-items-center" aria-label="...">
                         <Pagination
-                            className="pagination justify-content-center"
-                            listClassName="justify-content-center"
+                          className="pagination justify-content-center"
+                          listClassName="justify-content-center"
                         >
+                          <PaginationItem>
+                            <PaginationLink
+                              onClick={() => handlePagePrev()}
+                              tabIndex="-1"
+                            >
+                              <i className="fas fa-angle-left" />
+                              <span className="sr-only">Previous</span>
+                            </PaginationLink>
+                          </PaginationItem>
                             {Array.from({length: pageCount}, (_, i) => (
                                 <PaginationItem key={i} active={i === pageNumber}>
                                     <PaginationLink onClick={() => handlePageChange({selected: i})}>
@@ -426,6 +424,14 @@ const Personnel = () => {
                                     </PaginationLink>
                                 </PaginationItem>
                             ))}
+                          <PaginationItem>
+                            <PaginationLink
+                              onClick={() => handlePageNext()}
+                            >
+                              <i className="fas fa-angle-right" />
+                              <span className="sr-only">Next</span>
+                            </PaginationLink>
+                          </PaginationItem>
                         </Pagination>
                     </nav>
                 </CardFooter>

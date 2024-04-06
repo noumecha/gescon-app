@@ -25,22 +25,17 @@ const ArchiveAttestationConge = () => {
     const [pageNumber, setPageNumber] = useState(0);
     const [perPage] = useState(100);
     const [search, setSearch] = useState("");
-    const [filter, setFilter] = useState("");
     const pageCount = Math.ceil(archive_conge.length/perPage);
     const offset = pageNumber * perPage;
     const [deleteArchive, setDeleteArchive] = useState("");
 
-    const filterArchiveConge = filter !== "" || search !== ""
-    ? archive_conge.filter(attestation_conge => archive_conge.statut_conge === filter && (
+    const filterArchiveConge = search !== ""
+    ? archive_conge.filter(archive_conge => (
         archive_conge.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) || archive_conge.matricule_personnel.toLowerCase().includes(search.toLowerCase())
     ))
     : archive_conge
 
     /** some useful functions */
-
-    const handleFilterChange = (e) => {
-        setFilter(e.target.value);
-    }
 
     const handleSearch = (e) => {
         setSearch(e.target.value);
@@ -53,7 +48,7 @@ const ArchiveAttestationConge = () => {
     const handleArchiveDelete = (arch) => {
         console.log(arch);
         const req = `DELETE FROM archive_att_conge WHERE id_archive_att_conge = ${arch.id_archive_att_conge}`;
-        const req_conge = `UPDATE conge SET statut_conge ="non archivé" WHERE id_conge = ${arch.id_conge}`;
+        const req_conge = `UPDATE conge SET statut_attestation_conge ="non archivé" WHERE id_conge = ${arch.id_conge}`;
         window.electronAPI.deleteArchiveAttConge(req);
         window.electronAPI.deleteArchiveAttCongeSuccess(() => {
             setDeleteArchive("Archive Supprimser avec succès");
@@ -93,21 +88,7 @@ const ArchiveAttestationConge = () => {
         <Container className="mt--7" fluid>
             {/* Table */}
             <Row>
-                <Col lg="12">
-                    <Input
-                        type="select"
-                        className="form-control"
-                        onChange={handleFilterChange}
-                        value={filter}
-                    >
-                        <option value="">Tout les statut</option>
-                        <option value="archivé">archivé</option>
-                        <option value="non archivé">non archivé</option>
-                    </Input>
-                </Col>
-            </Row>
-            <Row>
-                <Col md="12">
+                <Col lg="12" md="12">
                     <div className="form-group custom-form">
                         <Input
                             type="text"
@@ -118,18 +99,14 @@ const ArchiveAttestationConge = () => {
                         />
                     </div>
                 </Col>
-            </Row>
-            <Row className="mt-3">
-                <Col>
+                <Col g="12" md="12">
                     { deleteArchive && (
                         <Alert color="success">
                             {deleteArchive}
                         </Alert>
                     )}                                                                                    
                 </Col>
-            </Row>
-            <Row>
-                <div className="col p-0">
+                <Col className="p-0" lg="12" md="12">
                     {archive_conge && archive_conge.length > 0 ? (
                         <div className="col">
                             <Card className="shadow">
@@ -198,7 +175,7 @@ const ArchiveAttestationConge = () => {
                             </Card>
                         </div>
                     )}
-                </div>
+                </Col>
             </Row>
             <Row className="m-0">
                 <CardFooter className="py-4">

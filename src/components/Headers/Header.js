@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 // reactstrap components
 import { Card, CardBody, CardTitle, Container, Row, Col } from "reactstrap";
 import { useState, useEffect } from "react";
@@ -22,12 +21,9 @@ const Header = () => {
   useEffect(() => {
     const func = async () => {
         try {
-            /*window.electronAPI.getDemandeConge();
-            await window.electronAPI.retrieveDemandeConge((event, res) => {
-              setDemande(res);
-            })*/
-            window.electronAPI.getConge();
-            await window.electronAPI.retrieveConge((event, res) => {
+            const req_get = `SELECT * FROM personnel WHERE statut_personnel = "en congé"`;
+            window.electronAPI.getSpecificPersonnel(req_get);
+            await window.electronAPI.retrieveSpecificPersonnel((event, res) => {
               setConge(res);
             })
             window.electronAPI.getPersonnel();
@@ -70,12 +66,6 @@ const Header = () => {
                         </div>
                       </Col>
                     </Row>
-                    <p className="mt-3 mb-0 text-muted text-sm">
-                      <span className="text-success mr-2">
-                        <i className="fa fa-arrow-up" /> 0%
-                      </span>{" "}
-                      <span className="text-nowrap">Depuis le dernier mois</span>
-                    </p>
                   </CardBody>
                 </Card>
               </Col>
@@ -100,12 +90,6 @@ const Header = () => {
                         </div>
                       </Col>
                     </Row>
-                    <p className="mt-3 mb-0 text-muted text-sm">
-                      <span className="text-warning mr-2">
-                        <i className="fas fa-arrow-down" /> 0%
-                      </span>{" "}
-                      <span className="text-nowrap">Depuis hier</span>
-                    </p>
                   </CardBody>
                 </Card>
               </Col>
@@ -128,12 +112,6 @@ const Header = () => {
                         </div>
                       </Col>
                     </Row>
-                    <p className="mt-3 mb-0 text-muted text-sm">
-                      <span className="text-success mr-2">
-                        <i className="fas fa-arrow-up" /> 12%
-                      </span>{" "}
-                      <span className="text-nowrap">Depuis le dernier mois</span>
-                    </p>
                   </CardBody>
                 </Card>
               </Col>
