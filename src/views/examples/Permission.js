@@ -58,6 +58,7 @@ const Permission = () => {
     const [statutFilter, setStatutFilter] = useState("");
     const [pageNumber, setPageNumber] = useState(0);
     const [perPage] = useState(100);
+    const [userConge, setUserConge] = useState([]);
 
     // usefull function   
     const filterPermission = search !== "" || status !== ""
@@ -161,28 +162,36 @@ const Permission = () => {
     const savePermission = async (e) => {
         e.preventDefault();
         try {
-            if (duration > nb_jours_permission) {
-              setError("Vous ne pouvez pas dépassé le nombre de jours de permission disponible");
-              setTimeout(() => {
-                setError("");
-              },7000)
-              return;
-            }
-            if (selectedPerson.statut_personnel === "en congé") {
+            //console.log("last permission start date : " + lastPermission[0].date_debut_permission)
+            //console.log("last permission end date : " + lastPermission[0].date_fin_permission)
+            console.log("start deate : " + startDate.toString())
+            console.log("en date : " + endDate)
+            console.log("en date : " + repDate)
+            console.log(`user conge start date ${userConge[0].date_debut_conge}`);
+            console.log(`user conge end date ${userConge[0].date_debut_conge}`);
+            /*if (selectedPerson.statut_personnel === "en congé") {
                 setError("Ce personnel n'a pas droit à une permission car il est en congé");
                 setTimeout(() => {
                     setError("");
                 },7000)
                 return;
             }
+            if (userConge.length > 0) {
+                for (let index = 0; index < userConge.length; index++) {
+                    if (startDate >= userConge[index].date_debut_conge && endDate >= userConge[index].date_fin_conge) {
+                        setError("Impossible de définir une permission pour cette date car le personnel a un congé prévu");
+                        setTimeout(() => {
+                            setError("");
+                        },7000)
+                        return;
+                    }
+                }
+            }
             if (lastPermission.length > 0) {
-                let dur = 0;
-                let total_duration = 0;
                 let fmd = firstDateOfMonth(curr_date);
                 let lmd = lastDateOfMonth(curr_date);
                 for (let i = 0; i < lastPermission.length; i++) {
                     if ((lastPermission[i].date_debut_permission.toISOString().slice(0,19).replace('T',' ') >= fmd && lastPermission[i].date_debut_permission.toISOString().slice(0,19).replace('T',' ') <= lmd) && (lastPermission[i].date_fin_permission.toISOString().slice(0,19).replace('T',' ') >= fmd && lastPermission[i].date_fin_permission.toISOString().slice(0,19).replace('T',' ') <= lmd)) {
-                        dur += lastPermission[i].duree_permission;
                         setError("Vous avez déja pris une permission pour ce mois");
                         setTimeout(() => {
                             setError("");
@@ -196,36 +205,8 @@ const Permission = () => {
                         },7000)
                         return;
                     }
-                    console.log("last permission start date : " + lastPermission[i].date_debut_permission)
-                    console.log("last permission end date : " + lastPermission[i].date_fin_permission)
-                    console.log("start deate : " + startDate.toString())
-                    console.log("en date : " + endDate)
-                    console.log("en date : " + repDate)
                     if ((startDate >= firstDateOfMonth(lastPermission[i].date_debut_permission) && startDate <= lastDateOfMonth(lastPermission[i].date_fin_permission)) && (endDate >= firstDateOfMonth(lastPermission[i].date_debut_permission) && endDate <= lastDateOfMonth(lastPermission[i].date_fin_permission))) {
                         setError("Vous avez déja pris une permission pour ce mois");
-                        setTimeout(() => {
-                            setError("");
-                        },7000)
-                        return;
-                    }
-                    total_duration += lastPermission[i].duree_permission;
-                }
-                console.log("Total duration " + total_duration);
-                if (total_duration > 10) {
-                    const req_personnel = `UPDATE personnel SET nb_jours_conge = (nb_jours_conge - ${total_duration - 10}) WHERE id_personnel = ${selectedPerson.id_personnel};`;
-                    window.electronAPI.updatePersonnel(req_personnel);
-                }
-                /*if (dur === 3) {
-                    setError("Vous avez epuisé vos permsissions pour ce mois");
-                    setTimeout(() => {
-                      setError("");
-                    },7000)
-                    return;
-                }*/
-                if (dur < 3) {
-                    setStatus(`${sexe === 'M' ? 'M' : 'Mme'} ${name} a encore droit à ${3 - dur > 0 ? 3 - dur + " jours de permissions" : 3 - dur + "jour permission"}`)
-                    if (duration > (3 - dur)) {         
-                        setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} a encore droit à ${3 - dur > 0 ? 3 - dur + " jours de permissions" : 3 - dur + "jour permission"}`);
                         setTimeout(() => {
                             setError("");
                         },7000)
@@ -239,6 +220,11 @@ const Permission = () => {
                   setError("");
                 },7000)
                 return;
+            }
+            if (selectedPerson.nb_jours_permission > 10 ) {
+                // remove the excedent from the nb_jours_conges
+                const req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges - ${duration}) WHERE id_personnel = ${selectedPerson.id_personnel};`;
+                window.electronAPI.updatePersonnel(req_personnel);
             }
             if (name === "" || startDate === "" || endDate === "" || duration === "" || repDate === "" || matricule === "" || type === "" || structure === "" || poste === "") {
                 setError('Veuillez remplir tous les champs');
@@ -285,7 +271,7 @@ const Permission = () => {
                 setTimeout(() => {
                     setSuccess("");
                 }, 3000)
-            }
+            }*/
         } catch (error) {
             console.error("Erreur saving permission : " + error.message);
         }
@@ -295,12 +281,6 @@ const Permission = () => {
     useEffect(() => {
         const func = async () => {
             try {
-                const last_permission_req = `SELECT * FROM permission WHERE id_personnel = ${id_personnel}`;
-                window.electronAPI.getLastPermission(last_permission_req);
-                await window.electronAPI.retrieveLastPermission((event, res) => {
-                    console.log("lasts permissions : ", res);
-                    setLastPermission(res);
-                })
                 window.electronAPI.getPermission();
                 await window.electronAPI.retrievePermission((event, res) => {
                     setPermission(res);
@@ -310,7 +290,29 @@ const Permission = () => {
             }
         }
         func();
-    }, [id_personnel]);
+    });
+
+    useEffect(() => {
+        const func = async () => {
+            try {
+                const test_conge_req = `SELECT * FROM conge WHERE id_personnel = ${id_personnel}`;
+                window.electronAPI.addConge(test_conge_req);
+                await window.electronAPI.congeAddedSuccess((event, res) => {
+                    console.log("conge for user " + id_personnel + " : " + res)
+                    setUserConge(res);
+                })
+                const last_permission_req = `SELECT * FROM permission WHERE id_personnel = ${id_personnel}`;
+                window.electronAPI.getLastPermission(last_permission_req);
+                await window.electronAPI.retrieveLastPermission((event, res) => {
+                    console.log("lasts permissions : ", res);
+                    setLastPermission(res);
+                })
+            } catch (error) {
+                console.error("Erreur : " + error.message);
+            }
+        }
+        func();
+    }, [id_personnel])
 
 
     return (
