@@ -18,6 +18,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     getCongeType: () => ipcRenderer.send('get-conge-type'),
     retrieveCongeType: (callback) => ipcRenderer.on('all-conge-type', callback),
     // conge :  
+    getSpecificConge: (req) => ipcRenderer.send('get-specific-conge' , req),
+    retrieveSpecificConge: (callback) => ipcRenderer.on('all-specific-conge', callback),
     addConge: (req) => ipcRenderer.send('add-conge', req),
     congeAddedSuccess: (callback) => ipcRenderer.on('conge-added-success', callback),    
     getConge: () => ipcRenderer.send('get-conge'),

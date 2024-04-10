@@ -455,7 +455,7 @@ const Conges = () => {
                       {filterConge.slice(offset, offset + perPage).map((c, index) => (
                           <tr key={index}>
                               <td>{c.matricule_personnel}</td>    
-                              <td>{c.nom_prenom_personnel}</td>    
+                              <td>{c.nom_prenom_personnel}</td> 
                               <td>{c.date_debut_conge.getFullYear() + "-" + (parseInt(c.date_debut_conge.getMonth()+1) <= 9 ? "0"+parseInt(c.date_debut_conge.getMonth()+1) : parseInt(c.date_fin_conge.getMonth()+1)) + "-" + c.date_debut_conge.getDate()}</td>
                               <td>{c.date_fin_conge.getFullYear() + "-" + (parseInt(c.date_fin_conge.getMonth()+1) <= 9 ? "0"+parseInt(c.date_fin_conge.getMonth()+1) : parseInt(c.date_fin_conge.getMonth()+1)) + "-" + c.date_fin_conge.getDate()}</td>
                               <td>{curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? Math.ceil((c.date_fin_conge - curr_date) / (1000 * 3600 * 24)) : Math.ceil((c.date_fin_conge - c.date_debut_conge)/ (1000 * 3600 * 24)) }</td>
