@@ -51,7 +51,7 @@ const Permission = () => {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const nb_jours_permission = selectedPerson ? selectedPerson.nb_jours_permission : 0;
-    const [status, setStatus] = useState(`${sexe === 'M' ? 'M' : 'Mme'} ${name} a encore ${10 - nb_jours_permission} ${10 - nb_jours_permission > 1 ? "jours" : "jour"} de ${10 - nb_jours_permission > 1 ? "permissions" : "permission"} ${10 - nb_jours_permission > 1 ? "disponibles" : "disponible"}`);
+    const [status, setStatus] = useState(nb_jours_permission >= 10 ? `les nouvelles permissions de ${sexe === 'M' ? 'M' : 'Mme'} ${name} seront détuites de ses jours de congés` : `${sexe === 'M' ? 'M' : 'Mme'} ${name} a encore ${10 - nb_jours_permission} ${10 - nb_jours_permission > 1 ? "jours" : "jour"} de ${10 - nb_jours_permission > 1 ? "permissions" : "permission"} ${10 - nb_jours_permission > 1 ? "disponibles" : "disponible"}`);
     const [visible, setVisible] = useState(true);
     const [deleteSuccess, setDeleteSuccess] = useState("");
     const [search, setSearch] = useState("");
@@ -72,8 +72,7 @@ const Permission = () => {
     
     const pageCount = Math.ceil(permission.length/perPage);
     const offset = pageNumber * perPage;
-  
-  
+
     const handlePageChange = ({selected}) => {
       setPageNumber(selected);
     }
@@ -104,7 +103,16 @@ const Permission = () => {
     const deletePermission = async (p) => {
         const req_permission = `DELETE FROM permission WHERE id_permission = '${p.id_permission}'`; 
         const statut = "en poste";
-        const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${p.duree_permission}) WHERE id_personnel = ${p.id_personnel};`;
+        let req_personnel;
+        if (p.nb_jours_permission > 10) {
+            if (p.nb_jours_permission === 12) {
+                req_personnel = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${p.duree_permission}),nb_jours_conges = (nb_jours_conges - ${2}) WHERE id_personnel = ${p.id_personnel};`;
+            } else {
+                req_personnel = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${p.duree_permission}),nb_jours_conges = (nb_jours_conges - ${p.duree_permission}) WHERE id_personnel = ${p.id_personnel};`;
+            }
+        } else {
+            req_personnel = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${p.duree_permission}) WHERE id_personnel = ${p.id_personnel};`;
+        }
         console.log(`${req_personnel}`);
         window.electronAPI.addPermission(req_permission);
         window.electronAPI.updatePersonnel(req_personnel);
@@ -178,6 +186,13 @@ const Permission = () => {
         try {
             if (!selectedPerson) {
                 setError(`Veuillez d'abord selectionner un personnel`);
+                setTimeout(() => {
+                    setError("");
+                },7000)
+                return;
+            }
+            if (duration <= 0) {
+                setError(`La durée de la permission ne peut pas etre négative ou égale à 0`);
                 setTimeout(() => {
                     setError("");
                 },7000)
@@ -310,7 +325,7 @@ const Permission = () => {
                 });
                 if (total_lasts_days + parseInt(duration) > 10 ) {
                     let diff = selectedPerson.nb_jours_permission + 1 === 10 ? (total_lasts_days + parseInt(duration)) - 10 : (total_lasts_days + parseInt(duration)) - selectedPerson.nb_jours_permission ;
-                    const req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges - ${diff}) WHERE id_personnel = ${selectedPerson.id_personnel};`;
+                    const req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges + ${diff}) WHERE id_personnel = ${selectedPerson.id_personnel};`;
                     console.log(`${req_personnel}`)
                     window.electronAPI.updatePersonnel(req_personnel);
                     window.electronAPI.updatePersonnelSuccess(() => {
@@ -340,6 +355,31 @@ const Permission = () => {
         }
         func();
     });
+
+    /** useEffect for updating specific data */
+    useEffect(() => {
+        const func = async () => {
+            try {
+              //const statut = curr_date >= conge_data.startDate && curr_date <= conge_data.endDate ? "en congé" : "en poste";
+                if (permission.length > 0) {
+                    let date = new Date();
+                    for (let x = 0; x < permission.length; x++) {
+                        console.log(`current date ${date}`)
+                        console.log(`current permission start date ${permission[x].date_debut_permission}`)
+                        console.log(`current permission end date ${permission[x].date_fin_permission}`)
+                        /*if (date >= permission[x].date_debut_permission && date <= permission[x].date_fin_conge) {
+                            const statut = "en permission";
+                            const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${permission[x].id_personnel};`;
+                            window.electronAPI.updatePersonnel(req_personnel);
+                        }*/
+                    }
+                }
+            } catch (err) {
+                console.error("Erreur : " + err.message);
+            }
+        }
+        func()
+    }, []);
 
     useEffect(() => {
         const func = async () => {
@@ -704,6 +744,7 @@ const Permission = () => {
                                         id="duree"
                                         defaultValue={duration}
                                         onChange={handleInputChange(setDuration)}
+                                        //onChange={(e) => handleChangeDuration(e)}
                                         name="datetitme"
                                         placeholder="duree en jours"
                                         type="number"

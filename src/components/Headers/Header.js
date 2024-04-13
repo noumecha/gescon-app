@@ -57,7 +57,7 @@ const Header = () => {
                           Personnel
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
-                          {nberPersonnel ? nberPersonnel : "" }
+                          {nberPersonnel ? nberPersonnel : "0" }
                         </span>
                       </div>
                       <Col className="col-auto">
@@ -104,7 +104,7 @@ const Header = () => {
                         >
                           Performance
                         </CardTitle>
-                        <span className="h2 font-weight-bold mb-0"> {perf}%</span>
+                        <span className="h2 font-weight-bold mb-0"> {nberPersonnel ? perf : 0}%</span>
                       </div>
                       <Col className="col-auto">
                         <div className="icon icon-shape bg-info text-white rounded-circle shadow">

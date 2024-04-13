@@ -49,7 +49,7 @@ const Conges = () => {
   const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste_personnel : "Contrôleur");
   //const [sexe, setSexe] = useState(selectedPerson ? selectedPerson.sexe_personnel : "M");
   const sexe = selectedPerson ? selectedPerson.sexe_personnel : "M"
-  const nb_jours_conges = selectedPerson ? selectedPerson.nb_jours_conges : 18
+  const nb_jours_conges = selectedPerson ? selectedPerson.id_type_personnel === 1 ? 30 - selectedPerson.nb_jours_conges : 18 - selectedPerson.nb_jours_conges : 0
   const [telephone, setTelphone] = useState(selectedPerson ? selectedPerson.telephone_personnel : 696879475)
   const [demande, setDemande] = useState(null);
   const [document, setDocument] = useState(null);
@@ -111,8 +111,47 @@ const Conges = () => {
   const saveConge = async (e) => {
     e.preventDefault();
     try {
-      if (duration > nb_jours_conges) {
+      /*if (duration > nb_jours_conges) {
         setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return;
+      }*/
+      if (duration <= 0) {
+        setError(`La durée du congé ne peut pas etre négative ou égale à 0`);
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return;
+      }
+      if (selectedPerson.id_type_personnel === 2) {
+        if (duration > 18 - selectedPerson.nb_jours_conges) {
+          setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
+          setTimeout(() => {
+            setError("");
+          },7000)
+          return;
+        }
+      }
+      if (selectedPerson.id_type_personnel === 1) {
+        if (duration > 30 - selectedPerson.nb_jours_conges) {
+          setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
+          setTimeout(() => {
+            setError("");
+          },7000)
+          return;
+        }
+      }
+      if (selectedPerson.id_type_personnel === 1 && selectedPerson.nb_jours_conges >= 30) {
+        setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} a déja epuisé tout ces congés pour l'année`);
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return;
+      }
+      if (selectedPerson.id_type_personnel === 2 && selectedPerson.nb_jours_conges >= 18) {
+        setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} a déja epuisé tout ces congés pour l'année`);
         setTimeout(() => {
           setError("");
         },7000)
@@ -155,7 +194,7 @@ const Conges = () => {
           (date_debut_conge, date_fin_conge, duree_conge, created_at_conge,attestation_conge,id_type_conge,id_personnel,demande_conge,statut_conge,statut_attestation_conge,document_a_fournir) 
           VALUES ("${conge_data.startDate}","${conge_data.endDate}",${conge_data.duration},"${conge_data.curr_date}",'${JSON.stringify(attestation)}',${conge_data.id_type_conge},${conge_data.id_personnel},"${conge_data.demandeFile}","${conge_data.statut_conge}","${conge_data.statut_attestation_conge}","${conge_data.document}");`;
         //const statut = curr_date >= conge_data.startDate && curr_date <= conge_data.endDate ? "en congé" : "en poste";
-        const req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges - ${duration}) WHERE id_personnel = ${conge_data.id_personnel};`;
+        const req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges + ${duration}) WHERE id_personnel = ${conge_data.id_personnel};`;
         window.electronAPI.addConge(req_conge);
         window.electronAPI.updatePersonnel(req_personnel);
         window.electronAPI.congeAddedSuccess(() => {
@@ -297,10 +336,10 @@ const Conges = () => {
   const deleteConge = (c) => {
     try {
       console.log("you want to delete conge : ", c);
-      const nb_jours_conges = c.id_type_personnel === 1 ? 30 : 18;
+      const nb_jours_conges = c.duree_conge;
       const delete_arch_conge = `DELETE FROM archive_att_conge WHERE id_conge= ${c.id_conge}`;
       const delete_conge = `DELETE FROM conge WHERE ${c.id_conge}`;
-      const update_personnel = `UPDATE personnel SET nb_jours_conges = ${nb_jours_conges}, statut_personnel = "en poste" WHERE id_personnel = ${c.id_personnel}`;
+      const update_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges - ${nb_jours_conges}), statut_personnel = "en poste" WHERE id_personnel = ${c.id_personnel}`;
       window.electronAPI.addArchiveAttestationConge(delete_arch_conge)
       window.electronAPI.addArchiveAttCongeSuccess(() => {
           setDeleteSuccess("attestation supprimé avec succès")
@@ -353,8 +392,9 @@ const Conges = () => {
             if (date >= conge[x].date_debut_conge && date <= conge[x].date_fin_conge) {
               const statut = "en congé";
               const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${conge[x].id_personnel};`;
+              console.log(req_personnel);
               window.electronAPI.updatePersonnel(req_personnel);
-              //console.log("le statut a été mis à jour");
+              console.log("le statut a été mis à jour");
             }
           }
         }
