@@ -168,7 +168,6 @@ const Personnel = () => {
 
     /** for the current selected personnle page */
     const handleCongeClick = (person) => {
-        console.log("person selected", person);
         navigate("/admin/conges", {state: {selectedPerson: person}});
         setSelectedPerson(person);
     }
@@ -180,7 +179,6 @@ const Personnel = () => {
     }
 
     const handlePermissionClick = (person) => {
-        console.log("person selected", person);
         navigate("/admin/permission", {state: {selectedPerson: person}});
         setSelectedPerson(person);
     }
@@ -201,7 +199,7 @@ const Personnel = () => {
             </Row>
             {/* Table */}
             <Row>
-                <div className="col p-0">
+                <Col lg="12">
                     <form className="form-group custom-form" onSubmit={handleFileSubmit}>
                         <input type="file" className="form-control" required onChange={handleFile}/>
                         <button type="submit" className="mt-3 btn btn-primary btn-md">Importer le fichier</button>
@@ -211,7 +209,7 @@ const Personnel = () => {
                             </div>
                         )}
                     </form>
-                </div>
+                </Col>
             </Row>
             <Row>
                 <Col lg="12">

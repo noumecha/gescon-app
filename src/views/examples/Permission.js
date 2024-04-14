@@ -423,6 +423,7 @@ const Permission = () => {
                         <option value="">Tous les statuts</option>
                         <option value="programmé">programmé</option>
                         <option value="en cours">en cours</option>
+                        <option value="terminé">terminé</option>
                       </Input>
                     </Col>
                     <Col lg="6">
