@@ -227,6 +227,7 @@ const Register = () => {
         setTelephone("");
         setPassword("");
         setConfirmPassword("");
+        setDisable(false);
         await handleRefresh();
       } else {
         console.log(userData);
