@@ -267,7 +267,7 @@ function getUsers(event, req) {
     })
 }
 function updateUser(event, req) {
-    pool.query('SELECT * FROM utilisateur', (err, res) => {
+    pool.query(req, (err, res) => {
         if (err) throw err;
         event.sender.send('user-updated-success', res);
     })
