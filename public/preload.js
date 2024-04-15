@@ -83,7 +83,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
     updatePersonnel: (req) => ipcRenderer.send('update-personnel', req),
     // for users : 
     userAddedSuccess: (callback) => ipcRenderer.on('user-added-success', callback),
-    addUsers: (req) => ipcRenderer.send('add-user', req),
+    userDeletedSuccess: (callback) => ipcRenderer.on('user-deleted-success', callback),
+    userUpdatedSuccess: (callback) => ipcRenderer.on('user-updated-success', callback),
+    addUser: (req) => ipcRenderer.send('add-user', req),
+    delUser: (r) => ipcRenderer.send('del-user', r),
+    updateUser: (r) => ipcRenderer.send('update-user', r),
     getUsers: () => ipcRenderer.send('get-users'),
     retrieveUsers: (callback) => ipcRenderer.on('all-users', callback),
 });
