@@ -63,6 +63,8 @@ const Conges = () => {
   const [statutFilter, setStatutFilter] = useState("");
   const [pageNumber, setPageNumber] = useState(0);
   const [perPage] = useState(100);
+  const [loadingSpinner, setLoadingSpinner] = useState(true);
+  const loadingText = "Aucune donnée dans la base de données";
   const [actived, setActived] = useState(selectedPerson === undefined ? true : false);
   const curr_date = new Date();
 
@@ -113,6 +115,9 @@ const Conges = () => {
       window.electronAPI.getConge();
       await window.electronAPI.retrieveConge((event, res) => {
         setConge(res);
+        setTimeout(() => 
+        setLoadingSpinner(false)
+        , 3000);
       })
       window.electronAPI.getSpecificDec(selectedPerson ? selectedPerson.id_type_personnel : 1);
       await window.electronAPI.retrieveSpecificDec((event, res) => {
@@ -209,6 +214,7 @@ const Conges = () => {
           id_type_conge : selectedType === "congé administratif partiel" ? 1 : selectedType === "congé administratif total" ? 2 : selectedType === "congé maternité" ? 3 : selectedType === "congé maladie" ? 4 : 0,
           statut_attestation_conge : "non archivé",
           statut_conge : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en cours" : "programmé",
+          statut_personnel : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en congé" : "en poste",
         }
         const req_conge = `INSERT INTO conge 
           (date_debut_conge, date_fin_conge, duree_conge, created_at_conge,attestation_conge,id_type_conge,id_personnel,demande_conge,statut_conge,statut_attestation_conge,document_a_fournir) 
@@ -312,44 +318,44 @@ const Conges = () => {
   /** useEffect for updating personnel and congé base on some state of current date */
   useEffect(() => {
     const updatePersonnelState = async () => {
-      try {
-        //const statut = curr_date >= conge_data.startDate && curr_date <= conge_data.endDate ? "en congé" : "en poste";
-        if (conge.length > 0) {
-          let date = new Date();
-          for (let x = 0; x < conge.length; x++) {
-            conge[x].attestation_conge = JSON.parse(conge[x].attestation_conge)
-            formatDate(conge[0].date_fin_conge);
-            conge[0].date_fin_conge.setDate(conge[0].date_fin_conge.getDate());
-            //console.log(`date : ${date.getMonth()}`)
-            /*console.log(`date dfc : ${conge[0].date_fin_conge.getDate()}`);
-            console.log(`attesttaion : ${new Date(conge[0].attestation_conge.repriseDate).getMonth()}`);*/
-            if (date >= conge[x].date_debut_conge && date <= conge[x].date_fin_conge) {
-              const statut = "en congé";
-              const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${conge[x].id_personnel};`;
-              window.electronAPI.updatePersonnel(req_personnel);
-              console.log("le statut du personnel a été mis à jour");
-            }
-            if ((date.getDate() === conge[x].date_fin_conge.getDate() && date.getMonth() === conge[x].date_fin_conge.getMonth() && date.getFullYear() === conge[x].date_fin_conge.getFullYear()) || (date.getDate() > conge[x].date_fin_conge.getDate() && date.getMonth() === conge[x].date_fin_conge.getMonth() && date.getFullYear() === conge[x].date_fin_conge.getFullYear())) {
-              const statut_conge = "terminé";
-              const req_conge = `UPDATE conge SET statut_conge = "${statut_conge}" WHERE id_conge = ${conge[x].id_conge}`;
-              window.electronAPI.addConge(req_conge);
-              setSuccess(`Le congé de ${conge[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${conge[x].nom_prenom_personnel} a été actualisé`);
-              setStatus(`Le satut du congé de ${conge[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${conge[x].nom_prenom_personnel} a été mis à jour !`);  
-              setTimeout(() => {
-                setSuccess("");
-              }, 3000)
-            }
-            if (date.getDate() === new Date(conge[0].attestation_conge.repriseDate).getDate() && date.getMonth() === new Date(conge[0].attestation_conge.repriseDate).getMonth() && date.getFullYear() === new Date(conge[0].attestation_conge.repriseDate).getFullYear()) {
-              const statut = "en poste";
-              const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${conge[x].id_personnel};`;
-              window.electronAPI.updatePersonnel(req_personnel);
-              console.log("le personnel est désormais en poste");
-            }
+    try {
+      //const statut = curr_date >= conge_data.startDate && curr_date <= conge_data.endDate ? "en congé" : "en poste";
+      if (conge.length > 0) {
+        let date = new Date();
+        for (let x = 0; x < conge.length; x++) {
+          conge[x].attestation_conge = JSON.parse(conge[x].attestation_conge)
+          formatDate(conge[0].date_fin_conge);
+          conge[0].date_fin_conge.setDate(conge[0].date_fin_conge.getDate());
+          //console.log(`date : ${date.getMonth()}`)
+          /*console.log(`date dfc : ${conge[0].date_fin_conge.getDate()}`);
+          console.log(`attesttaion : ${new Date(conge[0].attestation_conge.repriseDate).getMonth()}`);*/
+          if (date >= conge[x].date_debut_conge && date <= conge[x].date_fin_conge) {
+            const statut = "en congé";
+            const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${conge[x].id_personnel};`;
+            window.electronAPI.updatePersonnel(req_personnel);
+            console.log("le statut du personnel a été mis à jour");
+          }
+          if ((date.getDate() === conge[x].date_fin_conge.getDate() && date.getMonth() === conge[x].date_fin_conge.getMonth() && date.getFullYear() === conge[x].date_fin_conge.getFullYear()) || (date.getDate() > conge[x].date_fin_conge.getDate() && date.getMonth() === conge[x].date_fin_conge.getMonth() && date.getFullYear() === conge[x].date_fin_conge.getFullYear())) {
+            const statut_conge = "terminé";
+            const req_conge = `UPDATE conge SET statut_conge = "${statut_conge}" WHERE id_conge = ${conge[x].id_conge}`;
+            window.electronAPI.addConge(req_conge);
+            setSuccess(`Le congé de ${conge[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${conge[x].nom_prenom_personnel} a été actualisé`);
+            setStatus(`Le satut du congé de ${conge[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${conge[x].nom_prenom_personnel} a été mis à jour !`);  
+            setTimeout(() => {
+              setSuccess("");
+            }, 3000)
+          }
+          if (date.getDate() === new Date(conge[0].attestation_conge.repriseDate).getDate() && date.getMonth() === new Date(conge[0].attestation_conge.repriseDate).getMonth() && date.getFullYear() === new Date(conge[0].attestation_conge.repriseDate).getFullYear()) {
+            const statut = "en poste";
+            const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${conge[x].id_personnel};`;
+            window.electronAPI.updatePersonnel(req_personnel);
+            console.log("le personnel est désormais en poste");
           }
         }
-      } catch (err) {
-        console.error("Erreur : " + err.message);
       }
+    } catch (err) {
+      console.error("Erreur : " + err.message);
+    }
     }
     updatePersonnelState()
   }, [conge]);
@@ -358,6 +364,19 @@ const Conges = () => {
   useEffect(() => {
     fetchDatas();
   }, []);
+
+  const handleRefresh = () => {
+    try {
+      setLoadingSpinner(true);
+      setTimeout(() => 
+      setLoadingSpinner(false)
+      , 3000);
+      fetchDatas();
+      console.log("datas refreshed successfully");
+    } catch (err) {
+      console.error("error on refresh : " + err.message);
+    }
+  }
 
   return (
     <>
@@ -398,8 +417,15 @@ const Conges = () => {
           </Col>
           <Col lg="12">
             <Card className="shadow">
-              <CardHeader className="bg-white border-0">
+              <CardHeader className="bg-white border-2 d-flex justify-content-center">
                 <h3 className="mb-0 text-center">Listes des Congés</h3>
+                <Button
+                  size="sm"
+                  className="ml-3"
+                  onClick={() => handleRefresh()}
+                >
+                  Actualiser
+                </Button>
               </CardHeader>
               <Row>
                 <Col lg="12">
@@ -423,7 +449,16 @@ const Conges = () => {
                       </tr>
                   </thead>
                   <tbody>
-                      {filterConge.slice(offset, offset + perPage).map((c, index) => (
+                    {loadingSpinner && (
+                      <tr>
+                        <td colSpan="7" className="text-center">
+                          <div className="spinner-border" role="status">
+                            <span className="sr-only">Loading...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                      {filterConge.length > 0 ? !loadingSpinner && (filterConge.slice(offset, offset + perPage).map((c, index) => (
                           <tr key={index}>
                               <td>{c.matricule_personnel}</td>    
                               <td>{c.nom_prenom_personnel}</td> 
@@ -474,7 +509,16 @@ const Conges = () => {
                                   </UncontrolledDropdown>
                               </td>
                           </tr>
-                      ))}
+                      )))
+                      :
+                        !loadingSpinner && (
+                          <tr>
+                            <td colSpan="7" className="text-center">
+                              {loadingText}
+                            </td>
+                          </tr>
+                        )
+                      }
                   </tbody>
               </Table>
               <Row className="m-0 justify-content-center">

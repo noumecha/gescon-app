@@ -59,6 +59,8 @@ const Permission = () => {
     const [pageNumber, setPageNumber] = useState(0);
     const [perPage] = useState(100);
     const [userConge, setUserConge] = useState([]);
+    const [loadingSpinner, setLoadingSpinner] = useState(true);
+    const loadingText = "Aucune donnée dans la base de données";
     const [actived, setActived] = useState(selectedPerson === undefined ? true : false);
     let total_lasts_days = 0;
 
@@ -111,8 +113,9 @@ const Permission = () => {
                 req_personnel = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${p.duree_permission}),nb_jours_conges = (nb_jours_conges - ${p.duree_permission}) WHERE id_personnel = ${p.id_personnel};`;
             }
         } else {
-            req_personnel = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${p.duree_permission}) WHERE id_personnel = ${p.id_personnel};`;
+            req_personnel = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${p.duree_permission})  WHERE id_personnel = ${p.id_personnel};`;
         }
+        // (nb_jours_permission - ${p.duree_permission})
         console.log(`${req_personnel}`);
         window.electronAPI.addPermission(req_permission);
         window.electronAPI.updatePersonnel(req_personnel);
@@ -122,8 +125,12 @@ const Permission = () => {
             setError("");
             setDeleteSuccess("");
         },3000)
+        handleRefresh();
+        setLoadingSpinner(true);
+        setTimeout(() => 
+            setLoadingSpinner(false)
+        , 3000);
         setActived(true);
-        return;
     }
 
     function firstDateOfMonth(d){
@@ -155,6 +162,7 @@ const Permission = () => {
         return parseInt(Math.round((end.getTime() - start.getTime()) / (1000 * 3600 * 24)));
     }
 
+    // calculate the end date from startdate and duration
     useEffect(() => {
         const calculateEndDate = () => {
           if (startDate && duration) {
@@ -179,6 +187,21 @@ const Permission = () => {
           setStateFunction(base64);
       }
       reader.readAsDataURL(file);
+    }
+
+    // fetching permissions form db
+    const fetchDatas = async () => {
+        try {
+            window.electronAPI.getPermission();
+            await window.electronAPI.retrievePermission((event, res) => {
+                setPermission(res);
+                setTimeout(() => 
+                setLoadingSpinner(false)
+                , 3000);
+            })
+        } catch (error) {
+            console.error("Erreur : " + error.message);
+        }
     }
 
     const savePermission = async (e) => {
@@ -312,16 +335,19 @@ const Permission = () => {
                   (date_debut_permission, date_fin_permission, duree_permission, created_at_permission,attestation_permission,id_personnel,demande_permission,statut_permission,statut_attestation_permission) 
                   VALUES ("${permission_data.startDate}","${permission_data.endDate}",${permission_data.duration},"${permission_data.curr_date}",'${JSON.stringify(attestation)}',${permission_data.id_personnel},"${permission_data.demande}","${permission_data.statut_permission}","${permission_data.statut_attestation_permission}");`;
                 const statut = curr_date >= permission_data.startDate && curr_date <= permission_data.endDate ? "en permission" : "en poste";
-                const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission + ${duration}) WHERE id_personnel = ${permission_data.id_personnel};`;
+                const req_pers = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission + ${duration}) WHERE id_personnel = ${permission_data.id_personnel};`;
                 window.electronAPI.addPermission(req_permission);
                 setStatus(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
-                setActived(true);
-                window.electronAPI.updatePersonnel(req_personnel);
+                console.log(req_pers);
                 window.electronAPI.permissionAddedSuccess(() => {
                     setSuccess("permission ajoutée avec succès");
                     setTimeout(() => {
                         setSuccess("");
                     }, 3000)
+                });
+                window.electronAPI.updatePersonnel(req_pers);
+                window.electronAPI.updatePersonnelSuccess(() => {
+                    console.log("personnel updated");
                 });
                 if (total_lasts_days + parseInt(duration) > 10 ) {
                     let diff = selectedPerson.nb_jours_permission + 1 === 10 ? (total_lasts_days + parseInt(duration)) - 10 : (total_lasts_days + parseInt(duration)) - selectedPerson.nb_jours_permission ;
@@ -335,6 +361,12 @@ const Permission = () => {
                         }, 3000)
                     })
                 }
+                handleRefresh();
+                setLoadingSpinner(true);
+                setTimeout(() => 
+                    setLoadingSpinner(false)
+                , 3000);
+                setActived(true);
             }
         } catch (error) {
             console.error("Erreur saving permission : " + error.message);
@@ -343,43 +375,53 @@ const Permission = () => {
     
     /** useeffect for fetching */
     useEffect(() => {
-        const func = async () => {
-            try {
-                window.electronAPI.getPermission();
-                await window.electronAPI.retrievePermission((event, res) => {
-                    setPermission(res);
-                })
-            } catch (error) {
-                console.error("Erreur : " + error.message);
-            }
-        }
-        func();
-    });
+        fetchDatas();
+    }, []);
 
     /** useEffect for updating specific data */
     useEffect(() => {
-        const func = async () => {
+        const updatePersonnelState = async () => {
             try {
               //const statut = curr_date >= conge_data.startDate && curr_date <= conge_data.endDate ? "en congé" : "en poste";
                 if (permission.length > 0) {
                     let date = new Date();
                     for (let x = 0; x < permission.length; x++) {
-                        console.log(`current date ${date}`)
-                        console.log(`current permission start date ${permission[x].date_debut_permission}`)
-                        console.log(`current permission end date ${permission[x].date_fin_permission}`)
-                        /*if (date >= permission[x].date_debut_permission && date <= permission[x].date_fin_conge) {
-                            const statut = "en permission";
-                            const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${permission[x].id_personnel};`;
-                            window.electronAPI.updatePersonnel(req_personnel);
-                        }*/
+                        permission[x].attestation_permission = JSON.parse(permission[x].attestation_permission)
+                        formatDate(permission[0].date_fin_permission);
+                        permission[0].date_fin_permission.setDate(permission[0].date_fin_permission.getDate());
+                        console.log(`date : ${date}`)
+                        console.log(`date dfp : ${permission[0].date_fin_permission}`);
+                        console.log(`attesttaion repdate : ${permission[0].attestation_permission.repriseDate}`);
+                        if (date >= permission[x].date_debut_permission && (date <= permission[x].date_fin_permission)) {
+                          const statut = "en permission";
+                          const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${permission[x].id_personnel};`;
+                          window.electronAPI.updatePersonnel(req_personnel);
+                          console.log("le statut du personnel a été mis à jour");
+                        }
+                        if ((date.getDate() === permission[x].date_fin_permission.getDate() && date.getMonth() === permission[x].date_fin_permission.getMonth() && date.getFullYear() === permission[x].date_fin_permission.getFullYear()) || (date.getDate() > permission[x].date_fin_permission.getDate() && date.getMonth() === permission[x].date_fin_permission.getMonth() && date.getFullYear() === permission[x].date_fin_permission.getFullYear())) {
+                          const statut_permission = "terminé";
+                          const req_permission = `UPDATE permission SET statut_permission = "${statut_permission}" WHERE id_permission = ${permission[x].id_permission}`;
+                          window.electronAPI.addPermission(req_permission);
+                          setSuccess(`La permission de ${permission[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${permission[x].nom_prenom_personnel} a été actualisé`);
+                          setStatus(`Le satut de la permission de ${permission[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${permission[x].nom_prenom_personnel} a été mis à jour !`);  
+                          setTimeout(() => {
+                            setSuccess("");
+                          }, 3000)
+                        }
+                        if (date.getDate() === new Date(permission[0].attestation_permission.repriseDate).getDate() && date.getMonth() === new Date(permission[0].attestation_permission.repriseDate).getMonth() && date.getFullYear() === new Date(permission[0].attestation_permission.repriseDate).getFullYear()) {
+                          const statut = "en poste";
+                          const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${permission[x].id_personnel};`;
+                          window.electronAPI.updatePersonnel(req_personnel);
+                          console.log("le personnel est désormais en poste");
+                        }
                     }
                 }
             } catch (err) {
                 console.error("Erreur : " + err.message);
             }
         }
-        func()
-    }, []);
+        updatePersonnelState()
+    }, [permission]);
 
     useEffect(() => {
         const func = async () => {
@@ -401,6 +443,18 @@ const Permission = () => {
         func();
     }, [id_personnel])
 
+    const handleRefresh = () => {
+        try {
+          setLoadingSpinner(true);
+          setTimeout(() => 
+          setLoadingSpinner(false)
+          , 3000);
+          fetchDatas();
+          console.log("datas refreshed successfully");
+        } catch (err) {
+          console.error("error on refresh : " + err.message);
+        }
+    }
 
     return (
         <>
@@ -442,8 +496,15 @@ const Permission = () => {
             <div className="col p-0">
                 <div className="col">
                     <Card className="shadow">
-                        <CardHeader className="bg-white border-0">
+                        <CardHeader className="bg-white border-2 d-flex justify-content-center">
                             <h3 className="mb-0 text-center">Listes des Permissions</h3>
+                            <Button
+                                size="sm"
+                                className="ml-3"
+                                onClick={() => handleRefresh()}
+                                >
+                                Actualiser
+                            </Button>
                         </CardHeader>
                         <Row>
                             <Col lg="12">
@@ -467,7 +528,16 @@ const Permission = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filterPermission.slice(offset, offset + perPage).map((p, index) => (
+                                {loadingSpinner && (
+                                    <tr>
+                                        <td colSpan="7" className="text-center">
+                                            <div className="spinner-border" role="status">
+                                                <span className="sr-only">Loading...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                                {filterPermission.length > 0 ? !loadingSpinner && (filterPermission.slice(offset, offset + perPage).map((p, index) => (
                                     <tr key={index}>
                                         <td>{p.matricule_personnel}</td>    
                                         <td>{p.nom_prenom_personnel}</td>    
@@ -478,9 +548,16 @@ const Permission = () => {
                                             ? <Badge color="success">
                                                 {p.statut_permission}
                                               </Badge>
-                                            : <Badge color="warning">
-                                                {p.statut_permission}
-                                              </Badge>
+                                            : 
+                                                p.statut_permission === "terminé"
+                                            ?
+                                                <Badge color="primary">
+                                                    {p.statut_permission}
+                                                </Badge>
+                                            :
+                                                <Badge color="warning">
+                                                    {p.statut_permission}
+                                                </Badge>
                                             }
                                         </td>
                                         <td className="text-right">
@@ -510,7 +587,14 @@ const Permission = () => {
                                             </UncontrolledDropdown>
                                         </td>
                                     </tr>
-                                ))}
+                                ))) :             
+                                    !loadingSpinner && (
+                                        <tr>
+                                            <td colSpan="7" className="text-center">
+                                                {loadingText}
+                                            </td>
+                                        </tr>
+                                    )}
                             </tbody>
                         </Table>
                         <Row className="m-0 justify-content-center">
