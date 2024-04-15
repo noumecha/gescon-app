@@ -113,6 +113,13 @@ function getAttestationConge(even, req) {
     });
 }
 
+function getSpecificConge(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-specific-conge', res);
+    });
+}
+
 function addConge(event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
@@ -282,6 +289,7 @@ app.whenReady().then(() => {
     ipcMain.on('add-conge-type', addCongeType);
     ipcMain.on('get-specific-conge-type', getSpecificCongeType);
     // conge  
+    ipcMain.on('get-specific-conge', getSpecificConge);
     ipcMain.on('get-conge', getConge);
     ipcMain.on('add-archive-attestation-conge', addArchiveAttestationConge)
     ipcMain.on('update-conge', updateConge);

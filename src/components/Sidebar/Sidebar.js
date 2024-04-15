@@ -54,7 +54,7 @@ const Sidebar = (props) => {
   };
   // creates the links that appear in the left menu / Sidebar
   const createLinks = (routes) => {
-    const excludesRoutes = ['/personnel-details']
+    const excludesRoutes = ['/attestation-conge','/attestation-permission','/attestation_rep_permissions','/attestation_rep_conges','/personnel-details','/login','/register','/archive','/archive_permissions','/archive_att_rep_permissions','/archive_att_rep_conges']
     return routes.map((prop, key) => {
       if (!excludesRoutes.includes(prop.path)) {
         return (
@@ -69,7 +69,47 @@ const Sidebar = (props) => {
             </NavLink>
           </NavItem>
         );
-      } 
+      }
+      return null;
+    });
+  };
+  const createArchivesLinks = (routes) => {
+    const includesRoutes = ['/archive','/archive_permissions','/archive_att_rep_permissions','/archive_att_rep_conges']
+    return routes.map((prop, key) => {
+      if (includesRoutes.includes(prop.path)) {
+        return (
+          <NavItem key={key}>
+            <NavLink
+              to={prop.layout + prop.path}
+              tag={NavLinkRRD}
+              onClick={closeCollapse}
+            >
+              <i className={prop.icon} />
+              {prop.name}
+            </NavLink>
+          </NavItem>
+        );
+      }
+      return null;
+    });
+  };
+  const createAttestationsLinks = (routes) => {
+    const includesRoutes = ['/attestation-conge','/attestation-permission','/attestation_rep_permissions','/attestation_rep_conges']
+    return routes.map((prop, key) => {
+      if (includesRoutes.includes(prop.path)) {
+        return (
+          <NavItem key={key}>
+            <NavLink
+              to={prop.layout + prop.path}
+              tag={NavLinkRRD}
+              onClick={closeCollapse}
+            >
+              <i className={prop.icon} />
+              {prop.name}
+            </NavLink>
+          </NavItem>
+        );
+      }
       return null;
     });
   };
@@ -121,33 +161,8 @@ const Sidebar = (props) => {
           </NavbarBrand>
         ) : null}
         {/* User */}
-        <Nav className="align-items-center d-md-none">
+        <Nav className="align-items-center">
           <UncontrolledDropdown nav>
-            <DropdownToggle nav className="nav-link-icon">
-              <i className="ni ni-bell-55" />
-            </DropdownToggle>
-            <DropdownMenu
-              aria-labelledby="navbar-default_dropdown_1"
-              className="dropdown-menu-arrow"
-              right
-            >
-              <DropdownItem>Action</DropdownItem>
-              <DropdownItem>Another action</DropdownItem>
-              <DropdownItem divider />
-              <DropdownItem>Something else here</DropdownItem>
-            </DropdownMenu>
-          </UncontrolledDropdown>
-          <UncontrolledDropdown nav>
-            <DropdownToggle nav>
-              <Media className="align-items-center">
-                <span className="avatar avatar-sm rounded-circle">
-                  <img
-                    alt="..."
-                    src={require("../../assets/img/theme/team-1-800x800.jpg")}
-                  />
-                </span>
-              </Media>
-            </DropdownToggle>
             <DropdownMenu className="dropdown-menu-arrow" right>
               <DropdownItem className="noti-title" header tag="div">
                 <h6 className="text-overflow m-0">Bienvenue !</h6>
@@ -227,7 +242,19 @@ const Sidebar = (props) => {
           {/* Divider */}
           <hr className="my-3" />
           {/* Heading */}
-          <h6 className="navbar-heading text-muted">Aide</h6>
+          <h6 className="navbar-heading text-muted">Attestations</h6>
+          {/* Archives Navigation */}
+          <Nav navbar>{createAttestationsLinks(routes)}</Nav>
+          {/* Divider */}
+          <hr className="my-3" />
+          {/* Heading */}
+          <h6 className="navbar-heading text-muted">Archives</h6>
+          {/* Archives Navigation */}
+          <Nav navbar>{createArchivesLinks(routes)}</Nav>
+          {/* Divider */}
+          <hr className="my-3" />
+          {/* Heading */}
+          <h6 className="navbar-heading text-muted">Autres</h6>
           {/* Navigation */}
           <Nav className="mb-md-3" navbar>
             <NavItem>
