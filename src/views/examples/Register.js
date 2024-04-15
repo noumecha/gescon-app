@@ -18,7 +18,8 @@ import RegisterHeader from "components/Headers/RegisterHeader";
 import { useState } from "react";
 import {Icon} from 'react-icons-kit';
 import {eyeOff} from 'react-icons-kit/feather/eyeOff';
-import {eye} from 'react-icons-kit/feather/eye'
+import {eye} from 'react-icons-kit/feather/eye';
+import bcryptjs from "bcryptjs";
 
 const Register = () => {
 
@@ -26,6 +27,13 @@ const Register = () => {
   const [showPwd, setShowPwd] = useState(false);
   const [showConfirmPwd, setShowConfirmPwd] = useState(false);
   const [success, setSuccess] = useState("");
+  const [name, setName] = useState(""); 
+  const [email, setEmail] = useState("");
+  const roles = ["administrateur", "utilisateur"];
+  const [role, setRole] = useState(roles.length > 0 ? roles[0] : "");
+  const [telephone, setTelephone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const toggleShowPwd = () => {
     setShowPwd(!showPwd);
@@ -35,39 +43,67 @@ const Register = () => {
     setShowConfirmPwd(!showConfirmPwd);
   }
 
-  const onSubmit = (e) => {
+  const handleInputChange = (changeState) =>  (e) => {
+    changeState(e.target.value)
+  }
+
+  const isValidEmail = (email) => {
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  }
+
+  const onSubmit = async (e) => {
     e.preventDefault();
-    if (!userData.name || !userData.email || !userData.password || !userData.telephone || !userData.role || !userData.confirmPassword) {
+    const userData = {
+      name: name,
+      email: email,
+      role: role,
+      telephone: telephone,
+      password: password,
+    };
+    if (!userData.name || !userData.email || !userData.password || !userData.telephone || !userData.role || !confirmPassword) {
       setError('Veuillez remplir tous les champs');
       setTimeout(() => {
         setError("");
       },7000)
       return;
     }
-
-    if (userData.password !== userData.confirmPassword) {
+    if (userData.password !== confirmPassword) {
       setError('Les mots de passe ne sont pas identiques');
       setTimeout(() => {
         setError("");
-        //setPwdMatch(true);
       },7000)
       return
     }
+    if (userData.telephone.length < 9) {
+      setError('Le numero de téléphone doit contenir 9 chiffre minimum');
+      setTimeout(() => {
+        setError("");
+      },7000)
+      return
+    }
+    if (!isValidEmail(userData.email)) {
+      setError('L\'adresse email n\'est pas valide');
+      setTimeout(() => {
+        setError("");
+      },7000)
+      return
+    }
+    bcryptjs.hash(password, 10, (err, hash) => {
+      if (err) throw err;
+      userData.password = hash;
+    })
+    //await window.electronAPI.addUsers();
     setSuccess("Enregistré avec succès");
+    setTimeout(() => {
+      setSuccess("");
+    }, 3000);
     console.log(userData)
-  }
-  const [userData, setUserData] = useState({
-    name: "",
-    email: "",
-    role: "",
-    telephone: "",
-    password: "",
-    confirmPassword: "",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUserData({...userData, [name]: value});
+    setName("");
+    setEmail("");
+    setTelephone("");
+    setPassword("");
+    setConfirmPassword("");
   }
 
   return (
@@ -81,7 +117,7 @@ const Register = () => {
               <CardHeader className="bg-white border-0">
                 <Row className="align-items-center">
                   <Col lg="12">
-                    <h3 className="mb-0">Renseigner les informations</h3>
+                    <h3 className="mb-0">Ajouter un nouvel utilisateur</h3>
                   </Col>
                 </Row>
               </CardHeader>
@@ -113,9 +149,8 @@ const Register = () => {
                             className="form-control-alternative"
                             id="input-username"
                             name="name"
-                            placeholder="Username"
-                            defaultValue={userData.name}
-                            onChange={handleChange}
+                            value={name}
+                            onChange={handleInputChange(setName)}
                             required
                             type="text"
                           />
@@ -132,10 +167,9 @@ const Register = () => {
                           <Input
                             className="form-control-alternative"
                             id="input-email"
-                            onChange={handleChange}
-                            defaultValue={userData.email}
+                            onChange={handleInputChange(setEmail)}
+                            value={email}
                             name="email"
-                            placeholder="jesse@example.com"
                             type="email"
                             required
                           />
@@ -154,11 +188,10 @@ const Register = () => {
                           <Input
                             className="form-control-alternative"
                             name="telephone"
-                            onChange={handleChange}
-                            value={userData.telephone}
+                            onChange={handleInputChange(setTelephone)}
+                            value={telephone}
                             id="input-phone"
                             required
-                            placeholder="696879475"
                             type="number"
                           />
                         </FormGroup>
@@ -177,10 +210,14 @@ const Register = () => {
                             type="select"
                             name="role"
                             required
-                            onChange={handleChange}
+                            onChange={handleInputChange(setRole)}
                           >
-                            <option key={"admin"}>Administrateur</option>
-                            <option key={"utilisateur"}>Utilisateur</option>
+                            {roles && roles.length > 0 
+                              ? roles.map((r) => (
+                                <option key={r}>{r}</option>
+                              ))
+                              : (<option>Selectionner le rôle</option>)
+                            }
                           </Input>
                         </FormGroup>
                       </Col>
@@ -205,10 +242,9 @@ const Register = () => {
                               <Input
                                 //className="form-control-alternative"
                                 id="input-password"
-                                onChange={handleChange}
-                                defaultValue={userData.password}
+                                onChange={handleInputChange(setPassword)}
+                                value={password}
                                 name="password"
-                                placeholder="mot_de_passe"
                                 type={showPwd ? "text" : "password"}
                                 required
                               />
@@ -232,10 +268,9 @@ const Register = () => {
                               <Input
                                 //className="form-control-alternative"
                                 id="input-password-confirm"
-                                onChange={handleChange}
-                                defaultValue={userData.confirmPassword}
+                                onChange={handleInputChange(setConfirmPassword)}
+                                value={confirmPassword}
                                 name="confirmPassword"
-                                placeholder="confirm_password"
                                 type={showConfirmPwd ? "text" : "password"}
                                 required
                               />
