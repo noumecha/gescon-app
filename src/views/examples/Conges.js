@@ -68,7 +68,7 @@ const Conges = () => {
   const [actived, setActived] = useState(selectedPerson === undefined ? true : false);
   const curr_date = new Date();
 
-  const filterConge = search !== "" || status !== ""
+  const filterConge = search !== "" || statutFilter !== ""
     ? conge.filter(conge => conge.statut_conge.includes(statutFilter) && (
       conge.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
       || conge.matricule_personnel.toLowerCase().includes(search.toLowerCase())
@@ -228,7 +228,7 @@ const Conges = () => {
           setStatus(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
         });
         setTimeout(() => {
-            setSuccess("");
+          setSuccess("");
         }, 3000)
         setActived(true);
       }

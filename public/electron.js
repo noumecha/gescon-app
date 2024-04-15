@@ -254,11 +254,22 @@ function addUser(event, req) {
         event.sender.send('user-added-success', { message: 'Utilisateur ajouté avec succès!' });
     })
 }
-
+function delUser(event, r) {
+    pool.query(r, (err, res) => {
+        if (err) throw err;
+        event.sender.send('user-deleted-success', { message: 'Utilisateur ajouté avec succès!' });
+    })
+}
 function getUsers(event, req) {
-    pool.query('SELECT * FROM utilisateur WHERE', (err, res) => {
+    pool.query('SELECT * FROM utilisateur', (err, res) => {
         if (err) throw err;
         event.sender.send('all-users', res);
+    })
+}
+function updateUser(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('user-updated-success', res);
     })
 }
 
@@ -312,6 +323,8 @@ app.whenReady().then(() => {
     // users :
     ipcMain.on('get-users', getUsers);
     ipcMain.on('add-user', addUser);
+    ipcMain.on('del-user', delUser);
+    ipcMain.on('update-user', updateUser);
     // set the App title
     ipcMain.on('set-title', handleSetTitle);
     createWindow();
