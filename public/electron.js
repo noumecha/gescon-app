@@ -273,6 +273,13 @@ function updateUser(event, req) {
     })
 }
 
+function updateUserPassword(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('user-password-updated-success', { message: 'Utilisateur ajouté avec succès!' });
+    })
+}
+
 /**
  * In this following code is the main 
  * code when the app is started
@@ -325,6 +332,7 @@ app.whenReady().then(() => {
     ipcMain.on('add-user', addUser);
     ipcMain.on('del-user', delUser);
     ipcMain.on('update-user', updateUser);
+    ipcMain.on('update-user-password', updateUserPassword);
     // set the App title
     ipcMain.on('set-title', handleSetTitle);
     createWindow();

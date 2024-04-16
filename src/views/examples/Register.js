@@ -21,7 +21,10 @@ import {
   CardFooter,
   Pagination,
   PaginationItem,
-  PaginationLink
+  PaginationLink,
+  Modal,
+  ModalBody,
+  ModalHeader,
 } from "reactstrap";
 import RegisterHeader from "components/Headers/RegisterHeader";
 import { useState, useEffect } from "react";
@@ -36,6 +39,8 @@ const Register = () => {
   const [error, setError] = useState("");
   const [showPwd, setShowPwd] = useState(false);
   const [showConfirmPwd, setShowConfirmPwd] = useState(false);
+  const [showNewPwd, setShowNewPwd] = useState(false);
+  const [showConfirmNewPwd, setShowConfirmNewPwd] = useState(false);
   const [success, setSuccess] = useState("");
   const [name, setName] = useState(""); 
   const [email, setEmail] = useState("");
@@ -44,6 +49,8 @@ const Register = () => {
   const [telephone, setTelephone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [statutFilter, setStatutFilter] = useState("");
@@ -54,15 +61,29 @@ const Register = () => {
   const [actionType, setActionType] = useState(false);
   const [disable, setDisable] = useState(false);
   const [id, setId] = useState(0);
+  const [modalData, setModalData] = useState(null); 
+  const [modal, setModal] = useState(false);
+  const [errorPwdChange, setErrorPwdChange] = useState("");
+  const [successPwdChange, setSuccessPwdChange] = useState("");
   const [message, setMessage] = useState("Ajouter un nouvel utilisateur");
   const loadingText = "Aucun utilisateur dans la base de données";
 
+  // filters and search bar
   const filterUsers = search !== "" || statutFilter !== ""
   ? users.filter(user => user.role_utilisateur.includes(statutFilter) && (
     user.nom_utilisateur.toLowerCase().includes(search.toLowerCase())
   ))
   : users
 
+  const handleStatutFilter = (e) => {
+    setStatutFilter(e.target.value);
+  }
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  }
+
+  // pagination functions
   const handlePageChange = ({selected}) => {
     setPageNumber(selected);
   }
@@ -72,10 +93,47 @@ const Register = () => {
   const handlePageNext = () => {
     setPageNumber(pageCount <= 1 || pageCount === pageNumber + 1 ? pageNumber : pageNumber + 1);
   }
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
+  
+  const pageCount = Math.ceil(users.length/perPage);
+  const offset = pageNumber * perPage;
+
+  // verification functions 
+  const toggleShowPwd = () => {
+    setShowPwd(!showPwd);
   }
 
+  const toggleShowConfirmPwd = () => {
+    setShowConfirmPwd(!showConfirmPwd);
+  }
+
+  const toggleShowNewPwd = () => {
+    setShowNewPwd(!showNewPwd);
+  }
+
+  const toggleShowConfirmNewPwd = () => {
+    setShowConfirmNewPwd(!showConfirmNewPwd);
+  }
+
+  const handleInputChange = (changeState) =>  (e) => {
+    changeState(e.target.value)
+  }
+
+  const isValidEmail = (email) => {
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  }
+
+  // modal functions for update password : 
+  const toggleModal = () => {
+    setModal(!modal)
+  }
+
+  const handleRowClick = (att_con) => {
+    setModalData(att_con);
+    toggleModal();
+  };
+  
+  // refresh state of table function and users functions
   const handleRefresh = () => {
     try {
       setLoadingSpinner(true);
@@ -88,13 +146,6 @@ const Register = () => {
       console.error("error on refresh : " + err.message);
     }
   }
-
-  const handleStatutFilter = (e) => {
-    setStatutFilter(e.target.value);
-  }  
-
-  const pageCount = Math.ceil(users.length/perPage);
-  const offset = pageNumber * perPage;
 
   const deleteUser = async (u) => {
     try {
@@ -112,8 +163,47 @@ const Register = () => {
     }
   }
 
-  const updatePassword = (u) => {
-    console.log(`update password for user : ${u.nom_utilisateur}`)
+  const updatePassword = async (u) => {
+    try {
+      var salt = bcrypt.genSaltSync(10);
+      var crypPwd = bcrypt.hashSync(newPassword, salt);
+      const newPwd = crypPwd;
+      if (!actionType && (!newPassword || !confirmNewPassword)) {
+        setErrorPwdChange('Veuillez remplir tous les champs');
+        setTimeout(() => {
+          setErrorPwdChange("");
+        },4000)
+        return;
+      }
+      if (newPassword.length < 8) {
+        setErrorPwdChange('Le mot de passe doit contenir 8 carractères minimum');
+        setTimeout(() => {
+          setErrorPwdChange("");
+        },4000)
+        return
+      }
+      if (!bcrypt.compareSync(confirmNewPassword, newPwd)) {
+        setErrorPwdChange('Les mots de passe ne sont pas identiques');
+        setTimeout(() => {
+          setErrorPwdChange("");
+        },4000)
+        return
+      }
+      const req = `UPDATE utilisateur SET mdp_utilisateur = "${newPwd}" WHERE id_utilisateur = ${u.id_utilisateur}`;
+      //console.log(`req update pwd : ${req}`);
+      window.electronAPI.updateUserPassword(req);
+      await window.electronAPI.userPasswordUpdatedSuccess(() => {
+        console.log(`pwd for ${u.nom_utilisateur} update success`);
+        setSuccessPwdChange(`Le mot de passe de ${u.nom_utilisateur} a été modifié`);
+        setTimeout(() => {
+          setSuccessPwdChange("");
+        },4000)
+      })
+      setNewPassword("");
+      setConfirmNewPassword("");
+    } catch (err) {
+      console.log(`error on update password ${err.message}`)
+    }
   }
 
   const editUser = (u) => {
@@ -129,23 +219,6 @@ const Register = () => {
     } catch (error) {
       console.error(`error on edit : ${error.message}`);
     }
-  }
-
-  const toggleShowPwd = () => {
-      setShowPwd(!showPwd);
-  }
-
-  const toggleShowConfirmPwd = () => {
-      setShowConfirmPwd(!showConfirmPwd);
-  }
-
-  const handleInputChange = (changeState) =>  (e) => {
-      changeState(e.target.value)
-  }
-
-  const isValidEmail = (email) => {
-      const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      return re.test(String(email).toLowerCase());
   }
 
   const fetchDatas = async () => {
@@ -194,8 +267,22 @@ const Register = () => {
         },7000)
         return
       }
+      if (password.length < 8) {
+        setError('Le mot de passe doit contenir 8 carractères minimum');
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return
+      }
       if (userData.telephone.length < 9) {
-        setError('Le numero de téléphone doit contenir 9 chiffre minimum');
+        setError('Le numero de téléphone doit contenir 9 chiffres minimum');
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return
+      }
+      if (userData.telephone.length > 13) {
+        setError('Le numero de téléphone ne peut pas dépasser 13 chiffres');
         setTimeout(() => {
           setError("");
         },7000)
@@ -249,6 +336,21 @@ const Register = () => {
       }
     } catch (error) {
       console.error(`Error on save user : ${error.message}`);
+    }
+  }
+
+  const resetForm = async (e) => {
+    e.preventDefault();
+    try {
+      setName("");
+      setEmail("");
+      setTelephone("");
+      setPassword("");
+      setConfirmPassword("");
+      setDisable(false);
+      setConfirmPassword("");
+    } catch (error) {
+      console.log(`Error on	reset : ${error.message}`);
     }
   }
 
@@ -337,40 +439,151 @@ const Register = () => {
                     )}
                       {filterUsers.length > 0 ? !loadingSpinner && (filterUsers.slice(offset, offset + perPage).map((u, index) => (
                           <tr key={index}>
-                              <td>{u.nom_utilisateur}</td>    
-                              <td>{u.email_utilisateur}</td>
-                              <td>{u.telephone_utilisateur}</td>
-                              <td>{u.role_utilisateur}</td>
-                              <td className="text-right">
-                                  <UncontrolledDropdown>
-                                      <DropdownToggle
-                                      className="btn-icon-only text-light"
-                                      role="button"
-                                      size="sm"
-                                      color=""
-                                      onClick={(e) => e.preventDefault()}
-                                      >
-                                          <i className="fas fa-ellipsis-v" />
-                                      </DropdownToggle>
-                                      <DropdownMenu className="dropdown-menu-arrow" right>
-                                          <DropdownItem
-                                            onClick={() => editUser(u)}
-                                          >
-                                            Modifier l'utilisateur
-                                          </DropdownItem>
-                                          <DropdownItem
-                                            onClick={() => deleteUser(u)}
-                                          >
-                                            Supprimer l'utilisateur
-                                          </DropdownItem>
-                                          <DropdownItem
-                                            onClick={() => updatePassword(u)}
-                                          >
-                                            Modifier le mot de passe
-                                          </DropdownItem>
-                                      </DropdownMenu>
-                                  </UncontrolledDropdown>
-                              </td>
+                            <td>{u.nom_utilisateur}</td>    
+                            <td>{u.email_utilisateur}</td>
+                            <td>{u.telephone_utilisateur}</td>
+                            <td>{u.role_utilisateur}</td>
+                            <td className="text-right">
+                                <UncontrolledDropdown>
+                                    <DropdownToggle
+                                    className="btn-icon-only text-light"
+                                    role="button"
+                                    size="sm"
+                                    color=""
+                                    onClick={(e) => e.preventDefault()}
+                                    >
+                                        <i className="fas fa-ellipsis-v" />
+                                    </DropdownToggle>
+                                    <DropdownMenu className="dropdown-menu-arrow" right>
+                                        <DropdownItem
+                                          onClick={() => editUser(u)}
+                                        >
+                                          Modifier l'utilisateur
+                                        </DropdownItem>
+                                        <DropdownItem
+                                          onClick={() => deleteUser(u)}
+                                        >
+                                          Supprimer l'utilisateur
+                                        </DropdownItem>
+                                        <DropdownItem
+                                          onClick={() => handleRowClick(u)}
+                                        >
+                                          Modifier le mot de passe
+                                          <Modal isOpen={modal} toggle={toggleModal} {...modalData}>
+                                              <ModalHeader toggle={toggleModal}>
+                                                    <Row>
+                                                        <Col>
+                                                          { modalData && (
+                                                            <h3 className="mb-0">
+                                                              Modifier le mot de passe de {modalData.nom_utilisateur}
+                                                            </h3>
+                                                          )}
+                                                        </Col>
+                                                    </Row>
+                                              </ModalHeader>
+                                              <ModalBody>
+                                                  <CardBody>
+                                                      <Form>
+                                                          <Row className="mt-3">
+                                                                <Col>
+                                                                  { successPwdChange && (
+                                                                    <Alert color="success">
+                                                                      {successPwdChange}
+                                                                    </Alert>
+                                                                  )}                                                                                    
+                                                                </Col>
+                                                          </Row>
+                                                          <Row>
+                                                              <Col lg="12">
+                                                                <FormGroup>
+                                                                  <label
+                                                                    className="form-control-label"
+                                                                    htmlFor="input-password"
+                                                                  >
+                                                                    Nouveau mot de passe
+                                                                  </label>
+                                                                  <InputGroup className="input-group-alternative">
+                                                                      <Input
+                                                                        //className="form-control-alternative"
+                                                                        id="input-password"
+                                                                        onChange={handleInputChange(setNewPassword)}
+                                                                        value={newPassword}
+                                                                        name="newPassword"
+                                                                        type={showNewPwd ? "text" : "password"}
+                                                                        required
+                                                                      />
+                                                                      <InputGroupAddon addonType="prepend">
+                                                                        <InputGroupText onClick={toggleShowNewPwd}>
+                                                                          <Icon className="absolute mr-10" icon={showNewPwd ? eye : eyeOff } size={18}/>
+                                                                        </InputGroupText>
+                                                                      </InputGroupAddon>
+                                                                  </InputGroup>
+                                                                </FormGroup>
+                                                              </Col>
+                                                              <Col lg="12"> 
+                                                                <FormGroup>
+                                                                  <label
+                                                                    className="form-control-label"
+                                                                    htmlFor="input-password-confirm"
+                                                                  >
+                                                                    Confirmer le nouveau mot de passe 
+                                                                  </label>
+                                                                  <InputGroup className="input-group-alternative">
+                                                                      <Input
+                                                                        //className="form-control-alternative"
+                                                                        id="input-password-confirm"
+                                                                        onChange={handleInputChange(setConfirmNewPassword)}
+                                                                        value={confirmNewPassword}
+                                                                        name="confirmNewPassword"
+                                                                        type={showConfirmNewPwd ? "text" : "password"}
+                                                                        required
+                                                                      />
+                                                                      <InputGroupAddon addonType="prepend">
+                                                                        <InputGroupText onClick={toggleShowConfirmNewPwd}>
+                                                                          <Icon className="absolute mr-10" icon={showConfirmNewPwd ? eye : eyeOff } size={18}/>
+                                                                        </InputGroupText>
+                                                                      </InputGroupAddon>
+                                                                  </InputGroup>
+                                                                </FormGroup>
+                                                              </Col>
+                                                          </Row>
+                                                          <Row>
+                                                            <Col md="6">
+                                                              <Button
+                                                                color="success"
+                                                                size="md"
+                                                                onClick={() => updatePassword(modalData)}
+                                                              >
+                                                                Modifier
+                                                              </Button>
+                                                            </Col>
+                                                            <Col>
+                                                              <Button
+                                                                color="danger"
+                                                                size="md"
+                                                                onClick={() => toggleModal()}
+                                                              >
+                                                                Fermer
+                                                              </Button>
+                                                            </Col>
+                                                          </Row>
+                                                          <Row className="mt-3">
+                                                            <Col>
+                                                              { errorPwdChange && (
+                                                                <Alert color="danger">
+                                                                  {errorPwdChange}
+                                                                </Alert>
+                                                              )}                                                                                  
+                                                            </Col>
+                                                          </Row>
+                                                      </Form>
+                                                  </CardBody>
+                                              </ModalBody>
+                                          </Modal>
+                                        </DropdownItem>
+                                    </DropdownMenu>
+                                </UncontrolledDropdown>
+                            </td>
                           </tr>
                       )))
                       :
@@ -384,6 +597,7 @@ const Register = () => {
                       }
                   </tbody>
               </Table>
+              {/** Table pagination */}
               <Row className="m-0 justify-content-center">
                   <CardFooter className="py-3 d-flex" >
                       <nav className="ligna-items-center" aria-label="...">
@@ -422,6 +636,7 @@ const Register = () => {
             </Card>
           </Col>
         </Row>
+        {/** formulaire de creation d'utilisateur */}
         <Row className="mt-5">
           <Col className="order-xl-1" lg="12" md="12">
             <Card className="bg-secondary shadow">
@@ -618,6 +833,15 @@ const Register = () => {
                           onClick={onSubmit}
                         >
                           Enregister l'utilisateur
+                        </Button>
+                      </Col>
+                      <Col lg="6">
+                        <Button
+                          color="danger"
+                          onReset={resetForm}
+                          onClick={resetForm}
+                        >
+                          Annuler
                         </Button>
                       </Col>
                     </Row>
