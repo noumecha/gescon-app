@@ -284,13 +284,28 @@ function updateUserPassword(event, req) {
  * In this following code is the main 
  * code when the app is started
  */
+function userLogin (event, {username, password}) {
+    pool.query('SELECT * FROM utilisateurs WHERE username =?', [username, password], (err, results) => {
+        if (err) throw err;
+        if (results.length > 0) {
+            const user = results[0];
+            if (user.nom_utilisateur === username && user.mdp_utilisateur === password) {
+                event.sender.send('login-success', 'utilisateur connecté');
+            } else {
+                event.sender.send('login-fail',"nom d'utilisateur ou mot de passe incorrect!");
+            }
+        } else {
+            event.reply("utilisateur non trouvé");
+        }
+    });
+}
 app.whenReady().then(() => {
     ipcMain.handle('ping', () => 'pong!');
     // personnel datas get
     ipcMain.on('requete-sql', (event, arg) => {
         pool.query('SELECT * FROM personnel', (err, results) => {
             if (err) throw err;
-            event.sender.send('resultat-sql', JSON.stringify(results));
+            event.sender.send('resultat-sql', results);
         });
     });
     ipcMain.on('add-personnel', addPersonnel);
@@ -335,6 +350,8 @@ app.whenReady().then(() => {
     ipcMain.on('update-user-password', updateUserPassword);
     // set the App title
     ipcMain.on('set-title', handleSetTitle);
+    ipcMain.on('user-login', userLogin);
+    ipcMain.on('add-eleve', handleAddEleve);
     createWindow();
 });
 

@@ -1,5 +1,5 @@
 // reactstrap components
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -22,8 +22,18 @@ const Login = ({ onLogin }) => {
   const { login } = useAuth();
 
   function handleLogin() {
-    login();
+    window.electronAPI.userLogin(username, password);
+    //login();
   }
+
+  useEffect (() => {
+    window.electronAPI.loginSuccess(() => {
+      login();
+    });
+    window.electronAPI.loginFail((event, message) => {
+      console.log("Erreur de connection : " + message);
+    });
+  })
 
   return (
     <>
