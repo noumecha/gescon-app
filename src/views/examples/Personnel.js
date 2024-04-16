@@ -9,6 +9,9 @@ import {
     UncontrolledDropdown,
     DropdownToggle,
     Media,
+    NavItem,
+    NavLink,
+    Input,
     Pagination,
     PaginationItem,
     PaginationLink,
@@ -16,18 +19,34 @@ import {
     Table,
     Container,
     Row,
+    Col,
+    Alert,
+    Nav,
     UncontrolledTooltip,
   } from "reactstrap";
 import Header from "components/Headers/Header.js";
-import { useState } from "react";
+import ReactPaginate from "react-paginate";
+import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
+import { useNavigate } from "react-router-dom";
+import PersonnelDetails from "./PersonnelDetails";
 
 const Personnel = () => {
 
     const [excelFile, setExcelFile] = useState(null);
     const [typeError, setTypeError] = useState(null);
     const [excelData, setExcelData] = useState(null);
+    const [personnel, setPersonnel] = useState([]);
+    const [pageNumber, setPageNumber] = useState(0);
+    const [perPage] = useState(100);
+    const [filter, setFilter] = useState("");
+    const [search, setSearch] = useState("");
+    const [status, setStatus] = useState("");
+    const [success, setSuccess] = useState("");
+    const [selectedPerson, setSelectedPerson] = useState(null);
+    const navigate = useNavigate();
 
+    /** code for excel import */
     const handleFileSubmit = (e) => {
         e.preventDefault();
         if(excelFile!==null) {
@@ -35,7 +54,7 @@ const Personnel = () => {
             const worksheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[worksheetName];
             const data = XLSX.utils.sheet_to_json(worksheet);
-            setExcelData(data.slice(0,10));
+            setExcelData(data);
         } else {
             setTypeError("Veuillez selectionner un fichier Excel");
         }
@@ -65,14 +84,122 @@ const Personnel = () => {
         }
     } 
 
+    /** add personnel to the db */
+    const addPersonnel = async () => {
+        try {
+            for (let i = 0; i < excelData.length; i++) {
+                const type = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 1 : 2;
+                const statut = "en poste"; // en permission, en congé
+                //const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
+                const nb_jours_conges = 0;
+                const nb_jours_permission = 0;
+                const req = `
+                INSERT INTO personnel 
+                (ordre_personnel, matricule_personnel, nom_prenom_personnel, grade_personnel, poste_personnel, structure_personnel, sexe_personnel, date_recrutement_personnel, situation_matrimoniale_personnel,
+                region_personnel, departement_personnel, date_naiss_personnel, telephone_personnel,id_type_personnel, categorie_personnel, arrondissement_personnel,nb_jours_permission,nb_jours_conges,statut_personnel)
+                VALUES 
+                (${excelData[i].ORDRE},"${excelData[i].MATRICULE}","${excelData[i].NOM_PRENOM}",
+                "${excelData[i].GRADE}","${excelData[i].POSTE}","${excelData[i].STRUCTURE}","${excelData[i].SEXE}",
+                "${excelData[i].DATE_RECRUTEMENT}","${excelData[i].SITUATION_MATRIMONIALE}","${excelData[i].REGION}",
+                "${excelData[i].DEPARTEMENT}","${excelData[i].DATE_NAISSANCE}","${excelData[i].TELEPHONE}","${type}",
+                "${excelData[i].CATEGORIE}","${excelData[i].ARRONDISSEMENT}","${nb_jours_permission}","${nb_jours_conges}","${statut}");`;
+                window.electronAPI.addPersonnel(req);
+            }
+            window.electronAPI.personnelAddedSuccess(() => {
+                setSuccess("Personnel ajouté avec succès");
+            });
+            setTimeout(() => {
+                setSuccess("");
+            }, 3000)
+        } catch (err) {
+            console.error("Erreur Trouvé : " + err.message);
+        }
+    }
+
+    /** useeffect for common function and fetching */
+    useEffect(() => {
+        const func = async () => {
+            try {
+                window.electronAPI.getPersonnel();
+                await window.electronAPI.receivePersonnel((event, res) => {
+                    setPersonnel(res);
+                })
+            } catch (error) {
+                console.error("Erreur : " + error.message);
+            }
+        }
+        func();
+    }, []);
+
+    /** for the pagination */
+    const pageCount = Math.ceil(personnel.length/perPage);
+    const offset = pageNumber * perPage;
+    const handlePageChange = ({selected}) => {
+        setPageNumber(selected);
+    }
+
+    const handlePagePrev = () => {
+        setPageNumber(pageCount <= 1 || pageNumber === 0? pageNumber : pageNumber - 1);
+    }
+    const handlePageNext = () => {
+        setPageNumber(pageCount <= 1 || pageCount === pageNumber + 1 ? pageNumber : pageNumber + 1);
+    }
+
+    /** for the filter and the search bar */
+
+    const filterPersonnel = filter !== "" || search !== "" || status !== ""
+        ? personnel.filter(personnel => personnel.categorie_personnel.includes(filter) && (
+            personnel.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
+            || personnel.matricule_personnel.toLowerCase().includes(search.toLowerCase())
+        ) && personnel.statut_personnel.includes(status))
+        : personnel
+
+    const handleFilterChange = (e) => {
+        setFilter(e.target.value);
+    }
+
+    const handleSearch = (e) => {
+        setSearch(e.target.value);
+    }
+
+    const handleStatus = (e) => {
+        setStatus(e.target.value);
+    }
+
+    /** for the current selected personnle page */
+    const handleCongeClick = (person) => {
+        navigate("/admin/conges", {state: {selectedPerson: person}});
+        setSelectedPerson(person);
+    }
+
+    const handleDetailClick = (person) => {
+        console.log("personnel details :", person);
+        navigate("/admin/personnel-details", {state: {selectedPerson: person}});
+        setSelectedPerson(person);
+    }
+
+    const handlePermissionClick = (person) => {
+        navigate("/admin/permission", {state: {selectedPerson: person}});
+        setSelectedPerson(person);
+    }
+
     return (
         <>
         <Header />
         {/* Page content */}
-        <Container className="mt--7" fluid>
+        <Container className="mt--7" fluid>  
+            <Row>
+                <Col lg="12">
+                    { success && 
+                        <Alert className="text-center" color="success">
+                            {success}
+                        </Alert>
+                    }
+                </Col>
+            </Row>
             {/* Table */}
             <Row>
-                <div className="col">
+                <Col lg="12">
                     <form className="form-group custom-form" onSubmit={handleFileSubmit}>
                         <input type="file" className="form-control" required onChange={handleFile}/>
                         <button type="submit" className="mt-3 btn btn-primary btn-md">Importer le fichier</button>
@@ -82,34 +209,178 @@ const Personnel = () => {
                             </div>
                         )}
                     </form>
-                </div>
+                </Col>
             </Row>
             <Row>
-                <div className="col">
+                <Col lg="12">
                     {excelData ? (
+                        <div>
+                            <div className="mt-3 alert alert-success" role="alert">
+                                <h3 className="mb-0 text-center text-white"> Fichier importer avec succès ! </h3>
+                            </div>
+                            <Card className="shadow">
+                            </Card>
+                        </div>
+                    ) : (  
+                        <div>
+                            <div className="mt-3 alert alert-danger" role="alert">
+                                <h3 className="mb-0 text-center text-white"> Aucun Fichier importer ! </h3>
+                            </div>
+                        </div>
+                    )}
+                </Col>
+            </Row>
+            <Row>
+                <Col lg="6">
+                    <Input
+                        type="select"
+                        className="form-control"
+                        onChange={handleFilterChange}
+                        value={filter}
+                    >
+                        <option value="">Toutes les catégories</option>
+                        <option value="A1">A1</option>
+                        <option value="B1">B1</option>
+                        <option value="A2">A2</option>
+                        <option value="B2">B2</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                    </Input>
+                </Col>
+                <Col lg="6">
+                    <Input
+                        type="select"
+                        className="form-control"
+                        placeholder="Rechercher par nom ou matricule"
+                        onChange={handleStatus}
+                        value={status}
+                    >
+                        <option value="">Tous les statuts</option>
+                        <option value="en congé">en congé</option>
+                        <option value="en poste">en poste</option>
+                        <option value="en permission">en permission</option>
+                    </Input>
+                </Col>
+            </Row>
+            <Row>
+                <Col lg="12">
+                    <div className="form-group custom-form">
+                        <Input
+                            type="text"
+                            className="form-control mt-3"
+                            placeholder="Rechercher par nom ou matricule"
+                            onChange={handleSearch}
+                            value={search}
+                        />
+                    </div>
+                </Col>
+            </Row>
+            <Row>
+                <div className="col p-0">
+                    {personnel && personnel.length > 0 ? (
                         <div className="col">
                             <Card className="shadow">
                                 <CardHeader className="border-0">
-                                    <h3 className="mb-0 text-center">Listes du personnel</h3>
+                                    <h3 className="mb-0 text-center">Listes du personnel </h3>
                                 </CardHeader>
                                 <Table className="align-items-center table-flush" responsive>
                                     <thead className="thead-light">
                                         <tr>
-                                            {Object.keys(excelData[0]).map((key) => (
-                                                <th key={key}>
-                                                    {key}
-                                                </th>
-                                            ))}
+                                            <th>Matricule</th>
+                                            <th>Nom & Prenom</th>
+                                            {/*<th>Grade</th>*/}
+                                            <th>Poste</th>
+                                            {/*<th>Structure</th>*/}
+                                            {/*<th>Sexe</th>*/}
+                                            {/*<th>Date recrutement</th>*/}
+                                            {/*<th>Situation Matrimoniale</th>*/}
+                                            {/*<th>Region</th>*/}
+                                            {/*<th>Departement</th>*/}
+                                            {/*<th>Date de naissance</th>*/}
+                                            {/*<th>Telephone</th>*/}
+                                            <th>Categorie</th>
+                                            {/*<th>Arrondissement</th>*/}
+                                            <th>Statut</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {excelData.map((row, index) => (
+                                        {filterPersonnel.slice(offset, offset + perPage).map((person, index) => (
                                             <tr key={index}>
-                                                {Object.keys(row).map((key) => (
-                                                    <td key={key}>
-                                                        {row[key]}
-                                                    </td>
-                                                ))}
+                                                <td>{person.matricule_personnel}</td>    
+                                                <td>{person.nom_prenom_personnel}</td>    
+                                                {/*<td>{person.grade_personnel}</td>*/}    
+                                                <td>{person.poste_personnel}</td>    
+                                                {/*<td>{person.structure_personnel}</td>*/}    
+                                                {/*<td>{person.sexe_personnel}</td>*/}
+                                                {/*<td>{person.date_recrutement_personnel}</td>*/}    
+                                                {/*<td>{person.situration_matrimoniale_personnel}</td>*/}    
+                                                {/*<td>{person.region_personnel}</td>*/}    
+                                                {/*<td>{person.departement_personnel}</td>*/}    
+                                                {/*<td>{person.date_naiss_personnel}</td>*/}    
+                                                {/*<td>{person.telephone_personnel}</td>*/}    
+                                                <td>{person.categorie_personnel}</td>    
+                                                {/*<td>{person._personnel}</td>*/} 
+                                                <td>
+                                                    {person.statut_personnel === "en congé" ?  
+                                                        <Badge color="danger">
+                                                            {person.statut_personnel}
+                                                        </Badge> 
+                                                        : person.statut_personnel === "en poste" ? 
+                                                        <Badge color="success">
+                                                            {person.statut_personnel}
+                                                        </Badge> 
+                                                        : person.statut_personnel === "en permission" ?
+                                                        <Badge color="primary">
+                                                            {person.statut_personnel}
+                                                        </Badge>
+                                                        : 
+                                                        <Badge color="danger">
+                                                            {person.statut_personnel}
+                                                        </Badge>
+                                                    }
+                                                </td> 
+                                                <td className="text-right">
+                                                    <UncontrolledDropdown>
+                                                        <DropdownToggle
+                                                        className="btn-icon-only text-light"
+                                                        role="button"
+                                                        size="sm"
+                                                        color=""
+                                                        onClick={(e) => e.preventDefault()}
+                                                        >
+                                                            <i className="fas fa-ellipsis-v" />
+                                                        </DropdownToggle>
+                                                        <DropdownMenu className="dropdown-menu-arrow" right>
+                                                            <DropdownItem
+                                                                onClick={() => handleCongeClick(person)}
+                                                            >
+                                                                Nouveau congé
+                                                            </DropdownItem>
+                                                            <DropdownItem
+                                                                onClick={() => handlePermissionClick(person)}
+                                                            >
+                                                                Nouvelle permission
+                                                            </DropdownItem>
+                                                            <DropdownItem
+                                                                onClick={() => handleDetailClick(person)}
+                                                            >
+                                                                Détails
+                                                            </DropdownItem>
+                                                        </DropdownMenu>
+                                                    </UncontrolledDropdown>
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -120,16 +391,52 @@ const Personnel = () => {
                         <div className="col">  
                             <Card className="shadow">
                                 <CardHeader className="border-0">
-                                    <h3 className="mb-0 text-center"> Aucun fichier importer </h3>
+                                    <h3 className="mb-0 text-center"> Aucun personnel dans la base de données </h3>
                                 </CardHeader>
                             </Card>
                         </div>
                     )}
                 </div>
             </Row>
+            <Row className="m-0 justify-content-center">
+                <CardFooter className="py-3 d-flex" >
+                    <nav className="ligna-items-center" aria-label="...">
+                        <Pagination
+                          className="pagination justify-content-center"
+                          listClassName="justify-content-center"
+                        >
+                          <PaginationItem>
+                            <PaginationLink
+                              onClick={() => handlePagePrev()}
+                              tabIndex="-1"
+                            >
+                              <i className="fas fa-angle-left" />
+                              <span className="sr-only">Previous</span>
+                            </PaginationLink>
+                          </PaginationItem>
+                            {Array.from({length: pageCount}, (_, i) => (
+                                <PaginationItem key={i} active={i === pageNumber}>
+                                    <PaginationLink onClick={() => handlePageChange({selected: i})}>
+                                        {i}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            ))}
+                          <PaginationItem>
+                            <PaginationLink
+                              onClick={() => handlePageNext()}
+                            >
+                              <i className="fas fa-angle-right" />
+                              <span className="sr-only">Next</span>
+                            </PaginationLink>
+                          </PaginationItem>
+                        </Pagination>
+                    </nav>
+                </CardFooter>
+            </Row>
             <Row>
-                <div className="col">
+                <div className="col p-0">
                     <button type="submit" className="mt-3 btn btn-secondary btn-md">Exporter le fichier</button>
+                    <button type="submit" className="mt-3 btn btn-secondary btn-md" onClick={addPersonnel}>Intégrer à la base de données</button>
                 </div>
             </Row>
         </Container>
