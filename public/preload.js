@@ -16,7 +16,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     requeteSQL: () => ipcRenderer.send('requete-sql'),
     recevoirResultats: (callback) => ipcRenderer.on('resultat-sql', callback),
     // pour les test :
-    devName: dev,
     setTitle: (title) => ipcRenderer.send('set-title', title),
     ping: () => ipcRenderer.invoke('ping'),
     // type conge : 

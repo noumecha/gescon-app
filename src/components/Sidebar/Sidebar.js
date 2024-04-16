@@ -168,20 +168,8 @@ const Sidebar = (props) => {
                 <h6 className="text-overflow m-0">Bienvenue !</h6>
               </DropdownItem>
               <DropdownItem to="/admin/user-profile" tag={Link}>
-                <i className="ni ni-single-02" />
-                <span>Mon profile</span>
-              </DropdownItem>
-              <DropdownItem to="/admin/user-profile" tag={Link}>
                 <i className="ni ni-settings-gear-65" />
                 <span>Paramètres</span>
-              </DropdownItem>
-              <DropdownItem to="/admin/user-profile" tag={Link}>
-                <i className="ni ni-calendar-grid-58" />
-                <span>Demandes</span>
-              </DropdownItem>
-              <DropdownItem to="/admin/user-profile" tag={Link}>
-                <i className="ni ni-support-16" />
-                <span>Support</span>
               </DropdownItem>
               <DropdownItem divider />
               <DropdownItem tag={NavLinkRRD} onClick={handleLogout}>

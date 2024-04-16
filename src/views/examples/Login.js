@@ -12,28 +12,60 @@ import {
   InputGroupText,
   InputGroup,
   Col,
+  Row,
+  Alert,
 } from "reactstrap";
 import { useAuth } from "services/AuthContext";
+import {Icon} from 'react-icons-kit';
+import {eyeOff} from 'react-icons-kit/feather/eyeOff';
+import {eye} from 'react-icons-kit/feather/eye';
+const bcrypt = require("bcryptjs")
 
 const Login = ({ onLogin }) => {
 
+  const [showPwd, setShowPwd] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [users, setUsers] = useState('');
+  const [error, setError] = useState('');
   const { login } = useAuth();
 
+  const toggleShowPwd = () => {
+    setShowPwd(!showPwd);
+  }
+
   function handleLogin() {
-    window.electronAPI.userLogin(username, password);
-    //login();
+    /*if (!password || !username) {
+      setError('Veuillez renseigner vos informations de connexion!');
+      setTimeout(() => {
+        setError("");
+      },4000)
+      return;
+    }
+    if (users.length > 0 ) {
+      for (let i = 0; i < users.length; i++) {
+        if (users[i].nom_utilisateur === username && bcrypt.compareSync(password, users[i].mdp_utilisateur)) {
+          login(users[i]);
+        }
+      }
+    }*/
+    login(users[0]);
+  }
+
+  const fetchUsers = async () => {
+    try {
+      window.electronAPI.getUsers();
+      await window.electronAPI.retrieveUsers((event, res) => {
+        setUsers(res);
+      })
+    } catch (error) {
+        console.error("Erreur : " + error.message);
+    }
   }
 
   useEffect (() => {
-    window.electronAPI.loginSuccess(() => {
-      login();
-    });
-    window.electronAPI.loginFail((event, message) => {
-      console.log("Erreur de connection : " + message);
-    });
-  })
+    fetchUsers();
+  }, [])
 
   return (
     <>
@@ -70,15 +102,29 @@ const Login = ({ onLogin }) => {
                   </InputGroupAddon>
                   <Input
                     placeholder="Mot de passe"
-                    type="password"
                     autoComplete="new-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    type={showPwd ? "text" : "password"}
                   />
+                  <InputGroupAddon addonType="prepend">
+                    <InputGroupText onClick={toggleShowPwd}>
+                      <Icon className="absolute mr-10" icon={showPwd ? eye : eyeOff } size={18}/>
+                    </InputGroupText>
+                  </InputGroupAddon>
                 </InputGroup>
               </FormGroup>
+              <Row>
+                <Col lg="12">
+                  {error && 
+                    <Alert className="text-center" color="danger">
+                      {error}
+                    </Alert>
+                  }
+                </Col>
+              </Row>
               <div className="text-center">
-                <Button onClick={handleLogin} className="my-4" color="primary" type="button">
+                <Button onClick={handleLogin} className="" color="primary" type="button">
                   Se Connecter
                 </Button>
               </div>

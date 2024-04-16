@@ -285,18 +285,9 @@ function updateUserPassword(event, req) {
  * code when the app is started
  */
 function userLogin (event, {username, password}) {
-    pool.query('SELECT * FROM utilisateurs WHERE username =?', [username, password], (err, results) => {
+    pool.query('SELECT * FROM utilisateur', (err, results) => {
         if (err) throw err;
-        if (results.length > 0) {
-            const user = results[0];
-            if (user.nom_utilisateur === username && user.mdp_utilisateur === password) {
-                event.sender.send('login-success', 'utilisateur connecté');
-            } else {
-                event.sender.send('login-fail',"nom d'utilisateur ou mot de passe incorrect!");
-            }
-        } else {
-            event.reply("utilisateur non trouvé");
-        }
+        event.sender.send('login-success', results);
     });
 }
 app.whenReady().then(() => {
@@ -351,7 +342,6 @@ app.whenReady().then(() => {
     // set the App title
     ipcMain.on('set-title', handleSetTitle);
     ipcMain.on('user-login', userLogin);
-    ipcMain.on('add-eleve', handleAddEleve);
     createWindow();
 });
 
