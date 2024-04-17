@@ -1,15 +1,20 @@
 // reactstrap components
-import { Button, Container, Row, Col } from "reactstrap";
+import { Container, Row, Col } from "reactstrap";
+import { useAuth } from "services/AuthContext";
 
-const UserHeader = () => {
+const UserHeader = (props) => {
+
+  const hours = new Date().getHours();
+  const { user } = useAuth();
+
   return (
     <>
       <div
         className="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
         style={{
-          minHeight: "600px",
+          minHeight: "400px",
           backgroundImage:
-            "url(" + require("../../assets/img/theme/profile-cover.jpg") + ")",
+            "url(" + require("../../assets/img/theme/app_backgournd.jpg") + ")",
           backgroundSize: "cover",
           backgroundPosition: "center top",
         }}
@@ -19,19 +24,15 @@ const UserHeader = () => {
         {/* Header container */}
         <Container className="d-flex align-items-center" fluid>
           <Row>
-            <Col lg="7" md="10">
-              <h1 className="display-2 text-white">Bonjour XXX</h1>
+            <Col lg="12" md="10">
+              <h1 className="display-2 text-white">
+                {
+                  hours > 6 && hours < 18 ? `Bonjour ${user.nom_utilisateur}` : `Bonsoir ${user.nom_utilisateur}`
+                }
+              </h1>
               <p className="text-white mt-0 mb-5">
-                This is your profile page. You can see the progress you've made
-                with your work and manage your projects or assigned tasks
+                Sur cette page vous pouvez modifier vos informations de connexion et vos paramètres
               </p>
-              <Button
-                color="info"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-              >
-                Modifier le Profile
-              </Button>
             </Col>
           </Row>
         </Container>

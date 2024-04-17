@@ -173,7 +173,6 @@ const Personnel = () => {
     }
 
     const handleDetailClick = (person) => {
-        console.log("personnel details :", person);
         navigate("/admin/personnel-details", {state: {selectedPerson: person}});
         setSelectedPerson(person);
     }
