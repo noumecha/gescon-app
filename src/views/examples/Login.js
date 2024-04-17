@@ -35,21 +35,26 @@ const Login = ({ onLogin }) => {
   }
 
   function handleLogin() {
-    if (!password || !username) {
-      setError('Veuillez renseigner vos informations de connexion!');
+    /*if (!password || !username) {
+      setError('Renseigner vos informations de connexion!');
       setTimeout(() => {
         setError("");
       },4000)
       return;
     }
-    if (users.length > 0 ) {
-      for (let i = 0; i < users.length; i++) {
-        if (users[i].nom_utilisateur === username && bcrypt.compareSync(password, users[i].mdp_utilisateur)) {
-          login(users[i]);
-        }
-      }
-    }
-    //login(users[0]);
+    const matchedUser = users.find(
+      (user) => user.nom_utilisateur === username && bcrypt.compareSync(password, user.mdp_utilisateur)
+    );
+    if (matchedUser) {
+      login(matchedUser);
+      // console.log("match");
+    } else {
+      setError("nom d'utilisateur ou mot de passe incorrect");
+      setTimeout(() => {
+        setError("");
+      },4000);
+    }*/
+    login(users[0]);
   }
 
   const fetchUsers = async () => {
