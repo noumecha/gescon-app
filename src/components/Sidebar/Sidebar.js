@@ -1,4 +1,4 @@
-/*eslint-disable*/
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
 import { NavLink as NavLinkRRD, Link } from "react-router-dom";
 // nodejs library to set properties for components
@@ -6,30 +6,20 @@ import { PropTypes } from "prop-types";
 
 // reactstrap components
 import {
-  Button,
-  Card,
-  CardHeader,
-  CardBody,
-  CardTitle,
   Collapse,
   DropdownMenu,
   DropdownItem,
   UncontrolledDropdown,
-  DropdownToggle,
-  FormGroup,
   Form,
   Input,
   InputGroupAddon,
   InputGroupText,
   InputGroup,
-  Media,
   NavbarBrand,
   Navbar,
   NavItem,
   NavLink,
   Nav,
-  Progress,
-  Table,
   Container,
   Row,
   Col,
@@ -40,6 +30,7 @@ var ps;
 
 const Sidebar = (props) => {
   const [collapseOpen, setCollapseOpen] = useState();
+  const { user } = useAuth();
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
     return props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
@@ -54,19 +45,63 @@ const Sidebar = (props) => {
   };
   // creates the links that appear in the left menu / Sidebar
   const createLinks = (routes) => {
+    const excludesRoutes = ['/attestation-conge','/attestation-permission','/attestation_rep_permissions','/attestation_rep_conges','/personnel-details','/login','/register','/archive','/archive_permissions','/archive_att_rep_permissions','/archive_att_rep_conges']
     return routes.map((prop, key) => {
-      return (
-        <NavItem key={key}>
-          <NavLink
-            to={prop.layout + prop.path}
-            tag={NavLinkRRD}
-            onClick={closeCollapse}
-          >
-            <i className={prop.icon} />
-            {prop.name}
-          </NavLink>
-        </NavItem>
-      );
+      if (!excludesRoutes.includes(prop.path)) {
+        return (
+          <NavItem key={key}>
+            <NavLink
+              to={{pathname: prop.layout + prop.path}}
+              tag={NavLinkRRD}
+              onClick={() => closeCollapse()}
+            >
+              <i className={prop.icon} />
+              {prop.name}
+            </NavLink>
+          </NavItem>
+        );
+      }
+      return null;
+    });
+  };
+  const createArchivesLinks = (routes) => {
+    const includesRoutes = ['/archive','/archive_permissions','/archive_att_rep_permissions','/archive_att_rep_conges']
+    return routes.map((prop, key) => {
+      if (includesRoutes.includes(prop.path)) {
+        return (
+          <NavItem key={key}>
+            <NavLink
+              to={prop.layout + prop.path}
+              tag={NavLinkRRD}
+              onClick={closeCollapse}
+            >
+              <i className={prop.icon} />
+              {prop.name}
+            </NavLink>
+          </NavItem>
+        );
+      }
+      return null;
+    });
+  };
+  const createAttestationsLinks = (routes) => {
+    const includesRoutes = ['/attestation-conge','/attestation-permission','/attestation_rep_permissions','/attestation_rep_conges']
+    return routes.map((prop, key) => {
+      if (includesRoutes.includes(prop.path)) {
+        return (
+          <NavItem key={key}>
+            <NavLink
+              to={{pathname : prop.layout + prop.path}}
+              tag={NavLinkRRD}
+              onClick={closeCollapse}
+            >
+              <i className={prop.icon} />
+              {prop.name}
+            </NavLink>
+          </NavItem>
+        );
+      }
+      return null;
     });
   };
 
@@ -117,55 +152,18 @@ const Sidebar = (props) => {
           </NavbarBrand>
         ) : null}
         {/* User */}
-        <Nav className="align-items-center d-md-none">
+        <Nav className="align-items-center">
           <UncontrolledDropdown nav>
-            <DropdownToggle nav className="nav-link-icon">
-              <i className="ni ni-bell-55" />
-            </DropdownToggle>
-            <DropdownMenu
-              aria-labelledby="navbar-default_dropdown_1"
-              className="dropdown-menu-arrow"
-              right
-            >
-              <DropdownItem>Action</DropdownItem>
-              <DropdownItem>Another action</DropdownItem>
-              <DropdownItem divider />
-              <DropdownItem>Something else here</DropdownItem>
-            </DropdownMenu>
-          </UncontrolledDropdown>
-          <UncontrolledDropdown nav>
-            <DropdownToggle nav>
-              <Media className="align-items-center">
-                <span className="avatar avatar-sm rounded-circle">
-                  <img
-                    alt="..."
-                    src={require("../../assets/img/theme/team-1-800x800.jpg")}
-                  />
-                </span>
-              </Media>
-            </DropdownToggle>
             <DropdownMenu className="dropdown-menu-arrow" right>
               <DropdownItem className="noti-title" header tag="div">
                 <h6 className="text-overflow m-0">Bienvenue !</h6>
               </DropdownItem>
               <DropdownItem to="/admin/user-profile" tag={Link}>
-                <i className="ni ni-single-02" />
-                <span>Mon profile</span>
-              </DropdownItem>
-              <DropdownItem to="/admin/user-profile" tag={Link}>
                 <i className="ni ni-settings-gear-65" />
                 <span>Paramètres</span>
               </DropdownItem>
-              <DropdownItem to="/admin/user-profile" tag={Link}>
-                <i className="ni ni-calendar-grid-58" />
-                <span>Demandes</span>
-              </DropdownItem>
-              <DropdownItem to="/admin/user-profile" tag={Link}>
-                <i className="ni ni-support-16" />
-                <span>Support</span>
-              </DropdownItem>
               <DropdownItem divider />
-              <DropdownItem href="#pablo" onClick={(e) => e.preventDefault()}>
+              <DropdownItem tag={NavLinkRRD} onClick={handleLogout}>
                 <i className="ni ni-user-run" />
                 <span>Deconnexion</span>
               </DropdownItem>
@@ -223,47 +221,60 @@ const Sidebar = (props) => {
           {/* Divider */}
           <hr className="my-3" />
           {/* Heading */}
-          <h6 className="navbar-heading text-muted">Aide</h6>
+          <h6 className="navbar-heading text-muted">Attestations</h6>
+          {/* Archives Navigation */}
+          <Nav navbar>{createAttestationsLinks(routes)}</Nav>
+          {/* Divider */}
+          <hr className="my-3" />
+          {/* Heading */}
+          <h6 className="navbar-heading text-muted">Archives</h6>
+          {/* Archives Navigation */}
+          <Nav navbar>{createArchivesLinks(routes)}</Nav>
+          {/* Divider */}
+          <hr className="my-3" />
+          {/* Heading */}
+          <h6 className="navbar-heading text-muted">Autres</h6>
           {/* Navigation */}
           <Nav className="mb-md-3" navbar>
             <NavItem>
               <NavLink 
-                to="/"
+                to="/admin/conges"
                 tag={NavLinkRRD}
                 onClick={closeCollapse}
               >
-                <i className="ni ni-spaceship" />
+                <i className="ni ni-spaceship text-dark" />
                 Tutoriel
               </NavLink>
             </NavItem>
+            { user.role_utilisateur === "administrateur" ? (
+                <NavItem>
+                  <NavLink 
+                    to="/admin/register"
+                    tag={NavLinkRRD}
+                    onClick={closeCollapse}
+                  >
+                    <i className="ni ni-circle-08 text-dark" />
+                    Ajouter des utilisateurs
+                  </NavLink>
+                </NavItem>
+              ) : ""
+            }
             <NavItem>
               <NavLink 
-                to="/"
+                to="/admin/user-profile"
                 tag={NavLinkRRD}
                 onClick={closeCollapse}
               >
-                <i className="ni ni-palette" />
-                Autres
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink 
-                to="/"
-                tag={NavLinkRRD}
-                onClick={closeCollapse}
-              >
-                <i className="ni ni-ui-04" />
+                <i className="ni ni-ui-04 text-dark" />
                 Paramètres
               </NavLink>
             </NavItem>
-          </Nav>
-          <Nav className="mb-md-3" navbar>
-            <NavItem className="active-pro active">
+            <NavItem>
               <NavLink
                 tag={NavLinkRRD}
                 onClick={handleLogout}           
               >
-                <i className="ni ni-spaceship" />
+                <i className="ni ni-spaceship text-dark" />
                 Se Deconnecter
               </NavLink>
             </NavItem>
