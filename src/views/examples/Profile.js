@@ -27,7 +27,7 @@ const bcrypt = require("bcryptjs")
 const Profile = () => {
 
   const { user } = useAuth();
-  const { isLoggedIn } = useAuth();
+  //const { isLoggedIn } = useAuth();
   const [error, setError] = useState("");
   const [errorPwd, setErrorPwd] = useState("");
   const [success, setSuccess] = useState("");
