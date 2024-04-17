@@ -1,4 +1,4 @@
-/*eslint-disable*/
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
 import { NavLink as NavLinkRRD, Link } from "react-router-dom";
 // nodejs library to set properties for components
@@ -6,42 +6,31 @@ import { PropTypes } from "prop-types";
 
 // reactstrap components
 import {
-  Button,
-  Card,
-  CardHeader,
-  CardBody,
-  CardTitle,
   Collapse,
   DropdownMenu,
   DropdownItem,
   UncontrolledDropdown,
-  DropdownToggle,
-  FormGroup,
   Form,
   Input,
   InputGroupAddon,
   InputGroupText,
   InputGroup,
-  Media,
   NavbarBrand,
   Navbar,
   NavItem,
   NavLink,
   Nav,
-  Progress,
-  Table,
   Container,
   Row,
   Col,
 } from "reactstrap";
 import { useAuth } from "services/AuthContext";
-import { BrowserRouter, Route, Routes, Navigate, HashRouter } from "react-router-dom";
 
 var ps;
 
 const Sidebar = (props) => {
   const [collapseOpen, setCollapseOpen] = useState();
-  const user = props.user;
+  const { user } = useAuth();
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
     return props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
@@ -102,7 +91,7 @@ const Sidebar = (props) => {
         return (
           <NavItem key={key}>
             <NavLink
-              to={{pathname : prop.layout + prop.path, state: props.user}}
+              to={{pathname : prop.layout + prop.path}}
               tag={NavLinkRRD}
               onClick={closeCollapse}
             >
@@ -154,7 +143,7 @@ const Sidebar = (props) => {
         {/* Brand */}
         {logo ? (
           <NavbarBrand className="pt-0" {...navbarBrandProps}>
-            GESCON-APP - {JSON.stringify(props.user.id_utilisateur)}
+            GESCON-APP
             {/*<img
               alt={logo.imgAlt}
               className="navbar-brand-img"
@@ -257,19 +246,22 @@ const Sidebar = (props) => {
                 Tutoriel
               </NavLink>
             </NavItem>
+            { user.role_utilisateur === "administrateur" ? (
+                <NavItem>
+                  <NavLink 
+                    to="/admin/register"
+                    tag={NavLinkRRD}
+                    onClick={closeCollapse}
+                  >
+                    <i className="ni ni-circle-08 text-dark" />
+                    Ajouter des utilisateurs
+                  </NavLink>
+                </NavItem>
+              ) : ""
+            }
             <NavItem>
               <NavLink 
-                to="/admin/register"
-                tag={NavLinkRRD}
-                onClick={closeCollapse}
-              >
-                <i className="ni ni-circle-08 text-dark" />
-                Ajouter des utilisateurs
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink 
-                to="/"
+                to="/admin/user-profile"
                 tag={NavLinkRRD}
                 onClick={closeCollapse}
               >

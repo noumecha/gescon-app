@@ -157,6 +157,7 @@ const Profile = () => {
         return
       }
       const req = `UPDATE utilisateur SET mdp_utilisateur = "${psswd}" WHERE id_utilisateur = ${user.id_utilisateur}`;
+      console.log(req);
       window.electronAPI.updateUserPassword(req);
       await window.electronAPI.userPasswordUpdatedSuccess(() => {
         setSuccessPwd(`Le mot de passe de ${user.nom_utilisateur} a été modifié`);
@@ -180,7 +181,7 @@ const Profile = () => {
     <>
       <UserHeader />
       {/* Page content */}
-      <Container className="mt--8" fluid>
+      <Container className="mt--7" fluid>
         <Row>
           <Col className="order-xl-2 mb-5 mb-xl-0" xl="4">
             <Card className="card-profile shadow">
