@@ -20,7 +20,6 @@ const PersonnelDetails = () => {
         <>
             <Header />
             {/* Page content */}
-            {/* Page content */}
             <Container className="mt--4" fluid>
               <Row>
                 <Col className="order-xl-2 mb-5 mb-xl-0" xl="4">
@@ -64,7 +63,11 @@ const PersonnelDetails = () => {
                 <Col className="order-xl-1" xl="8">
                     <Card>
                         <CardHeader>
-
+                            <Row className="align-items-center">
+                                <Col xs="6">
+                                    <h3 className="mb-0">Mes informations</h3>
+                                </Col>
+                            </Row>
                         </CardHeader>
                         <CardBody>
 
