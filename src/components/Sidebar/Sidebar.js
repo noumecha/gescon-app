@@ -35,11 +35,13 @@ import {
   Col,
 } from "reactstrap";
 import { useAuth } from "services/AuthContext";
+import { BrowserRouter, Route, Routes, Navigate, HashRouter } from "react-router-dom";
 
 var ps;
 
 const Sidebar = (props) => {
   const [collapseOpen, setCollapseOpen] = useState();
+  const user = props.user;
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
     return props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
@@ -60,9 +62,9 @@ const Sidebar = (props) => {
         return (
           <NavItem key={key}>
             <NavLink
-              to={prop.layout + prop.path}
+              to={{pathname: prop.layout + prop.path}}
               tag={NavLinkRRD}
-              onClick={closeCollapse}
+              onClick={() => closeCollapse()}
             >
               <i className={prop.icon} />
               {prop.name}
@@ -100,7 +102,7 @@ const Sidebar = (props) => {
         return (
           <NavItem key={key}>
             <NavLink
-              to={prop.layout + prop.path}
+              to={{pathname : prop.layout + prop.path, state: props.user}}
               tag={NavLinkRRD}
               onClick={closeCollapse}
             >
@@ -152,7 +154,7 @@ const Sidebar = (props) => {
         {/* Brand */}
         {logo ? (
           <NavbarBrand className="pt-0" {...navbarBrandProps}>
-            GESCON-APP
+            GESCON-APP - {JSON.stringify(props.user.id_utilisateur)}
             {/*<img
               alt={logo.imgAlt}
               className="navbar-brand-img"

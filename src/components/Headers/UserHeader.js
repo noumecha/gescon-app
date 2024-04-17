@@ -1,9 +1,11 @@
 // reactstrap components
 import { Container, Row, Col } from "reactstrap";
+import { useAuth } from "services/AuthContext";
 
-const UserHeader = () => {
+const UserHeader = (props) => {
 
-  const hours = new Date().getHours()
+  const hours = new Date().getHours();
+  const { user } = useAuth();
 
   return (
     <>
@@ -25,7 +27,7 @@ const UserHeader = () => {
             <Col lg="12" md="10">
               <h1 className="display-2 text-white">
                 {
-                  hours > 6 && hours < 20 ? "Bonjour XXX" : "Bonsoir XXX"
+                  hours > 6 && hours < 18 ? `Bonjour ${user.nom_utilisateur}` : `Bonsoir ${user.nom_utilisateur}`
                 }
               </h1>
               <p className="text-white mt-0 mb-5">

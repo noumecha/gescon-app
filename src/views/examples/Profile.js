@@ -12,21 +12,30 @@ import {
   Col,
   InputGroup,
   InputGroupAddon,
-  InputGroupText
+  InputGroupText,
+  Alert
 } from "reactstrap";
 // core components
 import UserHeader from "components/Headers/UserHeader.js";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {Icon} from 'react-icons-kit';
 import {eyeOff} from 'react-icons-kit/feather/eyeOff';
 import {eye} from 'react-icons-kit/feather/eye';
+import { useAuth } from "services/AuthContext";
+const bcrypt = require("bcryptjs")
 
 const Profile = () => {
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("");
-  const [telephone, setTelephone] = useState("");
+  const { user } = useAuth();
+  const { isLoggedIn } = useAuth();
+  const [error, setError] = useState("");
+  const [errorPwd, setErrorPwd] = useState("");
+  const [success, setSuccess] = useState("");
+  const [successPwd, setSuccessPwd] = useState("");
+  const [name, setName] = useState(user.nom_utilisateur);
+  const [email, setEmail] = useState(user.email_utilisateur);
+  const [role, setRole] = useState(user.role_utilisateur);
+  const [telephone, setTelephone] = useState(user.telephone_utilisateur);
   const [pwd, setPwd] = useState("");
   const [confirmPwd, setConfirmPwd] = useState("");
   const [disable, setDisable] = useState(true);
@@ -55,14 +64,117 @@ const Profile = () => {
     stateFunction(e.target.value);
   }
 
-  // function for db 
-  const updateUserInfo = () => {
-    console.log(`Update user info`);
+  const isValidEmail = (email) => {
+    // eslint-disable-next-line no-useless-escape
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
   }
 
-  const updateUserPwd = () => {
-    console.log(`Update user pwd`);
+  // function for db 
+  const updateUserInfo = async (e) => {
+    e.preventDefault();
+    try {
+      const userData = {
+        name: name,
+        email: email,
+        telephone: telephone,
+        updated_at: new Date().toISOString().slice(0,19).replace('T',' '),
+        id_utilisateur : user.id_utilisateur,
+      };
+      if (!userData.name || !userData.email || !userData.telephone) {
+        setError('Veuillez remplir tous les champs');
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return;
+      }
+      if (userData.telephone.length < 9) {
+        setError('Le numero de téléphone doit contenir 9 chiffres minimum');
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return
+      }
+      if (userData.telephone.length > 13) {
+        setError('Le numero de téléphone ne peut pas dépasser 13 chiffres');
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return
+      }
+      if (!isValidEmail(userData.email)) {
+        setError('L\'adresse email n\'est pas valide');
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return
+      }
+        const req_users = `UPDATE utilisateur SET nom_utilisateur = "${userData.name}",email_utilisateur = "${userData.email}",
+        telephone_utilisateur = "${userData.telephone}", updated_at_utilisateur = "${userData.updated_at}" 
+        WHERE id_utilisateur = ${userData.id_utilisateur}`;
+        window.electronAPI.updateUser(req_users);
+        await window.electronAPI.userUpdatedSuccess(() => {
+          setSuccess(`Les informations de ${name} on été mis à jour`);
+          setTimeout(() => {
+            setSuccess("");
+          }, 3000);
+          console.log(userData)
+        })
+        setName("");
+        setEmail("");
+        setTelephone("");
+        toogleDisable();
+    } catch (error) {
+      console.error(`Error on save user : ${error.message}`);
+    }
   }
+
+  const updateUserPwd = async (e) => {
+    e.preventDefault();
+    try {
+      var salt = bcrypt.genSaltSync(10);
+      var crypPwd = bcrypt.hashSync(pwd, salt);
+      const psswd = crypPwd;
+      if (!pwd || !confirmPwd) {
+        setErrorPwd('Veuillez remplir tous les champs');
+        setTimeout(() => {
+          setErrorPwd("");
+        },4000)
+        return;
+      }
+      if (pwd.length < 8) {
+        setErrorPwd('Le mot de passe doit contenir 8 carractères minimum');
+        setTimeout(() => {
+          setErrorPwd("");
+        },4000)
+        return
+      }
+      if (!bcrypt.compareSync(confirmPwd, psswd)) {
+        setErrorPwd('Les mots de passe ne sont pas identiques');
+        setTimeout(() => {
+          setErrorPwd("");
+        },4000)
+        return
+      }
+      const req = `UPDATE utilisateur SET mdp_utilisateur = "${psswd}" WHERE id_utilisateur = ${user.id_utilisateur}`;
+      window.electronAPI.updateUserPassword(req);
+      await window.electronAPI.userPasswordUpdatedSuccess(() => {
+        setSuccessPwd(`Le mot de passe de ${user.nom_utilisateur} a été modifié`);
+        setTimeout(() => {
+          setSuccessPwd("");
+        },4000)
+      })
+      setPwd("");
+      setConfirmPwd("");
+      toggleDisablePwd();
+    } catch (err) {
+      console.log(`error on update password ${err.message}`)
+    }
+  }
+
+  useEffect(() => {
+    console.log(`User object : ${user}`);
+  },[user]);
 
   return (
     <>
@@ -89,13 +201,13 @@ const Profile = () => {
                 <div className="text-center my-4">
                   <hr className="my-4" />
                   <div className="h4 font-weight-300">
-                    Bucharest, Romania
+                    {user.nom_utilisateur}
+                  </div>
+                  <div className="h4 font-weight-300">
+                    {user.email_utilisateur}
                   </div>
                   <div className="h4 mt-4">
-                    Solution Manager - Creative Tim Officer
-                  </div>
-                  <div className="h4 mt-4">
-                    University of Computer Science
+                    {user.telephone_utilisateur}
                   </div>
                   <hr className="my-4" />
                 </div>
@@ -123,6 +235,15 @@ const Profile = () => {
               <CardBody>
                 <Form>
                   <div className="pl-lg-4">
+                    <Row>
+                      <Col className="mt-3" lg="12">
+                        {success && 
+                          <Alert className="text-center" color="success">
+                            {success}
+                          </Alert>
+                        }
+                      </Col>
+                    </Row>
                     <Row>
                       <Col lg="6">
                         <FormGroup>
@@ -176,7 +297,7 @@ const Profile = () => {
                             value={telephone}
                             disabled={disable}
                             onChange={handleInputChange(setTelephone)}
-                            type="text"
+                            type="number"
                           />
                         </FormGroup>
                       </Col>
@@ -203,12 +324,21 @@ const Profile = () => {
                       <Col className="" lg="6">
                         <Button
                           color="success"
-                          onClick={() => updateUserInfo()}
+                          onClick={(e) => updateUserInfo(e)}
                           disabled={disable}
                           size="md"
                         >
                           Enregistrer les modifications
                         </Button>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col className="mt-3" lg="12">
+                        {error && 
+                          <Alert className="text-center" color="danger">
+                            {error}
+                          </Alert>
+                        }
                       </Col>
                     </Row>
                   </div>
@@ -228,6 +358,15 @@ const Profile = () => {
                       >
                         Modifier le mot de passe
                     </Button>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col className="mt-3" lg="12">
+                      {successPwd && 
+                        <Alert className="text-center" color="success">
+                          {successPwd}
+                        </Alert>
+                      }
                     </Col>
                   </Row>
                   <div className="pl-lg-4 mt-4">
@@ -286,16 +425,26 @@ const Profile = () => {
                           </InputGroup>
                         </FormGroup>
                       </Col>
-                    </Row><Row>
+                    </Row>
+                    <Row>
                       <Col className="" lg="6">
                         <Button
                           color="success"
-                          onClick={() => updateUserPwd()}
+                          onClick={(e) => updateUserPwd(e)}
                           disabled={disablePwd}
                           size="md"
                         >
                           Mettre à jour
                         </Button>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col className="mt-3" lg="12">
+                        {errorPwd && 
+                          <Alert className="text-center" color="danger">
+                            {errorPwd}
+                          </Alert>
+                        }
                       </Col>
                     </Row>
                   </div>

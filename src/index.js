@@ -11,6 +11,7 @@ import { AuthProvider } from "services/AuthContext";
 
 import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
+import Profile from "views/examples/Profile";
 import { useAuth } from "services/AuthContext";
 
 function App() {

@@ -151,7 +151,7 @@ var routes = [
     path: "/user-profile",
     name: "Profile",
     icon: "ni ni-single-02 text-blue",
-    component: <Profile />,
+    component: <Profile name="ivan"/>,
     layout: "/admin",
   },
   {
