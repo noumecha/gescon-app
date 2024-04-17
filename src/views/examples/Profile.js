@@ -10,99 +10,206 @@ import {
   Container,
   Row,
   Col,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+  Alert
 } from "reactstrap";
 // core components
 import UserHeader from "components/Headers/UserHeader.js";
+import { useEffect, useState } from "react";
+import {Icon} from 'react-icons-kit';
+import {eyeOff} from 'react-icons-kit/feather/eyeOff';
+import {eye} from 'react-icons-kit/feather/eye';
+import { useAuth } from "services/AuthContext";
+const bcrypt = require("bcryptjs")
 
 const Profile = () => {
+
+  const { user } = useAuth();
+  //const { isLoggedIn } = useAuth();
+  const [error, setError] = useState("");
+  const [errorPwd, setErrorPwd] = useState("");
+  const [success, setSuccess] = useState("");
+  const [successPwd, setSuccessPwd] = useState("");
+  const [name, setName] = useState(user.nom_utilisateur);
+  const [email, setEmail] = useState(user.email_utilisateur);
+  const [role, setRole] = useState(user.role_utilisateur);
+  const [telephone, setTelephone] = useState(user.telephone_utilisateur);
+  const [pwd, setPwd] = useState("");
+  const [confirmPwd, setConfirmPwd] = useState("");
+  const [disable, setDisable] = useState(true);
+  const [disablePwd, setDisablePwd] = useState(true);
+  const [showPwd, setShowPwd] = useState(false);
+  const [showConfirmPwd, setShowConfirmPwd] = useState(false);
+
+  // usefull functions
+  const toggleShowPwd = () => {
+    setShowPwd(!showPwd);
+  }
+
+  const toggleShowConfirmPwd = () => {
+    setShowConfirmPwd(!showConfirmPwd);
+  }
+
+  const toogleDisable = () => {
+    setDisable(!disable);
+  }
+
+  const toggleDisablePwd = () => {
+    setDisablePwd(!disablePwd);
+  }
+
+  const handleInputChange = (stateFunction) => (e) => {
+    stateFunction(e.target.value);
+  }
+
+  const isValidEmail = (email) => {
+    // eslint-disable-next-line no-useless-escape
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  }
+
+  // function for db 
+  const updateUserInfo = async (e) => {
+    e.preventDefault();
+    try {
+      const userData = {
+        name: name,
+        email: email,
+        telephone: telephone,
+        updated_at: new Date().toISOString().slice(0,19).replace('T',' '),
+        id_utilisateur : user.id_utilisateur,
+      };
+      if (!userData.name || !userData.email || !userData.telephone) {
+        setError('Veuillez remplir tous les champs');
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return;
+      }
+      if (userData.telephone.length < 9) {
+        setError('Le numero de téléphone doit contenir 9 chiffres minimum');
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return
+      }
+      if (userData.telephone.length > 13) {
+        setError('Le numero de téléphone ne peut pas dépasser 13 chiffres');
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return
+      }
+      if (!isValidEmail(userData.email)) {
+        setError('L\'adresse email n\'est pas valide');
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return
+      }
+        const req_users = `UPDATE utilisateur SET nom_utilisateur = "${userData.name}",email_utilisateur = "${userData.email}",
+        telephone_utilisateur = "${userData.telephone}", updated_at_utilisateur = "${userData.updated_at}" 
+        WHERE id_utilisateur = ${userData.id_utilisateur}`;
+        window.electronAPI.updateUser(req_users);
+        await window.electronAPI.userUpdatedSuccess(() => {
+          setSuccess(`Les informations de ${name} on été mis à jour`);
+          setTimeout(() => {
+            setSuccess("");
+          }, 3000);
+          console.log(userData)
+        })
+        setName("");
+        setEmail("");
+        setTelephone("");
+        toogleDisable();
+    } catch (error) {
+      console.error(`Error on save user : ${error.message}`);
+    }
+  }
+
+  const updateUserPwd = async (e) => {
+    e.preventDefault();
+    try {
+      var salt = bcrypt.genSaltSync(10);
+      var crypPwd = bcrypt.hashSync(pwd, salt);
+      const psswd = crypPwd;
+      if (!pwd || !confirmPwd) {
+        setErrorPwd('Veuillez remplir tous les champs');
+        setTimeout(() => {
+          setErrorPwd("");
+        },4000)
+        return;
+      }
+      if (pwd.length < 8) {
+        setErrorPwd('Le mot de passe doit contenir 8 carractères minimum');
+        setTimeout(() => {
+          setErrorPwd("");
+        },4000)
+        return
+      }
+      if (!bcrypt.compareSync(confirmPwd, psswd)) {
+        setErrorPwd('Les mots de passe ne sont pas identiques');
+        setTimeout(() => {
+          setErrorPwd("");
+        },4000)
+        return
+      }
+      const req = `UPDATE utilisateur SET mdp_utilisateur = "${psswd}" WHERE id_utilisateur = ${user.id_utilisateur}`;
+      window.electronAPI.updateUserPassword(req);
+      await window.electronAPI.userPasswordUpdatedSuccess(() => {
+        setSuccessPwd(`Le mot de passe de ${user.nom_utilisateur} a été modifié`);
+        setTimeout(() => {
+          setSuccessPwd("");
+        },4000)
+      })
+      setPwd("");
+      setConfirmPwd("");
+      toggleDisablePwd();
+    } catch (err) {
+      console.log(`error on update password ${err.message}`)
+    }
+  }
+
+  useEffect(() => {
+    console.log(`User object : ${user}`);
+  },[user]);
+
   return (
     <>
       <UserHeader />
       {/* Page content */}
-      <Container className="mt--7" fluid>
+      <Container className="mt--8" fluid>
         <Row>
           <Col className="order-xl-2 mb-5 mb-xl-0" xl="4">
             <Card className="card-profile shadow">
-              <Row className="justify-content-center">
+              <Row className="justify-content-center mb-7">
                 <Col className="order-lg-2" lg="3">
                   <div className="card-profile-image">
                     <a href="#pablo" onClick={(e) => e.preventDefault()}>
                       <img
                         alt="..."
                         className="rounded-circle"
-                        src={require("../../assets/img/theme/team-4-800x800.jpg")}
+                        src={require("../../assets/img/theme/user_good.png")}
                       />
                     </a>
                   </div>
                 </Col>
               </Row>
-              <CardHeader className="text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
-                <div className="d-flex justify-content-between">
-                  <Button
-                    className="mr-4"
-                    color="info"
-                    href="#pablo"
-                    onClick={(e) => e.preventDefault()}
-                    size="sm"
-                  >
-                    Connect
-                  </Button>
-                  <Button
-                    className="float-right"
-                    color="default"
-                    href="#pablo"
-                    onClick={(e) => e.preventDefault()}
-                    size="sm"
-                  >
-                    Message
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardBody className="pt-0 pt-md-4">
-                <Row>
-                  <div className="col">
-                    <div className="card-profile-stats d-flex justify-content-center mt-md-5">
-                      <div>
-                        <span className="heading">22</span>
-                        <span className="description">Friends</span>
-                      </div>
-                      <div>
-                        <span className="heading">10</span>
-                        <span className="description">Photos</span>
-                      </div>
-                      <div>
-                        <span className="heading">89</span>
-                        <span className="description">Comments</span>
-                      </div>
-                    </div>
+              <CardBody className="my-4">
+                <div className="text-center my-4">
+                  <hr className="my-4" />
+                  <div className="h4 font-weight-300">
+                    {user.nom_utilisateur}
                   </div>
-                </Row>
-                <div className="text-center">
-                  <h3>
-                    Jessica Jones
-                    <span className="font-weight-light">, 27</span>
-                  </h3>
-                  <div className="h5 font-weight-300">
-                    <i className="ni location_pin mr-2" />
-                    Bucharest, Romania
+                  <div className="h4 font-weight-300">
+                    {user.email_utilisateur}
                   </div>
-                  <div className="h5 mt-4">
-                    <i className="ni business_briefcase-24 mr-2" />
-                    Solution Manager - Creative Tim Officer
-                  </div>
-                  <div>
-                    <i className="ni education_hat mr-2" />
-                    University of Computer Science
+                  <div className="h4 mt-4">
+                    {user.telephone_utilisateur}
                   </div>
                   <hr className="my-4" />
-                  <p>
-                    Ryan — the name taken by Melbourne-raised, Brooklyn-based
-                    Nick Murphy — writes, performs and records all of his own
-                    music.
-                  </p>
-                  <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                    Show more
-                  </a>
                 </div>
               </CardBody>
             </Card>
@@ -111,27 +218,32 @@ const Profile = () => {
             <Card className="bg-secondary shadow">
               <CardHeader className="bg-white border-0">
                 <Row className="align-items-center">
-                  <Col xs="8">
-                    <h3 className="mb-0">My account</h3>
+                  <Col xs="6">
+                    <h3 className="mb-0">Mes informations</h3>
                   </Col>
-                  <Col className="text-right" xs="4">
+                  <Col className="text-right" xs="6">
                     <Button
                       color="primary"
-                      href="#pablo"
-                      onClick={(e) => e.preventDefault()}
-                      size="sm"
+                      onClick={() => toogleDisable()}
+                      size="md"
                     >
-                      Settings
+                      Modifier mes informations
                     </Button>
                   </Col>
                 </Row>
               </CardHeader>
               <CardBody>
                 <Form>
-                  <h6 className="heading-small text-muted mb-4">
-                    User information
-                  </h6>
                   <div className="pl-lg-4">
+                    <Row>
+                      <Col className="mt-3" lg="12">
+                        {success && 
+                          <Alert className="text-center" color="success">
+                            {success}
+                          </Alert>
+                        }
+                      </Col>
+                    </Row>
                     <Row>
                       <Col lg="6">
                         <FormGroup>
@@ -139,13 +251,14 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-username"
                           >
-                            Username
+                            Nom
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="lucky.jesse"
+                            value={name}
                             id="input-username"
-                            placeholder="Username"
+                            disabled={disable}
+                            onChange={handleInputChange(setName)}
                             type="text"
                           />
                         </FormGroup>
@@ -156,13 +269,15 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-email"
                           >
-                            Email address
+                            Adresse email
                           </label>
                           <Input
                             className="form-control-alternative"
                             id="input-email"
-                            placeholder="jesse@example.com"
+                            value={email}
+                            disabled={disable}
                             type="email"
+                            onChange={handleInputChange(setEmail)}
                           />
                         </FormGroup>
                       </Col>
@@ -172,16 +287,17 @@ const Profile = () => {
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="input-first-name"
+                            htmlFor="input-phone"
                           >
-                            First name
+                            Téléphone
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="Lucky"
-                            id="input-first-name"
-                            placeholder="First name"
-                            type="text"
+                            id="input-phone"
+                            value={telephone}
+                            disabled={disable}
+                            onChange={handleInputChange(setTelephone)}
+                            type="number"
                           />
                         </FormGroup>
                       </Col>
@@ -189,113 +305,148 @@ const Profile = () => {
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="input-last-name"
+                            htmlFor="input-role"
                           >
-                            Last name
+                            Role
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="Jesse"
-                            id="input-last-name"
-                            placeholder="Last name"
+                            id="input-role"
+                            value={role}
+                            onChange={handleInputChange(setRole)}
+                            disabled
                             type="text"
                           />
                         </FormGroup>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col className="" lg="6">
+                        <Button
+                          color="success"
+                          onClick={(e) => updateUserInfo(e)}
+                          disabled={disable}
+                          size="md"
+                        >
+                          Enregistrer les modifications
+                        </Button>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col className="mt-3" lg="12">
+                        {error && 
+                          <Alert className="text-center" color="danger">
+                            {error}
+                          </Alert>
+                        }
                       </Col>
                     </Row>
                   </div>
                   <hr className="my-4" />
                   {/* Address */}
-                  <h6 className="heading-small text-muted mb-4">
-                    Contact information
-                  </h6>
-                  <div className="pl-lg-4">
+                  <Row className="align-items-center">
+                    <Col className="" xs="6">
+                      <h6 className="heading-small text-muted mb-0">
+                        informations de sécurité
+                      </h6>
+                    </Col>
+                    <Col className="text-right" xs="6">
+                      <Button
+                        color="primary"
+                        onClick={() => toggleDisablePwd()}
+                        size="md"
+                      >
+                        Modifier le mot de passe
+                    </Button>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col className="mt-3" lg="12">
+                      {successPwd && 
+                        <Alert className="text-center" color="success">
+                          {successPwd}
+                        </Alert>
+                      }
+                    </Col>
+                  </Row>
+                  <div className="pl-lg-4 mt-4">
                     <Row>
-                      <Col md="12">
+                      <Col lg="6">
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="input-address"
+                            htmlFor="input-pwd"
                           >
-                            Address
+                            Nouveau mot de passe
                           </label>
-                          <Input
-                            className="form-control-alternative"
-                            defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
-                            id="input-address"
-                            placeholder="Home Address"
-                            type="text"
-                          />
+                          <InputGroup className="input-group-alternative">
+                            <Input
+                              className="form-control-alternative"
+                              id="input-pwd"
+                              value={pwd}
+                              disabled={disablePwd}
+                              onChange={handleInputChange(setPwd)}
+                              type={showPwd ? "text" : "password"}
+                            />
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText onClick={toggleShowPwd}>
+                                <Icon className="absolute mr-10" icon={showPwd ? eye : eyeOff } size={18}/>
+                              </InputGroupText>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </FormGroup>
+                      </Col>
+                      <Col lg="6">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-confirm-pwd"
+                          >
+                            Confirmer le nouveau mot de passe
+                          </label>
+                          <InputGroup className="input-group-alternative">
+                            <Input
+                              className="form-control-alternative"
+                              id="input-pwd"
+                              value={confirmPwd}
+                              disabled={disablePwd}
+                              onChange={handleInputChange(setConfirmPwd)}
+                              type={showConfirmPwd ? "text" : "password"}
+                            />
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText onClick={toggleShowConfirmPwd}>
+                                <Icon  
+                                  className="absolute mr-10" 
+                                  icon={showConfirmPwd ? eye : eyeOff } 
+                                  size={18}
+                                />
+                              </InputGroupText>
+                            </InputGroupAddon>
+                          </InputGroup>
                         </FormGroup>
                       </Col>
                     </Row>
                     <Row>
-                      <Col lg="4">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-city"
-                          >
-                            City
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            defaultValue="New York"
-                            id="input-city"
-                            placeholder="City"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="4">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-country"
-                          >
-                            Country
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            defaultValue="United States"
-                            id="input-country"
-                            placeholder="Country"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="4">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-country"
-                          >
-                            Postal code
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-postal-code"
-                            placeholder="Postal code"
-                            type="number"
-                          />
-                        </FormGroup>
+                      <Col className="" lg="6">
+                        <Button
+                          color="success"
+                          onClick={(e) => updateUserPwd(e)}
+                          disabled={disablePwd}
+                          size="md"
+                        >
+                          Mettre à jour
+                        </Button>
                       </Col>
                     </Row>
-                  </div>
-                  <hr className="my-4" />
-                  {/* Description */}
-                  <h6 className="heading-small text-muted mb-4">About me</h6>
-                  <div className="pl-lg-4">
-                    <FormGroup>
-                      <label>About Me</label>
-                      <Input
-                        className="form-control-alternative"
-                        placeholder="A few words about you ..."
-                        rows="4"
-                        defaultValue="GESCON-APP"
-                        type="textarea"
-                      />
-                    </FormGroup>
+                    <Row>
+                      <Col className="mt-3" lg="12">
+                        {errorPwd && 
+                          <Alert className="text-center" color="danger">
+                            {errorPwd}
+                          </Alert>
+                        }
+                      </Col>
+                    </Row>
                   </div>
                 </Form>
               </CardBody>

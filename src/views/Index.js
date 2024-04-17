@@ -40,22 +40,14 @@ const Index = (props) => {
     setActiveNav(index);
     setChartExample1Data("data" + index);
   };
-  const [data, setData] = useState(null)
+  const [data, setData] = useState([])
   useEffect(() => {
     const func = async () => {
       try {
-        const title = "Gescon app by Noumel";
+        const title = `Gescon App - ${new Date().getFullYear()}`;
         window.electronAPI.setTitle(title);
         const res = await window.electronAPI.ping();
         console.log("Ping : " ,res);
-        //const req = 'INSERT INTO eleve (nom,prenom,classe) VALUES ("bams", "toto", "2nd C");';
-        //window.electronAPI.addEleve(req);
-        window.electronAPI.requeteSQL();
-        await window.electronAPI.recevoirResultats((event, res) => {
-          console.log("event : " + JSON.stringify(event));
-          console.log("res : " + JSON.stringify(res));
-          setData(res);
-        })
       } catch (error) {
         console.error("Erreur trouvé : " + error);
       }
@@ -92,19 +84,6 @@ const Index = (props) => {
                         >
                           <span className="d-none d-md-block">Mois</span>
                           <span className="d-md-none">M</span>
-                        </NavLink>
-                      </NavItem>
-                      <NavItem>
-                        <NavLink
-                          className={classnames("py-2 px-3", {
-                            active: activeNav === 2,
-                          })}
-                          data-toggle="tab"
-                          href="#pablo"
-                          onClick={(e) => toggleNavs(e, 2)}
-                        >
-                          <span className="d-none d-md-block">semaine</span>
-                          <span className="d-md-none">S</span>
                         </NavLink>
                       </NavItem>
                     </Nav>
