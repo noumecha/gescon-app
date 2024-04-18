@@ -231,7 +231,7 @@ const RepriseCongeDoc = (props) => {
                     </Text>
                     <Text>********</Text>
                     <Text style={styles.h4TitleNumber}>
-                        N°__________/MINFI/SG/DGB/SDAG/SP
+                        N°__________/CRS/MINFI/SG/DGB/SDAG/AAN
                     </Text>
                 </View>
                 {/* image */}
@@ -276,23 +276,19 @@ const RepriseCongeDoc = (props) => {
             <View style={styles.containerTwo}>
                 <View style={styles.section}>
                     <Text style={styles.h1CertifTitle}>
-                        CERTIFICAT DE REPRISE DE FONCTION
+                        CERTIFICAT DE REPRISE DE SERVICE
                     </Text>
                     <Text style={styles.h2CertifSubtitle}>
                         CERTIFICATE OF RESUMPTION OF FUNCTION
                     </Text>
                     <Text style={styles.pCertifText}>
                         Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
-                        {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service (au/à la) {props.structure} est bénéficiaire
-                        d'un {props.typeConge} de {props.duration} jours , accordé par décision N° {props.decision}
-                         {/*du DATE_DEC*/} du Ministre des finances.
+                        {props.type} d'Administration, Matricule {props.matricule}, {props.poste} (au/à la) {props.structure},bénéficiaire
+                        d'un {props.typeConge} de {props.duration} jours , accordé par décision N° {props.decision} {/*du DATE_DEC*/} du Ministre des Finances,
+                        allant du {props.startDate} au {props.endDate} a effectivement repris le service le {props.repriseDate} à 7 heures 30 précises.
                     </Text>
                     <Text style={styles.pCertifText}>
-                        L'intéressé{props.sexe === "M" ? "" : "e"} jouira dudit congé pendant la période du {props.startDate} au {props.endDate} et 
-                        reprendra le service le {props.repriseDate} à 7 heures 30 précises.
-                    </Text>
-                    <Text style={styles.pCertifText}>
-                        En foi de quoi, le présent certificat est établi et délivré à l'intéressé{props.sexe === "M" ? "" : "e"} pour
+                        En foi de quoi, le présent certificat de reprise de service est établi et délivré à l'intéressé{props.sexe === "M" ? "" : "e"} pour
                         servir et valoir ce que de droit./-
                     </Text>
                 </View>
@@ -309,7 +305,7 @@ const RepriseCongeDoc = (props) => {
                         - minfi/sg/drh
                     </Text>
                     <Text style={styles.amParagraph3}>
-                        - dgb/sdag/cfs-fs/df
+                        - minfi/dgb/sdag
                     </Text>
                     <Text style={styles.amParagraph4}>
                         - interessee/dossier
