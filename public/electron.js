@@ -280,6 +280,27 @@ function updateUserPassword(event, req) {
     })
 }
 
+// structures 
+function getStructuresNames(event, req) {
+    pool.query('SELECT DISTINCT structure_personnel FROM personnel', (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-structures-names', res);
+    });
+}
+
+function getStructuresNamePersonnel(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-structures-name-personnel', res);
+    });
+}
+
+function getStructuresConges(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('structures-conges', res);
+    });
+}
 /**
  * In this following code is the main 
  * code when the app is started
@@ -339,6 +360,10 @@ app.whenReady().then(() => {
     ipcMain.on('del-user', delUser);
     ipcMain.on('update-user', updateUser);
     ipcMain.on('update-user-password', updateUserPassword);
+    // structures : 
+    ipcMain.on('get-structures-names', getStructuresNames);
+    ipcMain.on('get-structures-name-personnel', getStructuresNamePersonnel);
+    ipcMain.on('get-structures-conges', getStructuresConges);
     // set the App title
     ipcMain.on('set-title', handleSetTitle);
     ipcMain.on('user-login', userLogin);
