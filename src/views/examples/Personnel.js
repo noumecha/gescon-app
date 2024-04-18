@@ -90,7 +90,8 @@ const Personnel = () => {
             for (let i = 0; i < excelData.length; i++) {
                 const type = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 1 : 2;
                 const statut = "en poste"; // en permission, en congé
-                const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
+                //const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
+                const nb_jours_conges = 0;
                 const nb_jours_permission = 0;
                 const req = `
                 INSERT INTO personnel 
@@ -121,8 +122,6 @@ const Personnel = () => {
             try {
                 window.electronAPI.getPersonnel();
                 await window.electronAPI.receivePersonnel((event, res) => {
-                    //console.log("pers event : " + JSON.stringify(event));
-                    //console.log("pers res : " + JSON.stringify(res));
                     setPersonnel(res);
                 })
             } catch (error) {
@@ -169,19 +168,16 @@ const Personnel = () => {
 
     /** for the current selected personnle page */
     const handleCongeClick = (person) => {
-        console.log("person selected", person);
         navigate("/admin/conges", {state: {selectedPerson: person}});
         setSelectedPerson(person);
     }
 
     const handleDetailClick = (person) => {
-        console.log("personnel details :", person);
         navigate("/admin/personnel-details", {state: {selectedPerson: person}});
         setSelectedPerson(person);
     }
 
     const handlePermissionClick = (person) => {
-        console.log("person selected", person);
         navigate("/admin/permission", {state: {selectedPerson: person}});
         setSelectedPerson(person);
     }
@@ -202,7 +198,7 @@ const Personnel = () => {
             </Row>
             {/* Table */}
             <Row>
-                <div className="col p-0">
+                <Col lg="12">
                     <form className="form-group custom-form" onSubmit={handleFileSubmit}>
                         <input type="file" className="form-control" required onChange={handleFile}/>
                         <button type="submit" className="mt-3 btn btn-primary btn-md">Importer le fichier</button>
@@ -212,7 +208,7 @@ const Personnel = () => {
                             </div>
                         )}
                     </form>
-                </div>
+                </Col>
             </Row>
             <Row>
                 <Col lg="12">

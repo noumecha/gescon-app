@@ -51,7 +51,6 @@ const AttestationConge = () => {
     }
 
     const handleRowClick = (att_con) => {
-        // Gérer le clic sur une ligne du tableau pour ouvrir le modal avec les données spécifiques
         setModalData(att_con);
         toggleModal();
     };

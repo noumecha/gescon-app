@@ -13,6 +13,10 @@ import ArchiveAttestationConge from "views/examples/ArchiveAttestationConge";
 import ArchiveAttestationPermission from "views/examples/ArchiveAttestationPermission";
 import PersonnelDetails from "views/examples/PersonnelDetails";
 import StructureStats from "views/examples/StructureStats";
+import AttestationRepPermission from "views/examples/AttestationRepPermission";
+import AttestationRepConge from "views/examples/AttestationRepConge";
+import ArchiveAttestationRepPermission from "views/examples/ArchiveAttestationRepPermission";
+import ArchiveAttestationRepConge from "views/examples/ArchiveAttestationRepConge";
 //import Tables from "views/examples/Tables";
 //import Icons from "views/examples/Icons";
 
@@ -116,10 +120,38 @@ var routes = [
     layout: "/admin",
   },
   {
+    path: "/attestation_rep_permissions",
+    name: "Attestations reprise permissions",
+    icon: "ni ni-paper-diploma text-blue",
+    component: <AttestationRepPermission />,
+    layout: "/admin",
+  },
+  {
+    path: "/archive_att_rep_permissions",
+    name: "Attestation Reprise Permisions Archivées",
+    icon: "ni ni-archive-2 text-blue",
+    component: <ArchiveAttestationRepPermission />,
+    layout: "/admin",
+  },
+  {
+    path: "/attestation_rep_conges",
+    name: "Attestations reprise congés",
+    icon: "ni ni-paper-diploma text-blue",
+    component: <AttestationRepConge />,
+    layout: "/admin",
+  },
+  {
+    path: "/archive_att_rep_conges",
+    name: "Attestation Reprise Congés Archivées",
+    icon: "ni ni-archive-2 text-blue",
+    component: <ArchiveAttestationRepConge />,
+    layout: "/admin",
+  },
+  {
     path: "/user-profile",
     name: "Profile",
     icon: "ni ni-single-02 text-blue",
-    component: <Profile />,
+    component: <Profile name="ivan"/>,
     layout: "/admin",
   },
   {

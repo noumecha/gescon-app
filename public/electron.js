@@ -113,6 +113,13 @@ function getAttestationConge(even, req) {
     });
 }
 
+function getSpecificConge(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-specific-conge', res);
+    });
+}
+
 function addConge(event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
@@ -157,7 +164,7 @@ function getPermission(event, req) {
 }
 
 function getAttestationPermission(even, req) {
-    pool.query('SELECT id_permission,nom_prenom_personnel,matricule_personnel,attestation_permission,statut_permission FROM permission,personnel WHERE permission.id_personnel = personnel.id_personnel', (err, res) => {
+    pool.query('SELECT id_permission,nom_prenom_personnel,matricule_personnel,attestation_permission,statut_permission,statut_attestation_permission FROM permission,personnel WHERE permission.id_personnel = personnel.id_personnel', (err, res) => {
         if (err) throw err;
         even.sender.send('all-attestation-permission', res);
     });
@@ -247,25 +254,70 @@ function addUser(event, req) {
         event.sender.send('user-added-success', { message: 'Utilisateur ajouté avec succès!' });
     })
 }
-
+function delUser(event, r) {
+    pool.query(r, (err, res) => {
+        if (err) throw err;
+        event.sender.send('user-deleted-success', { message: 'Utilisateur ajouté avec succès!' });
+    })
+}
 function getUsers(event, req) {
-    pool.query('SELECT * FROM utilisateur WHERE', (err, res) => {
+    pool.query('SELECT * FROM utilisateur', (err, res) => {
         if (err) throw err;
         event.sender.send('all-users', res);
     })
 }
+function updateUser(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('user-updated-success', res);
+    })
+}
 
+function updateUserPassword(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('user-password-updated-success', { message: 'Utilisateur ajouté avec succès!' });
+    })
+}
+
+// structures 
+function getStructuresNames(event, req) {
+    pool.query('SELECT DISTINCT structure_personnel FROM personnel', (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-structures-names', res);
+    });
+}
+
+function getStructuresNamePersonnel(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-structures-name-personnel', res);
+    });
+}
+
+function getStructuresConges(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('structures-conges', res);
+    });
+}
 /**
  * In this following code is the main 
  * code when the app is started
  */
+function userLogin (event, {username, password}) {
+    pool.query('SELECT * FROM utilisateur', (err, results) => {
+        if (err) throw err;
+        event.sender.send('login-success', results);
+    });
+}
 app.whenReady().then(() => {
     ipcMain.handle('ping', () => 'pong!');
     // personnel datas get
     ipcMain.on('requete-sql', (event, arg) => {
         pool.query('SELECT * FROM personnel', (err, results) => {
             if (err) throw err;
-            event.sender.send('resultat-sql', JSON.stringify(results));
+            event.sender.send('resultat-sql', results);
         });
     });
     ipcMain.on('add-personnel', addPersonnel);
@@ -282,6 +334,7 @@ app.whenReady().then(() => {
     ipcMain.on('add-conge-type', addCongeType);
     ipcMain.on('get-specific-conge-type', getSpecificCongeType);
     // conge  
+    ipcMain.on('get-specific-conge', getSpecificConge);
     ipcMain.on('get-conge', getConge);
     ipcMain.on('add-archive-attestation-conge', addArchiveAttestationConge)
     ipcMain.on('update-conge', updateConge);
@@ -304,8 +357,16 @@ app.whenReady().then(() => {
     // users :
     ipcMain.on('get-users', getUsers);
     ipcMain.on('add-user', addUser);
+    ipcMain.on('del-user', delUser);
+    ipcMain.on('update-user', updateUser);
+    ipcMain.on('update-user-password', updateUserPassword);
+    // structures : 
+    ipcMain.on('get-structures-names', getStructuresNames);
+    ipcMain.on('get-structures-name-personnel', getStructuresNamePersonnel);
+    ipcMain.on('get-structures-conges', getStructuresConges);
     // set the App title
     ipcMain.on('set-title', handleSetTitle);
+    ipcMain.on('user-login', userLogin);
     createWindow();
 });
 

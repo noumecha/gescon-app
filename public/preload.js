@@ -1,15 +1,21 @@
 const { contextBridge, ipcRenderer } = require("electron");
 const dev = "Spaker the TMC";
-ipcRenderer.setMaxListeners(1000);
+ipcRenderer.setMaxListeners(2500);
 
 window.addEventListener('DOMContentLoaded', () => {
     console.log('Preload script loaded successfully!');
   });
 contextBridge.exposeInMainWorld("electronAPI", {
     devName: dev,
-    //addEleve: (req) => ipcRenderer.send('add-eleve', req),
+    // pour le login : 
+    userLogin: (username,password) => ipcRenderer.send('user-login', username, password),
+    loginSuccess: (callback) => ipcRenderer.on('login-success', callback),
+    loginFail: (callback) => ipcRenderer.on('login-fail', callback),
+    // pour la page d'acceuil
+    addEleve: (req) => ipcRenderer.send('add-eleve', req),
     requeteSQL: () => ipcRenderer.send('requete-sql'),
     recevoirResultats: (callback) => ipcRenderer.on('resultat-sql', callback),
+    // pour les test :
     setTitle: (title) => ipcRenderer.send('set-title', title),
     ping: () => ipcRenderer.invoke('ping'),
     // type conge : 
@@ -18,6 +24,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     getCongeType: () => ipcRenderer.send('get-conge-type'),
     retrieveCongeType: (callback) => ipcRenderer.on('all-conge-type', callback),
     // conge :  
+    getSpecificConge: (req) => ipcRenderer.send('get-specific-conge' , req),
+    retrieveSpecificConge: (callback) => ipcRenderer.on('all-specific-conge', callback),
     addConge: (req) => ipcRenderer.send('add-conge', req),
     congeAddedSuccess: (callback) => ipcRenderer.on('conge-added-success', callback),    
     getConge: () => ipcRenderer.send('get-conge'),
@@ -81,7 +89,21 @@ contextBridge.exposeInMainWorld("electronAPI", {
     updatePersonnel: (req) => ipcRenderer.send('update-personnel', req),
     // for users : 
     userAddedSuccess: (callback) => ipcRenderer.on('user-added-success', callback),
-    addUsers: (req) => ipcRenderer.send('add-user', req),
+    userDeletedSuccess: (callback) => ipcRenderer.on('user-deleted-success', callback),
+    userUpdatedSuccess: (callback) => ipcRenderer.on('user-updated-success', callback),
+    userPasswordUpdatedSuccess: (callback) => ipcRenderer.on('user-password-updated-success', callback),
+    addUser: (req) => ipcRenderer.send('add-user', req),
+    delUser: (r) => ipcRenderer.send('del-user', r),
+    updateUser: (r) => ipcRenderer.send('update-user', r),
+    updateUserPassword: (r) => ipcRenderer.send('update-user-password', r),
     getUsers: () => ipcRenderer.send('get-users'),
     retrieveUsers: (callback) => ipcRenderer.on('all-users', callback),
+    // for strucutres : 
+    getStructuresNames: () => ipcRenderer.send('get-structures-names'),
+    retrieveStructuresNames: (callback) => ipcRenderer.on('all-structures-names', callback),
+    getStructuresNamePersonnel: (req) => ipcRenderer.send('get-structures-name-personnel', req),
+    getStructuresNamePersonnelSuccess: (callback) => ipcRenderer.on('get-structures-name-personnel-success', callback),
+    getStructuresConges: (req) => ipcRenderer.send('get-structures-conges', req),
+    retrieveStructuresConges: (callback) => ipcRenderer.on('structures-conges', callback),
+
 });
