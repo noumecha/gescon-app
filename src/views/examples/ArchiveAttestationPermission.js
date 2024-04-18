@@ -25,22 +25,17 @@ const ArchiveAttestationPermission = () => {
     const [pageNumber, setPageNumber] = useState(0);
     const [perPage] = useState(100);
     const [search, setSearch] = useState("");
-    const [filter, setFilter] = useState("");
     const pageCount = Math.ceil(archive_permission.length/perPage);
     const offset = pageNumber * perPage;
     const [deleteArchive, setDeleteArchive] = useState("");
 
-    const filterArchivePermission = filter !== "" || search !== ""
-    ? archive_permission.filter(attestation_conge => archive_permission.statut_permission === filter && (
+    const filterArchivePermission = search !== ""
+    ? archive_permission.filter(attestation_conge => (
         archive_permission.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) || archive_permission.matricule_personnel.toLowerCase().includes(search.toLowerCase())
     ))
     : archive_permission
 
     /** some useful functions */
-
-    const handleFilterChange = (e) => {
-        setFilter(e.target.value);
-    }
 
     const handleSearch = (e) => {
         setSearch(e.target.value);
@@ -53,7 +48,7 @@ const ArchiveAttestationPermission = () => {
     const handleArchiveDelete = (arch) => {
         console.log(arch);
         const req = `DELETE FROM archive_att_permission WHERE id_arch_att_permission  = ${arch.id_arch_att_permission}`;
-        const req_conge = `UPDATE permission SET statut_permission ="non archivé" WHERE id_permission = ${arch.id_permission}`;
+        const req_conge = `UPDATE permission SET statut_attestation_permission ="non archivé" WHERE id_permission = ${arch.id_permission}`;
         window.electronAPI.deleteArchiveAttPermission(req);
         window.electronAPI.deleteArchiveAttPermissionSuccess(() => {
             setDeleteArchive("Archive Supprimser avec succès");
@@ -92,20 +87,6 @@ const ArchiveAttestationPermission = () => {
         {/* Page content */}
         <Container className="mt--7" fluid>
             {/* Table */}
-            <Row>
-                <Col lg="12">
-                    <Input
-                        type="select"
-                        className="form-control"
-                        onChange={handleFilterChange}
-                        value={filter}
-                    >
-                        <option value="">Tout les statut</option>
-                        <option value="archivé">archivé</option>
-                        <option value="non archivé">non archivé</option>
-                    </Input>
-                </Col>
-            </Row>
             <Row>
                 <Col md="12">
                     <div className="form-group custom-form">

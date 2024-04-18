@@ -51,6 +51,12 @@ function addPersonnel(event, req) {
         event.sender.send('personnel-added-success', { message: 'Personnel ajouté avec succès !' });
     });
 }
+function getSpecificPersonnel(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('specific-personnel', res);
+    })
+}
 function getPersonnel(event, arg) {
     pool.query('SELECT * FROM Personnel', (err, res) => {
         if (err) throw err;
@@ -101,9 +107,16 @@ function getConge(event, req) {
 }
 
 function getAttestationConge(even, req) {
-    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_conge,statut_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel', (err, res) => {
+    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_conge,statut_attestation_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel', (err, res) => {
         if (err) throw err;
         even.sender.send('all-attestation-conge', res);
+    });
+}
+
+function getSpecificConge(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-specific-conge', res);
     });
 }
 
@@ -151,7 +164,7 @@ function getPermission(event, req) {
 }
 
 function getAttestationPermission(even, req) {
-    pool.query('SELECT id_permission,nom_prenom_personnel,matricule_personnel,attestation_permission,statut_permission FROM permission,personnel WHERE permission.id_personnel = personnel.id_personnel', (err, res) => {
+    pool.query('SELECT id_permission,nom_prenom_personnel,matricule_personnel,attestation_permission,statut_permission,statut_attestation_permission FROM permission,personnel WHERE permission.id_personnel = personnel.id_personnel', (err, res) => {
         if (err) throw err;
         even.sender.send('all-attestation-permission', res);
     });
@@ -241,11 +254,29 @@ function addUser(event, req) {
         event.sender.send('user-added-success', { message: 'Utilisateur ajouté avec succès!' });
     })
 }
-
+function delUser(event, r) {
+    pool.query(r, (err, res) => {
+        if (err) throw err;
+        event.sender.send('user-deleted-success', { message: 'Utilisateur ajouté avec succès!' });
+    })
+}
 function getUsers(event, req) {
-    pool.query('SELECT * FROM utilisateur WHERE', (err, res) => {
+    pool.query('SELECT * FROM utilisateur', (err, res) => {
         if (err) throw err;
         event.sender.send('all-users', res);
+    })
+}
+function updateUser(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('user-updated-success', res);
+    })
+}
+
+function updateUserPassword(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('user-password-updated-success', { message: 'Utilisateur ajouté avec succès!' });
     })
 }
 
@@ -253,17 +284,24 @@ function getUsers(event, req) {
  * In this following code is the main 
  * code when the app is started
  */
+function userLogin (event, {username, password}) {
+    pool.query('SELECT * FROM utilisateur', (err, results) => {
+        if (err) throw err;
+        event.sender.send('login-success', results);
+    });
+}
 app.whenReady().then(() => {
     ipcMain.handle('ping', () => 'pong!');
     // personnel datas get
     ipcMain.on('requete-sql', (event, arg) => {
         pool.query('SELECT * FROM personnel', (err, results) => {
             if (err) throw err;
-            event.sender.send('resultat-sql', JSON.stringify(results));
+            event.sender.send('resultat-sql', results);
         });
     });
     ipcMain.on('add-personnel', addPersonnel);
     ipcMain.on('get-personnel', getPersonnel);
+    ipcMain.on('get-specific-personnel', getSpecificPersonnel);
     ipcMain.on('update-personnel', updatePersonnel);
     // decision
     ipcMain.on('get-decision', getDecision);
@@ -275,6 +313,7 @@ app.whenReady().then(() => {
     ipcMain.on('add-conge-type', addCongeType);
     ipcMain.on('get-specific-conge-type', getSpecificCongeType);
     // conge  
+    ipcMain.on('get-specific-conge', getSpecificConge);
     ipcMain.on('get-conge', getConge);
     ipcMain.on('add-archive-attestation-conge', addArchiveAttestationConge)
     ipcMain.on('update-conge', updateConge);
@@ -297,8 +336,12 @@ app.whenReady().then(() => {
     // users :
     ipcMain.on('get-users', getUsers);
     ipcMain.on('add-user', addUser);
+    ipcMain.on('del-user', delUser);
+    ipcMain.on('update-user', updateUser);
+    ipcMain.on('update-user-password', updateUserPassword);
     // set the App title
     ipcMain.on('set-title', handleSetTitle);
+    ipcMain.on('user-login', userLogin);
     createWindow();
 });
 

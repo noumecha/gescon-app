@@ -11,26 +11,26 @@ import { AuthProvider } from "services/AuthContext";
 
 import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
+import Profile from "views/examples/Profile";
 import { useAuth } from "services/AuthContext";
 
 function App() {
 
   const { isLoggedIn } = useAuth();
+  const { user } = useAuth();
 
   return (
     <HashRouter>
       <Routes>
-        <Route path="/admin/*" element={ isLoggedIn ? <AdminLayout /> : <Navigate to="/auth/login"/>} />
-        <Route path="/auth/*" element={ isLoggedIn ? <Navigate to="/admin/index"/> : <AuthLayout />} />
-        <Route path="/register" element={ isLoggedIn ? <Navigate to="/auth/register"/> : <AuthLayout />} />
-        {<Route path="*" element={ isLoggedIn ? <Navigate to="/admin/index" /> : <Navigate to="/auth/login"/>} />}
+        <Route path="/admin/*" element={ isLoggedIn ? <AdminLayout user={user}/> : <Navigate to="/auth/login"/>} />
+        <Route path="/auth/*" element={ isLoggedIn ? <Navigate to="/admin/index" state={user}/> : <AuthLayout />} />
+        <Route path="/register" element={ isLoggedIn ? <Navigate to="/auth/register" state={user}/> : <AuthLayout />} />
+        {<Route path="*" element={ isLoggedIn ? <Navigate to="/admin/index" state={user} /> : <Navigate to="/auth/login"/>} />}
       </Routes>
     </HashRouter>
   );
 }
 
-//root.render(<App />);
-//render the app
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <AuthProvider>

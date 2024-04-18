@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 // reactstrap components
 import { Card, CardBody, CardTitle, Container, Row, Col } from "reactstrap";
 import { useState, useEffect } from "react";
@@ -22,12 +21,9 @@ const Header = () => {
   useEffect(() => {
     const func = async () => {
         try {
-            /*window.electronAPI.getDemandeConge();
-            await window.electronAPI.retrieveDemandeConge((event, res) => {
-              setDemande(res);
-            })*/
-            window.electronAPI.getConge();
-            await window.electronAPI.retrieveConge((event, res) => {
+            const req_get = `SELECT * FROM personnel WHERE statut_personnel = "en congé"`;
+            window.electronAPI.getSpecificPersonnel(req_get);
+            await window.electronAPI.retrieveSpecificPersonnel((event, res) => {
               setConge(res);
             })
             window.electronAPI.getPersonnel();
@@ -61,7 +57,7 @@ const Header = () => {
                           Personnel
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
-                          {nberPersonnel ? nberPersonnel : "" }
+                          {nberPersonnel ? nberPersonnel : "0" }
                         </span>
                       </div>
                       <Col className="col-auto">
@@ -108,7 +104,7 @@ const Header = () => {
                         >
                           Performance
                         </CardTitle>
-                        <span className="h2 font-weight-bold mb-0"> {perf}%</span>
+                        <span className="h2 font-weight-bold mb-0"> {nberPersonnel ? perf : 0}%</span>
                       </div>
                       <Col className="col-auto">
                         <div className="icon icon-shape bg-info text-white rounded-circle shadow">

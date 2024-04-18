@@ -1,14 +1,21 @@
 const { contextBridge, ipcRenderer } = require("electron");
 const dev = "Spaker the TMC";
+ipcRenderer.setMaxListeners(2500);
 
 window.addEventListener('DOMContentLoaded', () => {
     console.log('Preload script loaded successfully!');
   });
 contextBridge.exposeInMainWorld("electronAPI", {
     devName: dev,
-    //addEleve: (req) => ipcRenderer.send('add-eleve', req),
+    // pour le login : 
+    userLogin: (username,password) => ipcRenderer.send('user-login', username, password),
+    loginSuccess: (callback) => ipcRenderer.on('login-success', callback),
+    loginFail: (callback) => ipcRenderer.on('login-fail', callback),
+    // pour la page d'acceuil
+    addEleve: (req) => ipcRenderer.send('add-eleve', req),
     requeteSQL: () => ipcRenderer.send('requete-sql'),
     recevoirResultats: (callback) => ipcRenderer.on('resultat-sql', callback),
+    // pour les test :
     setTitle: (title) => ipcRenderer.send('set-title', title),
     ping: () => ipcRenderer.invoke('ping'),
     // type conge : 
@@ -16,14 +23,16 @@ contextBridge.exposeInMainWorld("electronAPI", {
     addCongeType: (req) => ipcRenderer.send('add-conge-type', req),
     getCongeType: () => ipcRenderer.send('get-conge-type'),
     retrieveCongeType: (callback) => ipcRenderer.on('all-conge-type', callback),
-    // conge : 
-    congeAddedSuccess: (callback) => ipcRenderer.on('conge-added-success', callback),
+    // conge :  
+    getSpecificConge: (req) => ipcRenderer.send('get-specific-conge' , req),
+    retrieveSpecificConge: (callback) => ipcRenderer.on('all-specific-conge', callback),
     addConge: (req) => ipcRenderer.send('add-conge', req),
+    congeAddedSuccess: (callback) => ipcRenderer.on('conge-added-success', callback),    
     getConge: () => ipcRenderer.send('get-conge'),
     retrieveConge: (callback) => ipcRenderer.on('all-conge', callback),
     getAttestationConge: () => ipcRenderer.send('get-attestation-conge'),
     retrieveAttestationConge: (callback) => ipcRenderer.on('all-attestation-conge', callback),
-    addArchiveAttestaetionCong: (req) => ipcRenderer.send('add-archive-attestation-conge' , req),
+    addArchiveAttestationConge: (req) => ipcRenderer.send('add-archive-attestation-conge' , req),
     addArchiveAttCongeSuccess: (callback) => ipcRenderer.on('attestation-conge-added-success', callback),
     updateConge: (req) => ipcRenderer.send('update-conge' , req),
     updateCongeSuccess: (callback) => ipcRenderer.on('update-conge-success', callback),
@@ -70,6 +79,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     getDocument: () => ipcRenderer.send('get-document'),
     retrieveDocument: (callback) => ipcRenderer.on('all-document', callback),
     // personnel : 
+    getSpecificPersonnel: (req) => ipcRenderer.send('get-specific-personnel', req),
+    retrieveSpecificPersonnel: (callback) => ipcRenderer.on('specific-personnel', callback),
     personnelAddedSuccess: (callback) => ipcRenderer.on('personnel-added-success', callback),
     addPersonnel : (req) => ipcRenderer.send('add-personnel', req),// to add personnel in the db
     getPersonnel: () => ipcRenderer.send('get-personnel'), // execute select all personnel
@@ -78,7 +89,13 @@ contextBridge.exposeInMainWorld("electronAPI", {
     updatePersonnel: (req) => ipcRenderer.send('update-personnel', req),
     // for users : 
     userAddedSuccess: (callback) => ipcRenderer.on('user-added-success', callback),
-    addUsers: (req) => ipcRenderer.send('add-user', req),
+    userDeletedSuccess: (callback) => ipcRenderer.on('user-deleted-success', callback),
+    userUpdatedSuccess: (callback) => ipcRenderer.on('user-updated-success', callback),
+    userPasswordUpdatedSuccess: (callback) => ipcRenderer.on('user-password-updated-success', callback),
+    addUser: (req) => ipcRenderer.send('add-user', req),
+    delUser: (r) => ipcRenderer.send('del-user', r),
+    updateUser: (r) => ipcRenderer.send('update-user', r),
+    updateUserPassword: (r) => ipcRenderer.send('update-user-password', r),
     getUsers: () => ipcRenderer.send('get-users'),
     retrieveUsers: (callback) => ipcRenderer.on('all-users', callback),
 });

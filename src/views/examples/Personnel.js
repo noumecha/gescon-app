@@ -90,7 +90,8 @@ const Personnel = () => {
             for (let i = 0; i < excelData.length; i++) {
                 const type = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 1 : 2;
                 const statut = "en poste"; // en permission, en congé
-                const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
+                //const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
+                const nb_jours_conges = 0;
                 const nb_jours_permission = 0;
                 const req = `
                 INSERT INTO personnel 
@@ -121,8 +122,6 @@ const Personnel = () => {
             try {
                 window.electronAPI.getPersonnel();
                 await window.electronAPI.receivePersonnel((event, res) => {
-                    //console.log("pers event : " + JSON.stringify(event));
-                    //console.log("pers res : " + JSON.stringify(res));
                     setPersonnel(res);
                 })
             } catch (error) {
@@ -139,17 +138,14 @@ const Personnel = () => {
         setPageNumber(selected);
     }
 
-    /** for the filter and the search bar */
+    const handlePagePrev = () => {
+        setPageNumber(pageCount <= 1 || pageNumber === 0? pageNumber : pageNumber - 1);
+    }
+    const handlePageNext = () => {
+        setPageNumber(pageCount <= 1 || pageCount === pageNumber + 1 ? pageNumber : pageNumber + 1);
+    }
 
-    /*const filterPersonnel = personnel.filter(personnel => 
-        (filter !== "" || search !== "" || status !== "") 
-        && personnel.categorie_personnel.includes(filter) 
-        && (
-            personnel.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
-            || personnel.matricule_personnel.toLowerCase().includes(search.toLowerCase())
-        )
-        && personnel.statut_personnel.includes(status)
-    );*/
+    /** for the filter and the search bar */
 
     const filterPersonnel = filter !== "" || search !== "" || status !== ""
         ? personnel.filter(personnel => personnel.categorie_personnel.includes(filter) && (
@@ -172,19 +168,16 @@ const Personnel = () => {
 
     /** for the current selected personnle page */
     const handleCongeClick = (person) => {
-        console.log("person selected", person);
         navigate("/admin/conges", {state: {selectedPerson: person}});
         setSelectedPerson(person);
     }
 
     const handleDetailClick = (person) => {
-        console.log("personnel details :", person);
         navigate("/admin/personnel-details", {state: {selectedPerson: person}});
         setSelectedPerson(person);
     }
 
     const handlePermissionClick = (person) => {
-        console.log("person selected", person);
         navigate("/admin/permission", {state: {selectedPerson: person}});
         setSelectedPerson(person);
     }
@@ -205,7 +198,7 @@ const Personnel = () => {
             </Row>
             {/* Table */}
             <Row>
-                <div className="col p-0">
+                <Col lg="12">
                     <form className="form-group custom-form" onSubmit={handleFileSubmit}>
                         <input type="file" className="form-control" required onChange={handleFile}/>
                         <button type="submit" className="mt-3 btn btn-primary btn-md">Importer le fichier</button>
@@ -215,7 +208,7 @@ const Personnel = () => {
                             </div>
                         )}
                     </form>
-                </div>
+                </Col>
             </Row>
             <Row>
                 <Col lg="12">
@@ -369,34 +362,16 @@ const Personnel = () => {
                                                             <i className="fas fa-ellipsis-v" />
                                                         </DropdownToggle>
                                                         <DropdownMenu className="dropdown-menu-arrow" right>
-                                                            {person.statut_personnel === "en congé" 
-                                                                ? 
-                                                                <DropdownItem
-                                                                    onClick={() => handleCongeClick(person)}
-                                                                >
-                                                                    Prolongé le congé
-                                                                </DropdownItem> 
-                                                                : 
-                                                                <DropdownItem
-                                                                    onClick={() => handleCongeClick(person)}
-                                                                >
-                                                                    Nouveau congé
-                                                                </DropdownItem>
-                                                            }
-                                                            {person.statut_personnel === "en permission" 
-                                                                ? 
-                                                                <DropdownItem
-                                                                    onClick={() => handlePermissionClick(person)}
-                                                                >
-                                                                    Prolongé la permission
-                                                                </DropdownItem>
-                                                                : 
-                                                                <DropdownItem
-                                                                    onClick={() => handlePermissionClick(person)}
-                                                                >
-                                                                    Nouvelle permission
-                                                                </DropdownItem>
-                                                            }
+                                                            <DropdownItem
+                                                                onClick={() => handleCongeClick(person)}
+                                                            >
+                                                                Nouveau congé
+                                                            </DropdownItem>
+                                                            <DropdownItem
+                                                                onClick={() => handlePermissionClick(person)}
+                                                            >
+                                                                Nouvelle permission
+                                                            </DropdownItem>
                                                             <DropdownItem
                                                                 onClick={() => handleDetailClick(person)}
                                                             >
@@ -422,13 +397,22 @@ const Personnel = () => {
                     )}
                 </div>
             </Row>
-            <Row className="m-0">
-                <CardFooter className="py-4">
-                    <nav aria-label="...">
+            <Row className="m-0 justify-content-center">
+                <CardFooter className="py-3 d-flex" >
+                    <nav className="ligna-items-center" aria-label="...">
                         <Pagination
-                            className="pagination justify-content-center"
-                            listClassName="justify-content-center"
+                          className="pagination justify-content-center"
+                          listClassName="justify-content-center"
                         >
+                          <PaginationItem>
+                            <PaginationLink
+                              onClick={() => handlePagePrev()}
+                              tabIndex="-1"
+                            >
+                              <i className="fas fa-angle-left" />
+                              <span className="sr-only">Previous</span>
+                            </PaginationLink>
+                          </PaginationItem>
                             {Array.from({length: pageCount}, (_, i) => (
                                 <PaginationItem key={i} active={i === pageNumber}>
                                     <PaginationLink onClick={() => handlePageChange({selected: i})}>
@@ -436,6 +420,14 @@ const Personnel = () => {
                                     </PaginationLink>
                                 </PaginationItem>
                             ))}
+                          <PaginationItem>
+                            <PaginationLink
+                              onClick={() => handlePageNext()}
+                            >
+                              <i className="fas fa-angle-right" />
+                              <span className="sr-only">Next</span>
+                            </PaginationLink>
+                          </PaginationItem>
                         </Pagination>
                     </nav>
                 </CardFooter>

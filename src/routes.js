@@ -2,11 +2,9 @@ import Index from "views/Index.js";
 import Profile from "views/examples/Profile.js";
 import Register from "views/examples/Register.js";
 import Login from "views/examples/Login.js";
-//import Tables from "views/examples/Tables.js";
 import Conges from "views/examples/Conges.js";
 import Personnel from "views/examples/Personnel.js";
 import Decision from "views/examples/Decision.js";
-//import Icons from "views/examples/Icons.js";
 import Permission from "views/examples/Permission";
 import AttestationConge from "views/examples/AttestationConge";
 import AttestationPermission from "views/examples/AttestationPermission";
@@ -14,6 +12,13 @@ import FichePersonnel from "views/examples/FichePersonnel";
 import ArchiveAttestationConge from "views/examples/ArchiveAttestationConge";
 import ArchiveAttestationPermission from "views/examples/ArchiveAttestationPermission";
 import PersonnelDetails from "views/examples/PersonnelDetails";
+import StructureStats from "views/examples/StructureStats";
+import AttestationRepPermission from "views/examples/AttestationRepPermission";
+import AttestationRepConge from "views/examples/AttestationRepConge";
+import ArchiveAttestationRepPermission from "views/examples/ArchiveAttestationRepPermission";
+import ArchiveAttestationRepConge from "views/examples/ArchiveAttestationRepConge";
+//import Tables from "views/examples/Tables";
+//import Icons from "views/examples/Icons";
 
 var routes = [
   {
@@ -87,6 +92,27 @@ var routes = [
     layout: "/admin",
   },
   {
+    path: "/structures",
+    name: "Structures",
+    icon: "ni ni-building text-blue",
+    component: <StructureStats />,
+    layout: "/admin",
+  },
+   /*{
+    path: "/tables",
+    name: "Tables",
+    icon: "ni ni-ruler-pencil text-blue",
+    component: <Tables />,
+    layout: "/admin",
+  },
+ {
+    path: "/icons",
+    name: "Structures",
+    icon: "ni ni-ruler-pencil text-blue",
+    component: <Icons />,
+    layout: "/admin",
+},*/
+  {
     path: "/decision",
     name: "Decisions",
     icon: "ni ni-ruler-pencil text-blue",
@@ -94,10 +120,38 @@ var routes = [
     layout: "/admin",
   },
   {
+    path: "/attestation_rep_permissions",
+    name: "Attestations reprise permissions",
+    icon: "ni ni-paper-diploma text-blue",
+    component: <AttestationRepPermission />,
+    layout: "/admin",
+  },
+  {
+    path: "/archive_att_rep_permissions",
+    name: "Attestation Reprise Permisions Archivées",
+    icon: "ni ni-archive-2 text-blue",
+    component: <ArchiveAttestationRepPermission />,
+    layout: "/admin",
+  },
+  {
+    path: "/attestation_rep_conges",
+    name: "Attestations reprise congés",
+    icon: "ni ni-paper-diploma text-blue",
+    component: <AttestationRepConge />,
+    layout: "/admin",
+  },
+  {
+    path: "/archive_att_rep_conges",
+    name: "Attestation Reprise Congés Archivées",
+    icon: "ni ni-archive-2 text-blue",
+    component: <ArchiveAttestationRepConge />,
+    layout: "/admin",
+  },
+  {
     path: "/user-profile",
     name: "Profile",
     icon: "ni ni-single-02 text-blue",
-    component: <Profile />,
+    component: <Profile name="ivan"/>,
     layout: "/admin",
   },
   {

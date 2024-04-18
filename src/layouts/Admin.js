@@ -24,7 +24,7 @@ const Admin = (props) => {
     return routes.map((prop, key) => {
       if (prop.layout === "/admin") {
         return (
-          <Route path={prop.path} element={prop.component} key={key} exact />
+          <Route path={prop.path} element={prop.component} key={key} user={props.user} exact />
         );
       } else {
         return null;
@@ -59,6 +59,7 @@ const Admin = (props) => {
         <AdminNavbar
           {...props}
           brandText={getBrandText(props?.location?.pathname)}
+          user={props.user}
         />
         <Routes>
           {getRoutes(routes)}
