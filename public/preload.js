@@ -98,4 +98,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
     updateUserPassword: (r) => ipcRenderer.send('update-user-password', r),
     getUsers: () => ipcRenderer.send('get-users'),
     retrieveUsers: (callback) => ipcRenderer.on('all-users', callback),
+    // for strucutres : 
+    getStructuresNames: () => ipcRenderer.send('get-structures-names'),
+    retrieveStructuresNames: (callback) => ipcRenderer.on('all-structures-names', callback),
+    getStructuresNamePersonnel: (req) => ipcRenderer.send('get-structures-name-personnel', req),
+    getStructuresNamePersonnelSuccess: (callback) => ipcRenderer.on('get-structures-name-personnel-success', callback),
+    getStructuresConges: (req) => ipcRenderer.send('get-structures-conges', req),
+    retrieveStructuresConges: (callback) => ipcRenderer.on('structures-conges', callback),
+
 });
