@@ -21,7 +21,7 @@ import { useState, useEffect } from "react";
 
 const ArchiveAttestationRepPermission = () => {
 
-    const [archive_rep_permission, setArchiveRepPermission] = useState([]);
+    /*const [archive_rep_permission, setArchiveRepPermission] = useState([]);
     const [pageNumber, setPageNumber] = useState(0);
     const [perPage] = useState(100);
     const [search, setSearch] = useState("");
@@ -35,7 +35,7 @@ const ArchiveAttestationRepPermission = () => {
     ))
     : archive_rep_permission
 
-    /** some useful functions */
+    /** some useful functions 
 
     const handleSearch = (e) => {
         setSearch(e.target.value);
@@ -65,7 +65,7 @@ const ArchiveAttestationRepPermission = () => {
         });
     }
 
-    /** useeffect for common function and fetching */
+    /** useeffect for common function and fetching 
     useEffect(() => {
         const func = async () => {
             try {
@@ -84,9 +84,9 @@ const ArchiveAttestationRepPermission = () => {
     return (
         <>
         <Header />
-        {/* Page content */}
+        {/* Page content }
         <Container className="mt--7" fluid>
-            {/* Table */}
+            {/* Table }
             <Row>
                 <Col md="12">
                     <div className="form-group custom-form">
@@ -198,6 +198,22 @@ const ArchiveAttestationRepPermission = () => {
                         </Pagination>
                     </nav>
                 </CardFooter>
+            </Row>
+        </Container>
+      </>
+    );*/    
+    return (
+        <>
+        <Header />
+        {/* Page content */}
+        <Container className="mt--7" fluid>
+            {/* Table */}
+            <Row>
+                <div className="col">
+                    <div className="mt-3 alert alert-success" role="alert">
+                        Page des FichePersonnels
+                    </div>
+                </div>
             </Row>
         </Container>
       </>
