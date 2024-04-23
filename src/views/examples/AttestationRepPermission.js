@@ -33,7 +33,7 @@ import ReprisePermissionDoc from "documents/ReprisePermissionDoc";
 
 const AttestationRepPermission = () => {
 
-    const [attestation_rep_permission, setAttestationPermission] = useState([]);
+    /*const [attestation_rep_permission, setAttestationPermission] = useState([]);
     const [pageNumber, setPageNumber] = useState(0);
     const [perPage] = useState(100);
     const [filter, setFilter] = useState("");
@@ -100,14 +100,14 @@ const AttestationRepPermission = () => {
         setSearch(e.target.value);
     }    
 
-    /** for the pagination */
+    /** for the pagination
     const pageCount = Math.ceil(attestation_rep_permission.length/perPage);
     const offset = pageNumber * perPage;
     const handlePageChange = ({selected}) => {
         setPageNumber(selected);
     }
 
-    /** Filter */
+    /** Filter
 
     const filterAttestation = filter !== "" || search !== ""
     ? attestation_rep_permission.filter(attestation_rep_permission => attestation_rep_permission.statut_attestation_rep_permission === filter && (
@@ -115,7 +115,7 @@ const AttestationRepPermission = () => {
     ))
     : attestation_rep_permission
 
-    /** useeffect for common function and fetching */
+    /** useeffect for common function and fetching
     useEffect(() => {
         const func = async () => {
             try {
@@ -136,7 +136,7 @@ const AttestationRepPermission = () => {
     return (
         <>
         <Header />
-        {/* Page content */}
+        {/* Page content }
         <Container className="mt--7" fluid> 
             <Row>
                 <Col lg="12">
@@ -165,7 +165,7 @@ const AttestationRepPermission = () => {
                     </div>
                 </Col>
             </Row>
-            {/* Table */}
+            {/* Table }
             <Row>
                 <div className="col p-0">
                     {attestation_rep_permission && attestation_rep_permission.length > 0 ? (
@@ -280,7 +280,7 @@ const AttestationRepPermission = () => {
                                                                                             onClick={() => saveArchive(modalData)}
                                                                                             /*onClick={() => {
                                                                                                 console.log("current archive : " + att_perm.nom_prenom_personnel)
-                                                                                            }}*/
+                                                                                            }}
                                                                                         >
                                                                                             Archiver
                                                                                         </Button>
@@ -354,6 +354,22 @@ const AttestationRepPermission = () => {
             </Row>
         </Container>
     </>
+    );*/
+    return (
+        <>
+        <Header />
+        {/* Page content */}
+        <Container className="mt--7" fluid>
+            {/* Table */}
+            <Row>
+                <div className="col">
+                    <div className="mt-3 alert alert-success" role="alert">
+                        Page des FichePersonnels
+                    </div>
+                </div>
+            </Row>
+        </Container>
+      </>
     );
 }
 
