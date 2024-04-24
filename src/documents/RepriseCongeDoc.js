@@ -284,7 +284,7 @@ const RepriseCongeDoc = (props) => {
                     <Text style={styles.pCertifText}>
                         Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
                         {props.type} d'Administration, Matricule {props.matricule}, {props.poste} (au/à la) {props.structure},bénéficiaire
-                        d'un {props.typeConge} de {props.duration} jours , accordé par décision N° {props.decision} {/*du DATE_DEC*/} du Ministre des Finances,
+                        d'un {props.typeConge} de {props.duration} jours , accordé par décision N° {props.decision} du Ministre des Finances,
                         allant du {props.startDate} au {props.endDate} a effectivement repris le service le {props.repriseDate} à 7 heures 30 précises.
                     </Text>
                     <Text style={styles.pCertifText}>
