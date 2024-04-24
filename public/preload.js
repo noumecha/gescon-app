@@ -30,25 +30,40 @@ contextBridge.exposeInMainWorld("electronAPI", {
     congeAddedSuccess: (callback) => ipcRenderer.on('conge-added-success', callback),    
     getConge: () => ipcRenderer.send('get-conge'),
     retrieveConge: (callback) => ipcRenderer.on('all-conge', callback),
+      // attestation congé
     getAttestationConge: () => ipcRenderer.send('get-attestation-conge'),
     retrieveAttestationConge: (callback) => ipcRenderer.on('all-attestation-conge', callback),
     addArchiveAttestationConge: (req) => ipcRenderer.send('add-archive-attestation-conge' , req),
     addArchiveAttCongeSuccess: (callback) => ipcRenderer.on('attestation-conge-added-success', callback),
+      // update congé
     updateConge: (req) => ipcRenderer.send('update-conge' , req),
     updateCongeSuccess: (callback) => ipcRenderer.on('update-conge-success', callback),
+      // archive attestation congé
     getArchiveAttConge: () => ipcRenderer.send('get-archive-att-conge'),
     retrieveArchiveAttConge: (callback) => ipcRenderer.on('all-archived-conge', callback),
     deleteArchiveAttConge: (req) => ipcRenderer.send('delete-archive-att-conge', req),
     deleteArchiveAttCongeSuccess: (callback) => ipcRenderer.on('delete-archive-att-conge-success', callback),
+      // attestation reprise congé : 
+    getAttestationRepConge: () => ipcRenderer.send('get-attestation-rep-conge'),
+    retrieveAttestationRepConge: (callback) => ipcRenderer.on('all-attestation-rep-conge', callback),
+    addArchiveAttestationRepConge: (req) => ipcRenderer.send('add-archive-attestation-rep-conge' , req),
+    addArchiveAttCongeRepSuccess: (callback) => ipcRenderer.on('attestation-rep-conge-added-success', callback),
+      // archive attestation reprise congé
+    getArchiveAttRepConge:() => ipcRenderer.send('get-archive-att-rep-conge'),
+    retrieveArchiveAttRepConge: (callback) => ipcRenderer.on('all-archive-att-rep-conge', callback),
+    deleteArchiveAttRepConge: (req) => ipcRenderer.send('delete-archive-att-rep-conge', req),
+    deleteArchiveAttRepCongeSuccess: (callback) => ipcRenderer.on('delete-archive-att-rep-conge-success', callback),
+      // get specific conge by req
     getSpecificCongeType: (arg) => ipcRenderer.send('get-specific-conge-type', arg),
     retrieveSpecificCongeType: (callback) => ipcRenderer.on('specific-conge-type', callback),
-    // permission : 
+    // permissions : 
     permissionAddedSuccess: (callback) => ipcRenderer.on('permission-added-success', callback),
     addPermission: (req) => ipcRenderer.send('add-permission', req),
     getPermission: () => ipcRenderer.send('get-permission'),
     retrievePermission: (callback) => ipcRenderer.on('all-permission', callback),
     getLastPermission: (req) => ipcRenderer.send('get-last-permission', req),
     retrieveLastPermission: (callback) => ipcRenderer.on('all-last-permission', callback),
+      // permission -> attestation permissions
     getAttestationPermission: () => ipcRenderer.send('get-attestation-permission'),
     retrieveAttestationPermission: (callback) => ipcRenderer.on('all-attestation-permission', callback),
     addArchiveAttestationPermission: (req) => ipcRenderer.send('add-archive-attestation-permission' , req),
@@ -59,6 +74,16 @@ contextBridge.exposeInMainWorld("electronAPI", {
     retrieveArchiveAttPermission: (callback) => ipcRenderer.on('all-archived-permission', callback),
     deleteArchiveAttPermission: (req) => ipcRenderer.send('delete-archive-att-permission', req),
     deleteArchiveAttPermissionSuccess: (callback) => ipcRenderer.on('delete-archive-att-permission-success', callback),
+      // permission -> attestation reprise permission : 
+    getAttestationRepPermission: () => ipcRenderer.send('get-attestation-rep-permission'),
+    retrieveAttestationRepPermission: (callback) => ipcRenderer.on('all-attestation-rep-permission', callback),
+    addArchiveAttestationRepPermission: (req) => ipcRenderer.send('add-archive-attestation-rep-permission' , req),
+    addArchiveAttPermissionRepSuccess: (callback) => ipcRenderer.on('attestation-rep-permission-added-success', callback),
+      // permission -> archive attestation reprise permission
+    getArchiveAttRepPermission:() => ipcRenderer.send('get-archive-att-rep-permission'),
+    retrieveArchiveAttRepPermission: (callback) => ipcRenderer.on('all-archive-att-rep-permission', callback),
+    deleteArchiveAttRepPermission: (req) => ipcRenderer.send('delete-archive-att-rep-permission', req),
+    deleteArchiveAttRepPermissionSuccess: (callback) => ipcRenderer.on('delete-archive-att-rep-permission-success', callback),
     // decision : 
     decisionAddedSuccess: (callback) => ipcRenderer.on('decision-added-success', callback),
     addDecision: (req) => ipcRenderer.send('add-decision', req),

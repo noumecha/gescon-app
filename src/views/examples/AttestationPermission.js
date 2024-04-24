@@ -43,6 +43,8 @@ const AttestationPermission = () => {
     const [errorArchive, setErrorArchive] = useState("");
     const [successArchive, setSuccessArchive] = useState("");
     const [archive, setArchive] = useState(null);
+    const [loadingSpinner, setLoadingSpinner] = useState(true);
+    const loadingText = "Aucune donnée dans la base de données";
 
     // usefull functions : 
 
@@ -116,22 +118,39 @@ const AttestationPermission = () => {
     : attestation_permission
 
     /** useeffect for common function and fetching */
-    useEffect(() => {
-        const func = async () => {
-            try {
-                window.electronAPI.getAttestationPermission();
-                await window.electronAPI.retrieveAttestationPermission((event, res) => {
-                    for (let index = 0; index < res.length; index++) {
-                        res[index].attestation_permission = JSON.parse(res[index].attestation_permission)                                                
-                    }
-                    setAttestationPermission(res);
-                })
-            } catch (error) {
-                console.error("Erreur : " + error.message);
-            }
+    const fetchDatas = async () => {
+        try {
+            window.electronAPI.getAttestationPermission();
+            await window.electronAPI.retrieveAttestationPermission((event, res) => {
+                for (let index = 0; index < res.length; index++) {
+                    res[index].attestation_permission = JSON.parse(res[index].attestation_permission)                                                
+                }
+                setAttestationPermission(res);
+                setTimeout(() => 
+                setLoadingSpinner(false)
+                , 3000);
+            })
+        } catch (error) {
+            console.error("Erreur : " + error.message);
         }
-        func();
+    }
+
+    useEffect(() => {
+        fetchDatas();
     }, []);
+
+    const handleRefresh = () => {
+        try {
+          setLoadingSpinner(true);
+          setTimeout(() => 
+          setLoadingSpinner(false)
+          , 3000);
+          fetchDatas();
+          console.log("datas refreshed successfully");
+        } catch (err) {
+          console.error("error on refresh : " + err.message);
+        }
+    }
 
     return (
         <>
@@ -168,11 +187,17 @@ const AttestationPermission = () => {
             {/* Table */}
             <Row>
                 <div className="col p-0">
-                    {attestation_permission && attestation_permission.length > 0 ? (
                         <div className="col">
                             <Card className="shadow">
-                                <CardHeader className="border-0">
+                                <CardHeader className="bg-white border-2 d-flex justify-content-center">
                                     <h3 className="mb-0 text-center">Listes des Attestations de Permission</h3>
+                                    <Button
+                                        size="sm"
+                                        className="ml-3"
+                                        onClick={() => handleRefresh()}
+                                    >
+                                        Actualiser
+                                    </Button>
                                 </CardHeader>
                                 <Table className="align-items-center table-flush" responsive>
                                     <thead className="thead-light">
@@ -184,8 +209,17 @@ const AttestationPermission = () => {
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        {filterAttestation.slice(offset, offset + perPage).map((att_perm, index) => (
+                                    <tbody>                                      
+                                        {loadingSpinner && (
+                                        <tr>
+                                            <td colSpan="7" className="text-center">
+                                            <div className="spinner-border" role="status">
+                                                <span className="sr-only">Loading...</span>
+                                            </div>
+                                            </td>
+                                        </tr>
+                                        )}
+                                        {filterAttestation && filterAttestation.length > 0 ? !loadingSpinner && (filterAttestation.slice(offset, offset + perPage).map((att_perm, index) => (
                                             <tr key={index}>
                                                 <td>{att_perm.matricule_personnel}</td>    
                                                 <td>{att_perm.nom_prenom_personnel}</td>
@@ -318,20 +352,18 @@ const AttestationPermission = () => {
                                                     </UncontrolledDropdown>
                                                 </td>
                                             </tr>
-                                        ))}
+                                        ))) :
+                                            !loadingSpinner && (
+                                                <tr>
+                                                    <td colSpan="7" className="text-center">
+                                                        {loadingText}
+                                                    </td>
+                                                </tr>
+                                        )}
                                     </tbody>
                                 </Table>
                             </Card>
                         </div>
-                    ) : (  
-                        <div className="col">  
-                            <Card className="shadow">
-                                <CardHeader className="border-0">
-                                    <h3 className="mb-0 text-center"> Aucune attestation dans la base de données </h3>
-                                </CardHeader>
-                            </Card>
-                        </div>
-                    )}
                 </div>
             </Row>
             <Row className="m-0">
