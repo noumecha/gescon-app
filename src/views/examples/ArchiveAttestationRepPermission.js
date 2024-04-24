@@ -15,27 +15,32 @@ import {
     Col,
     Alert,
     Input,
+    Button,
 } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import { useState, useEffect } from "react";
 
 const ArchiveAttestationRepPermission = () => {
 
-    /*const [archive_rep_permission, setArchiveRepPermission] = useState([]);
+    const [archiveAttRepPermission, setArchiveAttRepPermission] = useState([]);
     const [pageNumber, setPageNumber] = useState(0);
-    const [perPage] = useState(100);
     const [search, setSearch] = useState("");
-    const pageCount = Math.ceil(archive_rep_permission.length/perPage);
-    const offset = pageNumber * perPage;
     const [deleteArchive, setDeleteArchive] = useState("");
+    const [loadingSpinner, setLoadingSpinner] = useState(true);
+    const loadingText = "Aucune donnée dans la base de données";
 
-    const filterArchivePermission = search !== ""
-    ? archive_rep_permission.filter(attestation_conge => (
-        archive_rep_permission.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) || archive_rep_permission.matricule_personnel.toLowerCase().includes(search.toLowerCase())
+    const filterArchiveAttRepPermission = search !== ""
+    ? archiveAttRepPermission.filter(archive_att_conge => (
+        archive_att_conge.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) || archive_att_conge.matricule_personnel.toLowerCase().includes(search.toLowerCase())
     ))
-    : archive_rep_permission
+    : archiveAttRepPermission
 
-    /** some useful functions 
+    
+    const [perPage] = useState(100);
+    const pageCount = Math.ceil(archiveAttRepPermission ? archiveAttRepPermission.length/perPage : 0/perPage);
+    const offset = pageNumber * perPage;
+
+    /** some useful functions */
 
     const handleSearch = (e) => {
         setSearch(e.target.value);
@@ -46,49 +51,63 @@ const ArchiveAttestationRepPermission = () => {
     } 
 
     const handleArchiveDelete = (arch) => {
-        console.log(arch);
-        const req = `DELETE FROM archive_att_reprise_permission WHERE id_arch_att_rep_permission  = ${arch.id_arch_att_rep_permission}`;
-        const req_conge = `UPDATE permission SET statut_att_reprise_permission ="non archivé" WHERE id_permission = ${arch.id_permission}`;
-        window.electronAPI.deleteArchiveAttPermission(req);
-        window.electronAPI.deleteArchiveAttPermissionSuccess(() => {
+        const req = `DELETE FROM archive_att_reprise_permission WHERE id_arch_att_rep_permission = ${arch.id_arch_att_rep_permission}`;
+        const req_conge = `UPDATE permission SET statut_att_reprise_permission ="non archivé" WHERE id_permission = ${arch.id_arch_att_rep_permission}`;
+        window.electronAPI.deleteArchiveAttRepPermission(req);
+        window.electronAPI.deleteArchiveAttRepPermissionSuccess(() => {
             setDeleteArchive("Archive Supprimser avec succès");
             setTimeout(() => {
                 setDeleteArchive("");
-            }, 7000)
+            }, 3000)
         })
         window.electronAPI.updateConge(req_conge);
         window.electronAPI.updateCongeSuccess((event, res) => {
-            setDeleteArchive("permission mis à jour avec succès")
-            setTimeout(() => {
-                setDeleteArchive("");
-            }, 7000)
+            console.log("permission mis à jour avec succès");
         });
+        handleRefresh();
     }
 
-    /** useeffect for common function and fetching 
-    useEffect(() => {
-        const func = async () => {
-            try {
-                window.electronAPI.getArchiveAttPermission();
-                await window.electronAPI.retrieveArchiveAttPermission((event, res) => {
-                    console.log("archives : " + res);
-                    setArchiveRepPermission(res);
-                })
-            } catch (error) {
-                console.error("Erreur : " + error.message);
-            }
+    const fetchDatas = async () => {
+        try {
+            window.electronAPI.getArchiveAttRepPermission();
+            await window.electronAPI.retrieveArchiveAttRepPermission((event, res) => {
+                setArchiveAttRepPermission(res);
+                setTimeout(() => 
+                setLoadingSpinner(false)
+                , 3000);
+            })
+        } catch (error) {
+            console.error("Erreur : " + error.message);
         }
-        func();
+    }
+
+    /** useeffect for common function and fetching */
+    useEffect(() => {
+        fetchDatas();
     }, []);
+
+    const handleRefresh = () => {
+        try {
+          setLoadingSpinner(true);
+          setTimeout(() => 
+          setLoadingSpinner(false)
+          , 3000);
+          fetchDatas();
+          console.log("datas refreshed successfully");
+        } catch (err) {
+          console.error("error on refresh : " + err.message);
+        }
+    }
+
 
     return (
         <>
         <Header />
-        {/* Page content }
+        {/* Page content */}
         <Container className="mt--7" fluid>
-            {/* Table }
+            {/* Table */}
             <Row>
-                <Col md="12">
+                <Col lg="12" md="12">
                     <div className="form-group custom-form">
                         <Input
                             type="text"
@@ -99,23 +118,25 @@ const ArchiveAttestationRepPermission = () => {
                         />
                     </div>
                 </Col>
-            </Row>
-            <Row className="mt-3">
-                <Col>
+                <Col g="12" md="12">
                     { deleteArchive && (
                         <Alert color="success">
                             {deleteArchive}
                         </Alert>
                     )}                                                                                    
                 </Col>
-            </Row>
-            <Row>
-                <div className="col p-0">
-                    {archive_rep_permission && archive_rep_permission.length > 0 ? (
+                <Col className="p-0" lg="12" md="12">
                         <div className="col">
                             <Card className="shadow">
-                                <CardHeader className="border-0">
-                                    <h3 className="mb-0 text-center">Listes des Attestations de Permission Archivées</h3>
+                                <CardHeader className="bg-white border-2 d-flex justify-content-center">
+                                    <h3 className="mb-0 text-center">Listes des Attestations de Reprise après Permission Archivées</h3> 
+                                    <Button
+                                        size="sm"
+                                        className="ml-3"
+                                        onClick={() => handleRefresh()}
+                                    >
+                                        Actualiser
+                                    </Button>
                                 </CardHeader>
                                 <Table className="align-items-center table-flush" responsive>
                                     <thead className="thead-light">
@@ -127,8 +148,17 @@ const ArchiveAttestationRepPermission = () => {
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        {filterArchivePermission.slice(offset, offset + perPage).map((archive, index) => (
+                                    <tbody>                                        
+                                        {loadingSpinner && (
+                                        <tr>
+                                            <td colSpan="7" className="text-center">
+                                            <div className="spinner-border" role="status">
+                                                <span className="sr-only">Loading...</span>
+                                            </div>
+                                            </td>
+                                        </tr>
+                                        )}
+                                        {filterArchiveAttRepPermission && filterArchiveAttRepPermission.length > 0 ? !loadingSpinner &&  (filterArchiveAttRepPermission.slice(offset, offset + perPage).map((archive, index) => (
                                             <tr key={index}>
                                                 <td>{archive.matricule_personnel}</td>    
                                                 <td>{archive.nom_prenom_personnel}</td>
@@ -137,13 +167,13 @@ const ArchiveAttestationRepPermission = () => {
                                                         <a
                                                             color="success"
                                                             href={archive.fichier_arch_att_rep_permission}
-                                                            download={`archive_attestation_reprise_${archive.matricule_personnel}.jpg`}
+                                                            download={`archive_attestation_reprise_de_fonction_${archive.matricule_personnel}.jpg`}
                                                         >
                                                             Télécharger l'archive 
                                                         </a>
                                                     }
                                                 </td> 
-                                                <td>{archive.created_at_arch_att_permission.getFullYear() + "-" + (parseInt(archive.created_at_arch_permission.getMonth()+1) <= 9 ? "0"+parseInt(archive.created_at_arch_permission.getMonth()+1) : parseInt(archive.created_at_arch_permission.getMonth()+1)) + "-" + archive.created_at_arch_permission.getDate()}</td> 
+                                                <td>{archive.created_at_arch_att_rep_permission.getFullYear() + "-" + (parseInt(archive.created_at_arch_att_rep_permission.getMonth()+1) <= 9 ? "0"+parseInt(archive.created_at_arch_att_rep_permission.getMonth()+1) : parseInt(archive.created_at_arch_att_rep_permission.getMonth()+1)) + "-" + archive.created_at_arch_att_rep_permission.getDate()}</td> 
                                                 <td className="text-right">
                                                     <UncontrolledDropdown>
                                                         <DropdownToggle
@@ -165,21 +195,21 @@ const ArchiveAttestationRepPermission = () => {
                                                     </UncontrolledDropdown>
                                                 </td>
                                             </tr>
-                                        ))}
+                                        )))
+                                        : 
+                                            !loadingSpinner && (
+                                                <tr>
+                                                    <td colSpan="7" className="text-center">
+                                                        {loadingText}
+                                                    </td>
+                                                </tr>
+                                        )
+                                    }
                                     </tbody>
                                 </Table>
                             </Card>
                         </div>
-                    ) : (  
-                        <div className="col">  
-                            <Card className="shadow">
-                                <CardHeader className="border-0">
-                                    <h3 className="mb-0 text-center"> Aucune attestation archivée dans la base de données </h3>
-                                </CardHeader>
-                            </Card>
-                        </div>
-                    )}
-                </div>
+                </Col>
             </Row>
             <Row className="m-0">
                 <CardFooter className="py-4">
@@ -201,23 +231,8 @@ const ArchiveAttestationRepPermission = () => {
             </Row>
         </Container>
       </>
-    );*/    
-    return (
-        <>
-        <Header />
-        {/* Page content */}
-        <Container className="mt--7" fluid>
-            {/* Table */}
-            <Row>
-                <div className="col">
-                    <div className="mt-3 alert alert-success" role="alert">
-                        Page des FichePersonnels
-                    </div>
-                </div>
-            </Row>
-        </Container>
-      </>
     );
+
 }
 
 

@@ -78,7 +78,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     getAttestationRepPermission: () => ipcRenderer.send('get-attestation-rep-permission'),
     retrieveAttestationRepPermission: (callback) => ipcRenderer.on('all-attestation-rep-permission', callback),
     addArchiveAttestationRepPermission: (req) => ipcRenderer.send('add-archive-attestation-rep-permission' , req),
-    addArchiveAttCongePermissionSuccess: (callback) => ipcRenderer.on('attestation-rep-permission-added-success', callback),
+    addArchiveAttPermissionRepSuccess: (callback) => ipcRenderer.on('attestation-rep-permission-added-success', callback),
       // permission -> archive attestation reprise permission
     getArchiveAttRepPermission:() => ipcRenderer.send('get-archive-att-rep-permission'),
     retrieveArchiveAttRepPermission: (callback) => ipcRenderer.on('all-archive-att-rep-permission', callback),

@@ -53,7 +53,6 @@ const Permission = () => {
     const nb_jours_permission = selectedPerson ? selectedPerson.nb_jours_permission : 0;
     const [status, setStatus] = useState(nb_jours_permission >= 10 ? `les nouvelles permissions de ${sexe === 'M' ? 'M' : 'Mme'} ${name} seront détuites de ses jours de congés` : `${sexe === 'M' ? 'M' : 'Mme'} ${name} a encore ${10 - nb_jours_permission} ${10 - nb_jours_permission > 1 ? "jours" : "jour"} de ${10 - nb_jours_permission > 1 ? "permissions" : "permission"} ${10 - nb_jours_permission > 1 ? "disponibles" : "disponible"}`);
     const [visible, setVisible] = useState(true);
-    const [deleteSuccess, setDeleteSuccess] = useState("");
     const [search, setSearch] = useState("");
     const [statutFilter, setStatutFilter] = useState("");
     const [pageNumber, setPageNumber] = useState(0);
@@ -102,37 +101,6 @@ const Permission = () => {
         console.log("you want to edit the permission : ", p);
     }
 
-    const deletePermission = async (p) => {
-        const req_permission = `DELETE FROM permission WHERE id_permission = '${p.id_permission}'`; 
-        const statut = "en poste";
-        let req_personnel;
-        if (p.nb_jours_permission > 10) {
-            if (p.nb_jours_permission === 12) {
-                req_personnel = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${p.duree_permission}),nb_jours_conges = (nb_jours_conges - ${2}) WHERE id_personnel = ${p.id_personnel};`;
-            } else {
-                req_personnel = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${p.duree_permission}),nb_jours_conges = (nb_jours_conges - ${p.duree_permission}) WHERE id_personnel = ${p.id_personnel};`;
-            }
-        } else {
-            req_personnel = `UPDATE personnel SET statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${p.duree_permission})  WHERE id_personnel = ${p.id_personnel};`;
-        }
-        // (nb_jours_permission - ${p.duree_permission})
-        console.log(`${req_personnel}`);
-        window.electronAPI.addPermission(req_permission);
-        window.electronAPI.updatePersonnel(req_personnel);
-        setDeleteSuccess("permission supprimé avec succès");
-        setStatus(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
-        setTimeout(() => {
-            setError("");
-            setDeleteSuccess("");
-        },3000)
-        handleRefresh();
-        setLoadingSpinner(true);
-        setTimeout(() => 
-            setLoadingSpinner(false)
-        , 3000);
-        setActived(true);
-    }
-
     function firstDateOfMonth(d){
 		//var date = new Date();
         var y = d.getFullYear();
@@ -161,6 +129,43 @@ const Permission = () => {
     function nbDaysBetween(start, end) {
         return parseInt(Math.round((end.getTime() - start.getTime()) / (1000 * 3600 * 24)));
     }
+
+    
+  const saveAttestationRepPermission = async (p) => {
+    try {
+      p.attestation_permission = JSON.stringify(p.attestation_permission);
+      p.attestation_permission = JSON.parse(p.attestation_permission);
+      console.log(`we are goin to generate an attestation of reprise for conge ${JSON.stringify(p.attestation_permission)}`);
+      const attestation_reprise = {
+        name: p.attestation_permission.name,
+        matricule: p.attestation_permission.matricule,
+        sexe: p.attestation_permission.sexe,
+        poste: p.attestation_permission.poste, 
+        type: p.attestation_permission.type,
+        decision: p.attestation_permission.decision, 
+        duration: p.attestation_permission.duration,
+        structure: p.attestation_permission.structure,
+        startDate: p.attestation_permission.startDate,
+        endDate: p.attestation_permission.endDate,
+        repriseDate: p.attestation_permission.repriseDate,
+        typeConge: p.attestation_permission.typeConge,
+      }
+      const created_at_att_rep_permission = new Date().toISOString().slice(0,19).replace('T',' ');
+      const req = `UPDATE permission SET created_at_reprise_permission = "${created_at_att_rep_permission}",attestation_reprise_permission='${JSON.stringify(attestation_reprise)}',statut_att_reprise_permission="non archivé" WHERE ${p.id_permission}=permission.id_permission`; 
+      window.electronAPI.addArchiveAttestationRepPermission(req);
+      await window.electronAPI.addArchiveAttPermissionRepSuccess((event, res) => {
+        console.log("Attestation de reprise générer avec succès");
+      });
+      setSuccess("Attestation de reprise générer avec succès");
+      setStatus(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
+      setTimeout(() => {
+        setSuccess("");
+      }, 3000)
+      setActived(true);
+    } catch (error) {
+      console.error("Erreur saving congé : " + error.message);
+    }
+  }
 
     // calculate the end date from startdate and duration
     useEffect(() => {
@@ -328,7 +333,7 @@ const Permission = () => {
                 curr_date : new Date().toISOString().slice(0,19).replace('T',' '),
                 demande : demande,
                 document : document,
-                statut_permission : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en cours" : "pogrammé",
+                statut_permission : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en cours" : curr_date.toISOString().slice(0,19).replace('T',' ') >= endDate ? "terminé" : "pogrammé",
                 statut_attestation_permission : "non archivé"
               }
                 const req_permission = `INSERT INTO permission 
@@ -506,15 +511,6 @@ const Permission = () => {
                                 Actualiser
                             </Button>
                         </CardHeader>
-                        <Row>
-                            <Col lg="12">
-                                {deleteSuccess && 
-                                    <Alert className="text-center" color="success">
-                                        {deleteSuccess}
-                                    </Alert>
-                                }
-                            </Col>
-                        </Row>
                         <Table className="align-items-center table-flush" responsive>
                             <thead className="thead-light">
                                 <tr>
@@ -537,7 +533,7 @@ const Permission = () => {
                                         </td>
                                     </tr>
                                 )}
-                                {filterPermission.length > 0 ? !loadingSpinner && (filterPermission.slice(offset, offset + perPage).map((p, index) => (
+                                {filterPermission && filterPermission.length > 0 ? !loadingSpinner && (filterPermission.slice(offset, offset + perPage).map((p, index) => (
                                     <tr key={index}>
                                         <td>{p.matricule_personnel}</td>    
                                         <td>{p.nom_prenom_personnel}</td>    
@@ -579,9 +575,10 @@ const Permission = () => {
                                                         Modifier la permission
                                                     </DropdownItem>
                                                     <DropdownItem
-                                                        onClick={() => deletePermission(p)}
+                                                        onClick={() => saveAttestationRepPermission(p)}
+                                                        disabled={p.statut_permission === "terminé" ? false : true}
                                                     >
-                                                        Annuler la permission
+                                                        Générer l'attestation de reprise
                                                     </DropdownItem>
                                                 </DropdownMenu>
                                             </UncontrolledDropdown>

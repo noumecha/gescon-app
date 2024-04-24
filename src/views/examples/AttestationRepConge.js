@@ -43,7 +43,6 @@ const AttestationRepConge = () => {
     const [errorArchive, setErrorArchive] = useState("");
     const [successArchive, setSuccessArchive] = useState("");
     const [archive, setArchive] = useState(null);
-    const [asArchive, setAsArchive] = useState(false);
     const [loadingSpinner, setLoadingSpinner] = useState(true);
     const loadingText = "Aucune donnée dans la base de données";
 
@@ -90,7 +89,7 @@ const AttestationRepConge = () => {
         window.electronAPI.updateCongeSuccess((event, res) => {
             console.log("congé mis à jour avec succès");
         });
-        setAsArchive(true);
+        handleRefresh();
     }
 
     const handleFilterChange = (e) => {
@@ -137,12 +136,8 @@ const AttestationRepConge = () => {
     /** useeffect for common function and fetching */
     useEffect(() => {
         fetchDatas();
-        if(asArchive) {
-            handleRefresh();
-            setAsArchive(false);
-        }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [asArchive, setAsArchive]);
+    }, []);
     
     const handleRefresh = () => {
         try {
@@ -224,7 +219,7 @@ const AttestationRepConge = () => {
                                         </td>
                                     </tr>
                                     )}
-                                    {filterAttestationRepConge.length > 0 ? !loadingSpinner && (filterAttestationRepConge.slice(offset, offset + perPage).map((att_con, index) => (
+                                    {filterAttestationRepConge && filterAttestationRepConge.length > 0 ? !loadingSpinner && (filterAttestationRepConge.slice(offset, offset + perPage).map((att_con, index) => (
                                         <tr key={index}>
                                             <td>{att_con.matricule_personnel}</td>    
                                             <td>{att_con.nom_prenom_personnel}</td>

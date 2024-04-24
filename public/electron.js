@@ -107,14 +107,14 @@ function getConge(event, req) {
 }
 
 function getAttestationConge(even, req) {
-    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_conge,statut_attestation_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel  AND attestation_conge != "null";', (err, res) => {
+    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_conge,statut_attestation_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel  AND attestation_conge != "null" AND attestation_conge != "";', (err, res) => {
         if (err) throw err;
         even.sender.send('all-attestation-conge', res);
     });
 }
     // attestation reprise congé & archive attestation rep congés
 function getAttestationRepConge(event, req) {
-    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_reprise_service,statut_att_rep_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel AND attestation_reprise_service != "null";', (err, res) => {
+    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_reprise_service,statut_att_rep_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel AND attestation_reprise_service != "null" AND attestation_reprise_service != "";', (err, res) => {
         if (err) throw err;
         event.sender.send('all-attestation-rep-conge', res);
     })
@@ -192,7 +192,7 @@ function getPermission(event, req) {
 }
 
 function getAttestationPermission(even, req) {
-    pool.query('SELECT id_permission,nom_prenom_personnel,matricule_personnel,attestation_permission,statut_permission,statut_attestation_permission FROM permission,personnel WHERE permission.id_personnel = personnel.id_personnel', (err, res) => {
+    pool.query('SELECT id_permission,nom_prenom_personnel,matricule_personnel,attestation_permission,statut_permission,statut_attestation_permission FROM permission,personnel WHERE permission.id_personnel = personnel.id_personnel AND attestation_permission !="null" AND attestation_permission !=""', (err, res) => {
         if (err) throw err;
         even.sender.send('all-attestation-permission', res);
     });
@@ -234,8 +234,8 @@ function deleteArchiveAttPermission(event, req) {
 }
 
     // permission -> attestation reprise permission & archives: 
-function getAttestationRepPermission(event, req) {
-    pool.query('SELECT id_permission,nom_prenom_personnel,matricule_personnel,attestation_reprise_permission,statut_permission,statut_att_reprise_permission FROM permission,personnel WHERE permission.id_personnel = personnel.id_personnel', (err, res) => {
+function getAttestationRepPermission(event) {
+    pool.query('SELECT id_permission,nom_prenom_personnel,matricule_personnel,attestation_reprise_permission,statut_permission,statut_att_reprise_permission FROM permission,personnel WHERE permission.id_personnel = personnel.id_personnel AND attestation_reprise_permission !="null" AND attestation_reprise_permission !="";', (err, res) => {
         if (err) throw err;
         event.sender.send('all-attestation-rep-permission', res);
     })
@@ -249,9 +249,9 @@ function addArchiveAttestationRepPermission(event, req) {
 }
 
 function getArchiveAttRepPermission(event) {
-    pool.query('SELECT archive_att_reprise_permission.id_permission,id_arch_att_rep_permission,nom_prenom_personnel,matricule_personnel,created_at_arch_rep_permission,fichier_arch_att_rep_permission FROM permission,personnel,archive_att_reprise_permission WHERE permission.id_personnel = personnel.id_personnel AND permission.id_permission = archive_att_reprise_permission.id_permission;', (err, res) => {
+    pool.query('SELECT archive_att_reprise_permission.id_permission,id_arch_att_rep_permission,nom_prenom_personnel,matricule_personnel,created_at_arch_att_rep_permission,fichier_arch_att_rep_permission FROM permission,personnel,archive_att_reprise_permission WHERE permission.id_personnel = personnel.id_personnel AND permission.id_permission = archive_att_reprise_permission.id_permission;', (err, res) => {
         if (err) throw err;
-        event.sender.send('all-archive-att-rep-permission');
+        event.sender.send('all-archive-att-rep-permission', res);
     })
 }
 
