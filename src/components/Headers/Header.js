@@ -1,7 +1,43 @@
 // reactstrap components
 import { Card, CardBody, CardTitle, Container, Row, Col } from "reactstrap";
+import { useState, useEffect } from "react";
 
 const Header = () => {
+
+  //const [demande, setDemande] = useState([]);
+  const [nberPersonnel, setNberPersonnel] = useState();
+  const [conge, setConge] = useState([]);
+  const [perf, setPerf] = useState(100);
+
+
+  useEffect(() => {
+    const func = async () => {
+      const prf = conge.length === 0 ? 100 : Number.parseFloat(100 - ((conge.length * 100)/nberPersonnel)).toFixed(2);
+      setPerf(prf);
+    }
+    func();
+  })
+
+  useEffect(() => {
+    const func = async () => {
+        try {
+            const req_get = `SELECT * FROM personnel WHERE statut_personnel = "en congé"`;
+            window.electronAPI.getSpecificPersonnel(req_get);
+            await window.electronAPI.retrieveSpecificPersonnel((event, res) => {
+              setConge(res);
+            })
+            window.electronAPI.getPersonnel();
+            await window.electronAPI.receivePersonnel((event, res) => {
+              //console.log("pers event : " + res.length);
+              setNberPersonnel(res.length);
+            });
+        } catch (error) {
+            console.error("Erreur : " + error.message);
+        }
+    }
+    func();
+  }, []);
+
   return (
     <>
       <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
@@ -18,10 +54,10 @@ const Header = () => {
                           tag="h5"
                           className="text-uppercase text-muted mb-0"
                         >
-                          Demandes de Congés
+                          Personnel
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
-                          350,897
+                          {nberPersonnel ? nberPersonnel : "0" }
                         </span>
                       </div>
                       <Col className="col-auto">
@@ -30,12 +66,6 @@ const Header = () => {
                         </div>
                       </Col>
                     </Row>
-                    <p className="mt-3 mb-0 text-muted text-sm">
-                      <span className="text-success mr-2">
-                        <i className="fa fa-arrow-up" /> 3.48%
-                      </span>{" "}
-                      <span className="text-nowrap">Depuis le dernier mois</span>
-                    </p>
                   </CardBody>
                 </Card>
               </Col>
@@ -48,9 +78,11 @@ const Header = () => {
                           tag="h5"
                           className="text-uppercase text-muted mb-0"
                         >
-                          Congés accordés
+                          Personnels en Congés
                         </CardTitle>
-                        <span className="h2 font-weight-bold mb-0">924</span>
+                        <span className="h2 font-weight-bold mb-0">
+                          { conge ? conge.length : 0 }
+                        </span>
                       </div>
                       <Col className="col-auto">
                         <div className="icon icon-shape bg-yellow text-white rounded-circle shadow">
@@ -58,12 +90,6 @@ const Header = () => {
                         </div>
                       </Col>
                     </Row>
-                    <p className="mt-3 mb-0 text-muted text-sm">
-                      <span className="text-warning mr-2">
-                        <i className="fas fa-arrow-down" /> 1.10%
-                      </span>{" "}
-                      <span className="text-nowrap">Depuis hier</span>
-                    </p>
                   </CardBody>
                 </Card>
               </Col>
@@ -78,7 +104,7 @@ const Header = () => {
                         >
                           Performance
                         </CardTitle>
-                        <span className="h2 font-weight-bold mb-0">49,65%</span>
+                        <span className="h2 font-weight-bold mb-0"> {nberPersonnel ? perf : 0}%</span>
                       </div>
                       <Col className="col-auto">
                         <div className="icon icon-shape bg-info text-white rounded-circle shadow">
@@ -86,12 +112,6 @@ const Header = () => {
                         </div>
                       </Col>
                     </Row>
-                    <p className="mt-3 mb-0 text-muted text-sm">
-                      <span className="text-success mr-2">
-                        <i className="fas fa-arrow-up" /> 12%
-                      </span>{" "}
-                      <span className="text-nowrap">Depuis le dernier mois</span>
-                    </p>
                   </CardBody>
                 </Card>
               </Col>
