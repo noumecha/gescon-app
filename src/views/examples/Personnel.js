@@ -220,8 +220,20 @@ const Personnel = () => {
             <Row>
                 <Col lg="12">
                     <form className="form-group custom-form" onSubmit={handleFileSubmit}>
-                        <input type="file" className="form-control" required onChange={handleFile}/>
-                        <button type="submit" className="mt-3 btn btn-primary btn-md">Importer le fichier</button>
+                        <input 
+                            type="file" 
+                            className="form-control" 
+                            required 
+                            disabled={personnel.length > 0 ? true : false}
+                            onChange={handleFile}
+                        />
+                        <button 
+                            type="submit" 
+                            disabled={personnel.length > 0 ? true : false}
+                            className="mt-3 btn btn-primary btn-md"
+                        >
+                            Importer le fichier
+                        </button>
                         {typeError&&(
                             <div className="mt-3 alert alert-danger" role="alert">
                                 {typeError}
@@ -232,7 +244,7 @@ const Personnel = () => {
             </Row>
             <Row>
                 <Col lg="12">
-                    {excelData ? (
+                    {excelData || personnel.length > 0 ? (
                         <div>
                             <div className="mt-3 alert alert-success" role="alert">
                                 <h3 className="mb-0 text-center text-white"> Fichier importer avec succès ! </h3>

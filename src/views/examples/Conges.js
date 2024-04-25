@@ -40,7 +40,7 @@ const Conges = () => {
   const [duration, setDuration] = useState(selectedPerson ? selectedPerson.id_type_personnel === 1 ? "30" : "18" : "18");
   const [endDate, setEndDate] = useState("");
   const [repriseDate, setRepriseDate] = useState("");
-  const [selectedType, setSelectedType] = useState("");
+  const [selectedType, setSelectedType] = useState(typeConge.length > 0 ? typeConge[0].libelle_type_conge : "congé administratif partiel");
   const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom_personnel : "TCHUENTE");
   const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule_personnel : "XD3 566");
   const [type, setType] = useState(selectedPerson ? selectedPerson.id_type_personnel === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
@@ -135,13 +135,6 @@ const Conges = () => {
   const saveConge = async (e) => {
     e.preventDefault();
     try {
-      /*if (duration > nb_jours_conges) {
-        setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
-        setTimeout(() => {
-          setError("");
-        },7000)
-        return;
-      }*/
       if (duration <= 0) {
         setError(`La durée du congé ne peut pas etre négative ou égale à 0`);
         setTimeout(() => {
@@ -281,9 +274,9 @@ const Conges = () => {
 
   // useEffect for calculate the end conge date base on the start date and duration
   useEffect(() => {
-    if (typeConge && typeConge.length > 0) {
+    /*if (typeConge && typeConge.length > 0) {
       setSelectedType(typeConge[0].libelle_type_conge);
-    }
+    }*/
     const calculateEndDate = () => {
       if (startDate && duration) {
         const start = new Date(startDate);
@@ -844,43 +837,6 @@ const Conges = () => {
             </Card>
           </Col>
         </Row>
-        {/*<Row>
-          <Col md="12">
-            <PDFViewer width="100%" height="100%">
-              <CongeDoc 
-                name={name} 
-                matricule={matricule}
-                sexe={sexe}
-                poste={poste} 
-                type={type} 
-                decision={selectedDec} 
-                duration={duration} 
-                structure={struc}
-                startDate={startDate}
-                endDate={endDate}
-                repriseDate={repriseDate}
-                typeConge={selectedType}
-              />
-            </PDFViewer>
-          </Col>
-          <Col md="12">
-            <PDFDownloadLink document={<CongeDoc 
-              name={name} 
-              matricule={matricule}
-              sexe={sexe}
-              poste={poste} 
-              type={type} 
-              decision={selectedDec} 
-              duration={duration} 
-              structure={struc}
-              startDate={startDate}
-              endDate={endDate}
-              repriseDate={repriseDate}
-              typeConge={selectedType}/>} fileName={`attestation_${matricule}.pdf`}>
-              {({ blob, url, loading, error }) => (loading ? 'Loading document...' : <Button color="primary">Télécharger l'attestation </Button>)}
-            </PDFDownloadLink>
-          </Col>
-            </Row>*/}
       </Container>
     </>
   );
