@@ -39,7 +39,7 @@ const PersonnelDetails = () => {
     }, [selectedPerson.id_personnel])
 
     useEffect(() => {
-        if (nberConge.length > 0) {
+        if (nberConge.length > 0 || nberPermission.length > 0) {
             let total = 0;
             nberConge.forEach(element => {
                 total += element.duree_conge;

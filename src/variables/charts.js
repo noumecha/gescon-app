@@ -559,48 +559,42 @@ export const ChartExample3 = () => {
     },
     tooltips: {
       callbacks: {
-        label: function (item, data) {
-          var label = data.datasets[item.datasetIndex].label || "";
-          var yLabel = item.yLabel;
+        label: function (tooltipItem, data) {
+          var label = data.datasets[tooltipItem.datasetIndex].label;
+          var yLabel = tooltipItem.yLabel;
           var content = "";
           if (data.datasets.length > 1) {
             content += label;
           }
-          content += yLabel;
+          content += yLabel;;
           return content;
         },
       },
     },
   }
   // slicing the months 
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-  const currentMonthIndex = new Date().getMonth();
-  const lastSixMonths = [];
-
-  for (let i = 1; i <= 5; i++) {
-    const prevMonthIndex = (currentMonthIndex - i + 12) % 12; // Handle wrap-around for the beginning of the year
-    lastSixMonths.unshift(months[prevMonthIndex]);
-  }
-
-  lastSixMonths.push(months[currentMonthIndex]);
-
-  // demandes per month : 
-  const totalCongeDatas = Array.from({ length: 12 }, (_, i) => getDemandeMonth(i));
-  const lastSixMonthsDemande = [];
-
-  for (let i = 1; i <= 5; i++) {
-    const prevMonthIndex = (currentMonthIndex - i + 12) % 12; // Handle wrap-around for the beginning of the year
-    lastSixMonthsDemande.unshift(totalCongeDatas[prevMonthIndex]);
-  }
-
-  lastSixMonthsDemande.push(totalCongeDatas[currentMonthIndex]);
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const datas = [
+    {m: months[0], d: getDemandeMonth(months[0])},
+    {m: months[1], d: getDemandeMonth(months[1])},
+    {m: months[2], d: getDemandeMonth(months[2])},
+    {m: months[3], d: getDemandeMonth(months[3])},
+    {m: months[4], d: getDemandeMonth(months[4])},
+    {m: months[5], d: getDemandeMonth(months[5])},
+    {m: months[6], d: getDemandeMonth(months[6])},
+    {m: months[7], d: getDemandeMonth(months[7])},
+    {m: months[8], d: getDemandeMonth(months[8])},
+    {m: months[9], d: getDemandeMonth(months[9])},
+    {m: months[10], d: getDemandeMonth(months[10])},
+    {m: months[11], d: getDemandeMonth(months[11])}
+  ]
 
   const data = {
-    labels: lastSixMonths,
+    labels: months,
     datasets: [
       {
         label: "Sales",
-        data: [25, 20, 30, 22, 17, 29],//lastSixMonthsDemande,//
+        data: datas.map((data, i) => getDemandeMonth(i)),
         maxBarThickness: 10,
       },
     ],
