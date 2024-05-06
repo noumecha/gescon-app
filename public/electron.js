@@ -107,19 +107,47 @@ function getConge(event, req) {
 }
 
 function getAttestationConge(even, req) {
-    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_conge,statut_attestation_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel', (err, res) => {
+    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_conge,statut_attestation_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel  AND attestation_conge != "null" AND attestation_conge != "";', (err, res) => {
         if (err) throw err;
         even.sender.send('all-attestation-conge', res);
     });
 }
+    // attestation reprise congé & archive attestation rep congés
+function getAttestationRepConge(event, req) {
+    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_reprise_service,statut_att_rep_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel AND attestation_reprise_service != "null" AND attestation_reprise_service != "";', (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-attestation-rep-conge', res);
+    })
+}
 
+function addArchiveAttestationRepConge(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('attestation-rep-conge-added-success');
+    })
+}
+
+function deleteArchiveAttRepConge(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('delete-archive-att-rep-conge-success')
+    })
+}
+
+function getArchiveAttRepConge(event) {
+    pool.query('SELECT archive_att_reprise_conge.id_conge,id_archive_att_reprise_conge,nom_prenom_personnel,matricule_personnel,created_at_archive_att_reprise_conge,fichier_archive_att_reprise_conge FROM conge,personnel,archive_att_reprise_conge WHERE conge.id_personnel = personnel.id_personnel AND conge.id_conge = archive_att_reprise_conge.id_conge;', (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-archive-att-rep-conge', res);
+    });
+}
+    // congés -> getting specific conge by req
 function getSpecificConge(event, req) {
     pool.query(req, (err, res) => {
         if (err) throw err;
         event.sender.send('all-specific-conge', res);
     });
 }
-
+    // congés -> congés
 function addConge(event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
@@ -164,7 +192,7 @@ function getPermission(event, req) {
 }
 
 function getAttestationPermission(even, req) {
-    pool.query('SELECT id_permission,nom_prenom_personnel,matricule_personnel,attestation_permission,statut_permission,statut_attestation_permission FROM permission,personnel WHERE permission.id_personnel = personnel.id_personnel', (err, res) => {
+    pool.query('SELECT id_permission,nom_prenom_personnel,matricule_personnel,attestation_permission,statut_permission,statut_attestation_permission FROM permission,personnel WHERE permission.id_personnel = personnel.id_personnel AND attestation_permission !="null" AND attestation_permission !=""', (err, res) => {
         if (err) throw err;
         even.sender.send('all-attestation-permission', res);
     });
@@ -203,6 +231,35 @@ function deleteArchiveAttPermission(event, req) {
         if (err) throw err;
         event.sender.send('delete-archive-att-permission-success', { message: 'Archive supprimée avec succès!' });
     })
+}
+
+    // permission -> attestation reprise permission & archives: 
+function getAttestationRepPermission(event) {
+    pool.query('SELECT id_permission,nom_prenom_personnel,matricule_personnel,attestation_reprise_permission,statut_permission,statut_att_reprise_permission FROM permission,personnel WHERE permission.id_personnel = personnel.id_personnel AND attestation_reprise_permission !="null" AND attestation_reprise_permission !="";', (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-attestation-rep-permission', res);
+    })
+}
+
+function addArchiveAttestationRepPermission(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('attestation-rep-permission-added-success');
+    })
+}
+
+function getArchiveAttRepPermission(event) {
+    pool.query('SELECT archive_att_reprise_permission.id_permission,id_arch_att_rep_permission,nom_prenom_personnel,matricule_personnel,created_at_arch_att_rep_permission,fichier_arch_att_rep_permission FROM permission,personnel,archive_att_reprise_permission WHERE permission.id_personnel = personnel.id_personnel AND permission.id_permission = archive_att_reprise_permission.id_permission;', (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-archive-att-rep-permission', res);
+    })
+}
+
+function deleteArchiveAttRepPermission(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('delete-archive-att-rep-permission-success');
+    });
 }
 
 function getLastPermission(event, req) {
@@ -342,6 +399,11 @@ app.whenReady().then(() => {
     ipcMain.on('get-attestation-conge', getAttestationConge);
     ipcMain.on('get-archive-att-conge', getArchiveAttConge);
     ipcMain.on('delete-archive-att-conge', deleteArchiveAttConge);
+        // conge -> attestation reprise
+    ipcMain.on('get-attestation-rep-conge', getAttestationRepConge);
+    ipcMain.on('add-archive-attestation-rep-conge', addArchiveAttestationRepConge);
+    ipcMain.on('get-archive-att-rep-conge', getArchiveAttRepConge);
+    ipcMain.on('delete-archive-att-rep-conge', deleteArchiveAttRepConge);
     // permission  
     ipcMain.on('get-permission', getPermission);
     ipcMain.on('get-last-permission', getLastPermission);
@@ -351,6 +413,12 @@ app.whenReady().then(() => {
     ipcMain.on('get-attestation-permission', getAttestationPermission);
     ipcMain.on('get-archive-att-permission', getArchiveAttPermission);
     ipcMain.on('delete-archive-att-permission', deleteArchiveAttPermission);
+        // permission -> attestation reprise permission
+    ipcMain.on('get-attestation-rep-permission', getAttestationRepPermission);
+    ipcMain.on('add-archive-attestation-rep-permission', addArchiveAttestationRepPermission);
+        // permission -> archive attestation reprise permission
+    ipcMain.on('get-archive-att-rep-permission', getArchiveAttRepPermission);
+    ipcMain.on('delete-archive-att-rep-permission', deleteArchiveAttRepPermission);
     // document à fournir : 
     ipcMain.on('get-document', getDocument);
     ipcMain.on('add-document', addDocument);

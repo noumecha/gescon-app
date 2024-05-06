@@ -40,7 +40,7 @@ const Conges = () => {
   const [duration, setDuration] = useState(selectedPerson ? selectedPerson.id_type_personnel === 1 ? "30" : "18" : "18");
   const [endDate, setEndDate] = useState("");
   const [repriseDate, setRepriseDate] = useState("");
-  const [selectedType, setSelectedType] = useState("");
+  const [selectedType, setSelectedType] = useState(typeConge.length > 0 ? typeConge[0].libelle_type_conge : "congé administratif partiel");
   const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom_personnel : "TCHUENTE");
   const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule_personnel : "XD3 566");
   const [type, setType] = useState(selectedPerson ? selectedPerson.id_type_personnel === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
@@ -56,8 +56,7 @@ const Conges = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [status, setStatus] = useState(`${sexe === 'M' ? 'M' : 'Mme'} ${name} à droit à ${nb_jours_conges} ${nb_jours_conges > 1 ? "jours" : "jour"} de congés`);
-  const [visible, setVisible] = useState(true)
-  const [deleteSuccess, setDeleteSuccess] = useState("");
+  const [visible, setVisible] = useState(true);
   const [conge, setConge] = useState([]);
   const [search, setSearch] = useState("");
   const [statutFilter, setStatutFilter] = useState("");
@@ -136,13 +135,6 @@ const Conges = () => {
   const saveConge = async (e) => {
     e.preventDefault();
     try {
-      /*if (duration > nb_jours_conges) {
-        setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
-        setTimeout(() => {
-          setError("");
-        },7000)
-        return;
-      }*/
       if (duration <= 0) {
         setError(`La durée du congé ne peut pas etre négative ou égale à 0`);
         setTimeout(() => {
@@ -213,7 +205,7 @@ const Conges = () => {
           document : document,
           id_type_conge : selectedType === "congé administratif partiel" ? 1 : selectedType === "congé administratif total" ? 2 : selectedType === "congé maternité" ? 3 : selectedType === "congé maladie" ? 4 : 0,
           statut_attestation_conge : "non archivé",
-          statut_conge : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en cours" : "programmé",
+          statut_conge : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en cours" : curr_date.toISOString().slice(0,19).replace('T',' ') >= endDate ? "terminé" : "programmé",
           statut_personnel : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en congé" : "en poste",
         }
         const req_conge = `INSERT INTO conge 
@@ -238,53 +230,37 @@ const Conges = () => {
   }
 
   const saveAttestationRepConge = async (c) => {
-    c.attestation_conge = JSON.stringify(c.attestation_conge);
-    c.attestation_conge = JSON.parse(c.attestation_conge);
-    console.log(`we are goin to generate an attestation of reprise for conge ${c.attestation_conge.name}`);
-    /*const attestation_reprise = {
-      name: name,
-      matricule: matricule,
-      sexe: sexe,
-      poste: poste.replace("'", "`"), 
-      type: type,
-      decision: selectedDec, 
-      duration: duration,
-      structure: struc.replace("'", "`"),
-      startDate: startDate,
-      endDate: endDate,
-      repriseDate: repriseDate,
-      typeConge: selectedType,
-    }*/
-  }
-
-  const deleteConge = async (c) => {
     try {
-      //console.log("you want to delete conge : ", c);
-      const nb_jours_conges = c.duree_conge;
-      const delete_arch_conge = `DELETE FROM archive_att_conge WHERE id_conge= ${c.id_conge}`;
-      const delete_conge = `DELETE FROM conge WHERE ${c.id_conge}`;
-      const update_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges - ${nb_jours_conges}), statut_personnel = "en poste" WHERE id_personnel = ${c.id_personnel}`;
-      await window.electronAPI.addArchiveAttestationConge(delete_arch_conge)
-      window.electronAPI.addArchiveAttCongeSuccess(() => {
-          setDeleteSuccess("attestation supprimé avec succès")
-          setTimeout(() => {
-              setDeleteSuccess("");
-          }, 7000)
-      })
-      window.electronAPI.updatePersonnel(update_personnel);
-      window.electronAPI.addConge(delete_conge);
-      window.electronAPI.congeAddedSuccess(() => {
-        setDeleteSuccess("congé supprimé avec succès");
+      c.attestation_conge = JSON.stringify(c.attestation_conge);
+      c.attestation_conge = JSON.parse(c.attestation_conge);
+      console.log(`we are goin to generate an attestation of reprise for conge ${JSON.stringify(c.attestation_conge)}`);
+      const attestation_reprise = {
+        name: c.attestation_conge.name,
+        matricule: c.attestation_conge.matricule,
+        sexe: c.attestation_conge.sexe,
+        poste: c.attestation_conge.poste, 
+        type: c.attestation_conge.type,
+        decision: c.attestation_conge.decision, 
+        duration: c.attestation_conge.duration,
+        structure: c.attestation_conge.structure,
+        startDate: c.attestation_conge.startDate,
+        endDate: c.attestation_conge.endDate,
+        repriseDate: c.attestation_conge.repriseDate,
+        typeConge: c.attestation_conge.typeConge,
+      }
+      const created_at_att_rep_conge = new Date().toISOString().slice(0,19).replace('T',' ');
+      const req = `UPDATE conge SET created_at_reprise_service = "${created_at_att_rep_conge}",attestation_reprise_service='${JSON.stringify(attestation_reprise)}',statut_att_rep_conge="non archivé" WHERE ${c.id_conge}=conge.id_conge`; 
+      window.electronAPI.addArchiveAttestationRepConge(req);
+      await window.electronAPI.addArchiveAttCongeRepSuccess((event, res) => {
+        setSuccess("Attestation de reprise générer avec succès");
         setStatus(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
       });
-      console.log("conge suprrimé");
-      console.log("statut mis à jour");
       setTimeout(() => {
-          setSuccess("");
+        setSuccess("");
       }, 3000)
       setActived(true);
-    } catch (err) {
-      console.log("error on delete conge : " + err.message);
+    } catch (error) {
+      console.error("Erreur saving congé : " + error.message);
     }
   }
 
@@ -298,9 +274,9 @@ const Conges = () => {
 
   // useEffect for calculate the end conge date base on the start date and duration
   useEffect(() => {
-    if (typeConge && typeConge.length > 0) {
+    /*if (typeConge && typeConge.length > 0) {
       setSelectedType(typeConge[0].libelle_type_conge);
-    }
+    }*/
     const calculateEndDate = () => {
       if (startDate && duration) {
         const start = new Date(startDate);
@@ -427,15 +403,6 @@ const Conges = () => {
                   Actualiser
                 </Button>
               </CardHeader>
-              <Row>
-                <Col lg="12">
-                  {deleteSuccess && 
-                    <Alert className="text-center" color="success">
-                      {deleteSuccess}
-                    </Alert>
-                  }
-                </Col>
-              </Row>
               <Table className="align-items-center table-flush" responsive>
                   <thead className="thead-light">
                       <tr>
@@ -458,7 +425,7 @@ const Conges = () => {
                         </td>
                       </tr>
                     )}
-                      {filterConge.length > 0 ? !loadingSpinner && (filterConge.slice(offset, offset + perPage).map((c, index) => (
+                      {filterConge && filterConge.length > 0 ? !loadingSpinner && (filterConge.slice(offset, offset + perPage).map((c, index) => (
                           <tr key={index}>
                               <td>{c.matricule_personnel}</td>    
                               <td>{c.nom_prenom_personnel}</td> 
@@ -493,12 +460,6 @@ const Conges = () => {
                                           <i className="fas fa-ellipsis-v" />
                                       </DropdownToggle>
                                       <DropdownMenu className="dropdown-menu-arrow" right>
-                                          <DropdownItem
-                                            onClick={() => deleteConge(c)}
-                                            //disabled={c.statut_conge === "terminé" ? true : false}
-                                          >
-                                              Annuler le congé
-                                          </DropdownItem>
                                           <DropdownItem
                                             onClick={() => saveAttestationRepConge(c)}
                                             disabled={c.statut_conge === "terminé" ? false : true}
@@ -876,43 +837,6 @@ const Conges = () => {
             </Card>
           </Col>
         </Row>
-        {/*<Row>
-          <Col md="12">
-            <PDFViewer width="100%" height="100%">
-              <CongeDoc 
-                name={name} 
-                matricule={matricule}
-                sexe={sexe}
-                poste={poste} 
-                type={type} 
-                decision={selectedDec} 
-                duration={duration} 
-                structure={struc}
-                startDate={startDate}
-                endDate={endDate}
-                repriseDate={repriseDate}
-                typeConge={selectedType}
-              />
-            </PDFViewer>
-          </Col>
-          <Col md="12">
-            <PDFDownloadLink document={<CongeDoc 
-              name={name} 
-              matricule={matricule}
-              sexe={sexe}
-              poste={poste} 
-              type={type} 
-              decision={selectedDec} 
-              duration={duration} 
-              structure={struc}
-              startDate={startDate}
-              endDate={endDate}
-              repriseDate={repriseDate}
-              typeConge={selectedType}/>} fileName={`attestation_${matricule}.pdf`}>
-              {({ blob, url, loading, error }) => (loading ? 'Loading document...' : <Button color="primary">Télécharger l'attestation </Button>)}
-            </PDFDownloadLink>
-          </Col>
-            </Row>*/}
       </Container>
     </>
   );

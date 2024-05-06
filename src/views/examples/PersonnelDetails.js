@@ -5,10 +5,13 @@ import {
     Container,
     Row,
     Col,
+    Button,
 } from "reactstrap";
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "components/Headers/Header.js";
+import PersonnelDoc from "documents/PersonnelDoc";
+import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 
 const PersonnelDetails = () => {
     
@@ -39,7 +42,7 @@ const PersonnelDetails = () => {
     }, [selectedPerson.id_personnel])
 
     useEffect(() => {
-        if (nberConge.length > 0) {
+        if (nberConge.length > 0 || nberPermission.length > 0) {
             let total = 0;
             nberConge.forEach(element => {
                 total += element.duree_conge;
@@ -191,6 +194,28 @@ const PersonnelDetails = () => {
                     </Card>
                 </Col>
               </Row>
+              <Row>
+                    <Col className="order-xl-1" xl="8">
+                        <PDFViewer document={<PersonnelDoc                      
+                            />} fileName={`fiche_du_personnel_${selectedPerson.nom_prenom_personnel}.pdf`}>
+                            {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 
+                            <Button
+                                color="success"
+                            >
+                                Télécharger l'attestation 
+                            </Button>)}
+                        </PDFViewer>
+                        <PDFDownloadLink document={<PersonnelDoc                      
+                            />} fileName={`fiche_du_personnel_${selectedPerson.nom_prenom_personnel}.pdf`}>
+                            {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 
+                            <Button
+                                color="success"
+                            >
+                                Télécharger l'attestation 
+                            </Button>)}
+                        </PDFDownloadLink>
+                    </Col>
+                </Row>
             </Container>
         </>
     );

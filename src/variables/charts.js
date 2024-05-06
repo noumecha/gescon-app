@@ -493,6 +493,116 @@ export const ChartExample2 = () => {
   return <Bar data={data} options={options} />
 };
 
+export const ChartExample3 = () => {
+  const [permissions, setPermissions] = useState([]);
+  const [conges, setConges] = useState([]);
+
+  function formatDate(d) {
+    const date = new Date(d);
+    const day = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    return new Date(year, month, day);
+  }
+
+  useEffect(() => {
+    const fetchDatas = async () => {
+      try {
+        window.electronAPI.getConge();
+        await window.electronAPI.retrieveConge((event, res) => {
+          setConges(res);
+        })
+        window.electronAPI.getPermission();
+        await window.electronAPI.retrievePermission((event, res) => {
+          setPermissions(res);
+        })
+      } catch (error) {
+        console.error("Erreur : " + error.message);
+      }
+    }
+    fetchDatas();
+  }, [])
+
+  const getDemandeMonth = (month) => {
+    let total = 0;
+    if (conges.length > 0) {
+      conges.forEach(element => {
+        if (formatDate(element.date_debut_conge).getMonth() === month) {
+          total += 1;
+        }
+      });
+      if (permissions.length > 0) {
+        permissions.forEach(element => {
+          if (formatDate(element.date_debut_permission).getMonth() === month) {
+            total += 1;
+          }
+        });
+      }
+    }
+    return total;
+  };
+
+  const options = {
+    scales: {
+      yAxes: [
+        {
+          ticks: {
+            callback: function (value) {
+              if (Number.isInteger(value)) {
+                return  value;
+              }
+              return '';
+            },
+          },
+        },
+      ],
+    },
+    tooltips: {
+      callbacks: {
+        label: function (tooltipItem, data) {
+          var label = data.datasets[tooltipItem.datasetIndex].label;
+          var yLabel = tooltipItem.yLabel;
+          var content = "";
+          if (data.datasets.length > 1) {
+            content += label;
+          }
+          content += yLabel;;
+          return content;
+        },
+      },
+    },
+  }
+  // slicing the months 
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const datas = [
+    {m: months[0], d: getDemandeMonth(months[0])},
+    {m: months[1], d: getDemandeMonth(months[1])},
+    {m: months[2], d: getDemandeMonth(months[2])},
+    {m: months[3], d: getDemandeMonth(months[3])},
+    {m: months[4], d: getDemandeMonth(months[4])},
+    {m: months[5], d: getDemandeMonth(months[5])},
+    {m: months[6], d: getDemandeMonth(months[6])},
+    {m: months[7], d: getDemandeMonth(months[7])},
+    {m: months[8], d: getDemandeMonth(months[8])},
+    {m: months[9], d: getDemandeMonth(months[9])},
+    {m: months[10], d: getDemandeMonth(months[10])},
+    {m: months[11], d: getDemandeMonth(months[11])}
+  ]
+
+  const data = {
+    labels: months,
+    datasets: [
+      {
+        label: "Sales",
+        data: datas.map((data, i) => getDemandeMonth(i)),
+        maxBarThickness: 10,
+      },
+    ],
+  }
+
+  return <Bar data={data} options={options} />
+};
+
 /*module.exports = {
   chartOptions, // used inside src/views/Index.js
   parseOptions, // used inside src/views/Index.js

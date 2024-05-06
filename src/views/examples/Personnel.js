@@ -23,6 +23,7 @@ import {
     Alert,
     Nav,
     UncontrolledTooltip,
+    Button,
   } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import ReactPaginate from "react-paginate";
@@ -44,6 +45,8 @@ const Personnel = () => {
     const [status, setStatus] = useState("");
     const [success, setSuccess] = useState("");
     const [selectedPerson, setSelectedPerson] = useState(null);
+    const [loadingSpinner, setLoadingSpinner] = useState(true);
+    const loadingText = "Aucune donnée dans la base de données";
     const navigate = useNavigate();
 
     /** code for excel import */
@@ -117,19 +120,36 @@ const Personnel = () => {
     }
 
     /** useeffect for common function and fetching */
-    useEffect(() => {
-        const func = async () => {
-            try {
-                window.electronAPI.getPersonnel();
-                await window.electronAPI.receivePersonnel((event, res) => {
-                    setPersonnel(res);
-                })
-            } catch (error) {
-                console.error("Erreur : " + error.message);
-            }
+    const fetchDatas = async () => {
+        try {
+            window.electronAPI.getPersonnel();
+            await window.electronAPI.receivePersonnel((event, res) => {
+                setPersonnel(res);
+                setTimeout(() => 
+                setLoadingSpinner(false)
+                , 3000);
+            })
+        } catch (error) {
+            console.error("Erreur : " + error.message);
         }
-        func();
+    }
+
+    useEffect(() => {
+        fetchDatas();
     }, []);
+
+    const handleRefresh = () => {
+        try {
+          setLoadingSpinner(true);
+          setTimeout(() => 
+          setLoadingSpinner(false)
+          , 3000);
+          fetchDatas();
+          console.log("datas refreshed successfully");
+        } catch (err) {
+          console.error("error on refresh : " + err.message);
+        }
+    }
 
     /** for the pagination */
     const pageCount = Math.ceil(personnel.length/perPage);
@@ -200,8 +220,20 @@ const Personnel = () => {
             <Row>
                 <Col lg="12">
                     <form className="form-group custom-form" onSubmit={handleFileSubmit}>
-                        <input type="file" className="form-control" required onChange={handleFile}/>
-                        <button type="submit" className="mt-3 btn btn-primary btn-md">Importer le fichier</button>
+                        <input 
+                            type="file" 
+                            className="form-control" 
+                            required 
+                            disabled={personnel.length > 0 ? true : false}
+                            onChange={handleFile}
+                        />
+                        <button 
+                            type="submit" 
+                            disabled={personnel.length > 0 ? true : false}
+                            className="mt-3 btn btn-primary btn-md"
+                        >
+                            Importer le fichier
+                        </button>
                         {typeError&&(
                             <div className="mt-3 alert alert-danger" role="alert">
                                 {typeError}
@@ -212,7 +244,7 @@ const Personnel = () => {
             </Row>
             <Row>
                 <Col lg="12">
-                    {excelData ? (
+                    {excelData || personnel.length > 0 ? (
                         <div>
                             <div className="mt-3 alert alert-success" role="alert">
                                 <h3 className="mb-0 text-center text-white"> Fichier importer avec succès ! </h3>
@@ -287,11 +319,17 @@ const Personnel = () => {
             </Row>
             <Row>
                 <div className="col p-0">
-                    {personnel && personnel.length > 0 ? (
                         <div className="col">
                             <Card className="shadow">
-                                <CardHeader className="border-0">
+                                <CardHeader className="bg-white border-2 d-flex justify-content-center">
                                     <h3 className="mb-0 text-center">Listes du personnel </h3>
+                                    <Button
+                                        size="sm"
+                                        className="ml-3"
+                                        onClick={() => handleRefresh()}
+                                        >
+                                        Actualiser
+                                    </Button>
                                 </CardHeader>
                                 <Table className="align-items-center table-flush" responsive>
                                     <thead className="thead-light">
@@ -315,7 +353,16 @@ const Personnel = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {filterPersonnel.slice(offset, offset + perPage).map((person, index) => (
+                                        {loadingSpinner && (
+                                            <tr>
+                                                <td colSpan="7" className="text-center">
+                                                    <div className="spinner-border" role="status">
+                                                        <span className="sr-only">Loading...</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                        {filterPersonnel && filterPersonnel.length > 0 ? !loadingSpinner && (filterPersonnel.slice(offset, offset + perPage).map((person, index) => (
                                             <tr key={index}>
                                                 <td>{person.matricule_personnel}</td>    
                                                 <td>{person.nom_prenom_personnel}</td>    
@@ -381,20 +428,18 @@ const Personnel = () => {
                                                     </UncontrolledDropdown>
                                                 </td>
                                             </tr>
-                                        ))}
+                                        ))) :              
+                                            !loadingSpinner && (
+                                                <tr>
+                                                    <td colSpan="7" className="text-center">
+                                                        {loadingText}
+                                                    </td>
+                                                </tr>
+                                        )}
                                     </tbody>
                                 </Table>
                             </Card>
                         </div>
-                    ) : (  
-                        <div className="col">  
-                            <Card className="shadow">
-                                <CardHeader className="border-0">
-                                    <h3 className="mb-0 text-center"> Aucun personnel dans la base de données </h3>
-                                </CardHeader>
-                            </Card>
-                        </div>
-                    )}
                 </div>
             </Row>
             <Row className="m-0 justify-content-center">

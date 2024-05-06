@@ -191,10 +191,7 @@ const styles = StyleSheet.create({
 });
 
 // Create Document Component
-const RepriseCongeDoc = (props) => {
-
-    const d = new Date();
-
+const PersonnelDoc = () => {
     return (
         <Document>
         <Page size="A4" style={styles.page}>
@@ -231,7 +228,7 @@ const RepriseCongeDoc = (props) => {
                     </Text>
                     <Text>********</Text>
                     <Text style={styles.h4TitleNumber}>
-                        N°__________/CRS/MINFI/SG/DGB/SDAG/AAN
+                        N°__________/MINFI/SG/DGB/SDAG/SP
                     </Text>
                 </View>
                 {/* image */}
@@ -273,59 +270,10 @@ const RepriseCongeDoc = (props) => {
                     </Text>
                 </View>
             </View>
-            <View style={styles.containerTwo}>
-                <View style={styles.section}>
-                    <Text style={styles.h1CertifTitle}>
-                        CERTIFICAT DE REPRISE DE SERVICE
-                    </Text>
-                    <Text style={styles.h2CertifSubtitle}>
-                        CERTIFICATE OF RESUMPTION OF FUNCTION
-                    </Text>
-                    <Text style={styles.pCertifText}>
-                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
-                        {props.type} d'Administration, Matricule {props.matricule}, {props.poste} (au/à la) {props.structure},bénéficiaire
-                        d'un {props.typeConge} de {props.duration} jours , accordé par décision N° {props.decision} du Ministre des Finances,
-                        allant du {props.startDate} au {props.endDate} a effectivement repris le service le {props.repriseDate} à 7 heures 30 précises.
-                    </Text>
-                    <Text style={styles.pCertifText}>
-                        En foi de quoi, le présent certificat de reprise de service est établi et délivré à l'intéressé{props.sexe === "M" ? "" : "e"} pour
-                        servir et valoir ce que de droit./-
-                    </Text>
-                </View>
-            </View>
-            <View style={styles.containerThree}>
-                <View style={styles.sectionLeftBottom}>
-                    <Text style={styles.amTitle}>
-                        Ampliations :
-                    </Text>
-                    <Text style={styles.amParagraph1}>
-                        - minfi/cab
-                    </Text>
-                    <Text style={styles.amParagraph2}>
-                        - minfi/sg/drh
-                    </Text>
-                    <Text style={styles.amParagraph3}>
-                        - minfi/dgb/sdag
-                    </Text>
-                    <Text style={styles.amParagraph4}>
-                        - interessee/dossier
-                    </Text>
-                    <Text style={styles.amParagraph5}>
-                        - chrono/archives
-                    </Text>
-                </View>
-            </View>
-            <View style={styles.containerQr}>
-                <View style={styles.sectionQr}>
-                    <Text style={styles.qrText}>
-                        GESCON-APP - {d.getTime()} - {d.getFullYear()}
-                    </Text>
-                </View>
-            </View>
         </Page>
       </Document>
     );
 
 };
 
-export default RepriseCongeDoc;
+export default PersonnelDoc;
