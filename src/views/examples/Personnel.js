@@ -411,11 +411,13 @@ const Personnel = () => {
                                                         <DropdownMenu className="dropdown-menu-arrow" right>
                                                             <DropdownItem
                                                                 onClick={() => handleCongeClick(person)}
+                                                                disabled={(person.nb_jours_conges + person.nb_jours_permission >= 28 && person.id_type_personnel === 1) || (person.nb_jours_conges + person.nb_jours_permission >= 40 && person.id_type_personnel === 2) ? true : false}
                                                             >
                                                                 Nouveau congé
                                                             </DropdownItem>
                                                             <DropdownItem
                                                                 onClick={() => handlePermissionClick(person)}
+                                                                //disabled={person.nb_jours_permission >= 10 ? true : false}
                                                             >
                                                                 Nouvelle permission
                                                             </DropdownItem>
