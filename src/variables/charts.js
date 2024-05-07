@@ -1,11 +1,9 @@
+/* eslint-disable no-unreachable */
 //const Chart = require("chart.js");
 import Chart from "chart.js";
 import { Bar, Line } from "react-chartjs-2";
 import { useState,useEffect } from "react";
-//
-// Chart extension for making the bars rounded
-// Code from: https://codepen.io/jedtrow/full/ygRYgo
-//
+
 
 Chart.elements.Rectangle.prototype.draw = function () {
   var ctx = this._chart.ctx;
@@ -494,8 +492,8 @@ export const ChartExample2 = () => {
 };
 
 export const ChartExample3 = () => {
-  const [permissions, setPermissions] = useState([]);
   const [conges, setConges] = useState([]);
+  const [structureNames, setStructureNames] = useState([]);
 
   function formatDate(d) {
     const date = new Date(d);
@@ -508,14 +506,18 @@ export const ChartExample3 = () => {
   useEffect(() => {
     const fetchDatas = async () => {
       try {
+        window.electronAPI.getStructuresNames();
+        await window.electronAPI.retrieveStructuresNames((event, res) => {
+          setStructureNames(res);
+        })
         window.electronAPI.getConge();
         await window.electronAPI.retrieveConge((event, res) => {
           setConges(res);
         })
-        window.electronAPI.getPermission();
+        /*window.electronAPI.getPermission();
         await window.electronAPI.retrievePermission((event, res) => {
           setPermissions(res);
-        })
+        })*/
       } catch (error) {
         console.error("Erreur : " + error.message);
       }
@@ -523,30 +525,46 @@ export const ChartExample3 = () => {
     fetchDatas();
   }, [])
 
-  const getDemandeMonth = (month) => {
+  const getDemandeMonth = (month, struc) => {
     let total = 0;
     if (conges.length > 0) {
       conges.forEach(element => {
-        if (formatDate(element.date_debut_conge).getMonth() === month) {
+        /**/
+        if (element.structure_personnel === struc && formatDate(element.date_debut_conge).getMonth() === month) {
           total += 1;
         }
       });
-      if (permissions.length > 0) {
-        permissions.forEach(element => {
-          if (formatDate(element.date_debut_permission).getMonth() === month) {
-            total += 1;
-          }
-        });
-      }
     }
     return total;
   };
 
-  const options = {
+  let mths = ["Dec", "Nov", "Oct", "Sep", "Auo", "Juil", "Juin", "Mai", "Avr", "Mar", "Fev", "Jan"];
+  const options_1 = {
+    scales: {
+      xAxes: [{ stacked: true }],
+      yAxes: [{ stacked: true }],
+    },
+    plugins: {
+      datalabels: {
+        formatter: function(value, context) {
+          const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
+          return total;
+        },
+        color: 'top',
+        anchor: 'end',
+        align: 'end'
+      }
+    }
+  };
+  /*const options = {
     scales: {
       yAxes: [
         {
+          
           ticks: {
+            /*callback: function (value, index) {
+              return mths[index]
+            },
             callback: function (value) {
               if (Number.isInteger(value)) {
                 return  value;
@@ -571,36 +589,97 @@ export const ChartExample3 = () => {
         },
       },
     },
+  }*/
+
+  let tab = [];
+  structureNames.forEach(element => {
+    tab.push(element.structure_personnel);
+  });
+  //console.log(`simple tab : ${tab}`);
+  const struc = ["DGB","[SO]","SGDB","SGCCC","[SDAG]","SDCF","DI","DPC","DREF","DPB","DCOB","DDPP"];
+  let finalStrucNames = [];
+  let strucLabels = [];
+  tab.forEach(t => {
+    for(let i = 0; i < struc.length; i++) {
+      if (t.includes(struc[i])) {
+        //console.log(`tab ${t}`);
+        strucLabels.push(struc[i]);
+        finalStrucNames.push(t);
+      }
+    }
+  })
+  //console.log(`stucture tried : ${finalStrucNames}`);
+  let datas = []
+  for (let index = 0; index < finalStrucNames.length; index++) {
+    datas.push(getDemandeMonth(index, finalStrucNames[index]));
   }
-  // slicing the months 
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const datas = [
-    {m: months[0], d: getDemandeMonth(months[0])},
-    {m: months[1], d: getDemandeMonth(months[1])},
-    {m: months[2], d: getDemandeMonth(months[2])},
-    {m: months[3], d: getDemandeMonth(months[3])},
-    {m: months[4], d: getDemandeMonth(months[4])},
-    {m: months[5], d: getDemandeMonth(months[5])},
-    {m: months[6], d: getDemandeMonth(months[6])},
-    {m: months[7], d: getDemandeMonth(months[7])},
-    {m: months[8], d: getDemandeMonth(months[8])},
-    {m: months[9], d: getDemandeMonth(months[9])},
-    {m: months[10], d: getDemandeMonth(months[10])},
-    {m: months[11], d: getDemandeMonth(months[11])}
-  ]
+  //console.log(`datas : ${datas}`);
+  function getMonthNumber(month) {
+    switch (month) {
+      case "Jan":
+        return 0;
+        break;
+      case "Fev":
+        return 1;
+        break;
+      case "Mar":
+        return 2;
+        break;
+      case "Avr":
+        return 3;
+        break;
+      case "Mai":
+        return 4;
+        break;
+      case "Juin":
+        return 5;
+        break;
+      case "Juil":
+        return 6;
+        break;
+      case "Auo":
+        return 7;
+        break;
+      case "Sep":
+        return 8;
+        break;
+      case "Oct":
+        return 9;
+        break;
+      case "Nov":
+        return 10;
+        break;
+      case "Dec":
+        return 11;
+        break;
+      default:
+        return 0;
+        break;
+    }
+  }
+
+  const datasets = mths.map(month => {
+    const data = finalStrucNames.map(structure => getDemandeMonth(getMonthNumber(month), structure));
+    return {
+      label: month,
+      data: data,
+      maxBarThickness: 10,
+    };
+  });
 
   const data = {
-    labels: months,
-    datasets: [
+    labels: strucLabels,
+    /*datasets: [
       {
         label: "Sales",
-        data: datas.map((data, i) => getDemandeMonth(i)),
+        data: datas,
         maxBarThickness: 10,
       },
-    ],
+    ],*/
+    datasets: datasets,
   }
 
-  return <Bar data={data} options={options} />
+  return <Line data={data} options={options_1} />
 };
 
 /*module.exports = {
