@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
     Card,
     CardHeader,
@@ -5,10 +6,13 @@ import {
     Container,
     Row,
     Col,
+    Button,
 } from "reactstrap";
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "components/Headers/Header.js";
+import PersonnelDoc from "documents/PersonnelDoc";
+import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 
 const PersonnelDetails = () => {
     
@@ -55,6 +59,46 @@ const PersonnelDetails = () => {
             }
         }
     }, [nberConge, nberPermission])
+
+    function formatDate(d, m) {
+        const date = new Date(d);
+        const day = date.getDate();
+        const month = date.getMonth();
+        const year = date.getFullYear();
+        if (m === 0) {
+            return new Date(year, month, day);
+        }
+        if (m === 1) {
+            return new Date(year, month, day).getDate() + "/" + (new Date(year, month, day).getMonth() < 10 ? "0"+parseInt(new Date(year, month, day).getMonth()+1) : parseInt(new Date(year, month, day).getMonth()+1))+ "/" + new Date(year, month, day).getFullYear()
+        }
+    }  
+
+    //let statistics = [stat1, stat2]
+    let statistics = nberConge.reduce((acc, conge) => {
+        let year = formatDate(conge.date_debut_conge, 0).getFullYear();
+        let existingStat = acc.find(stat => stat.year === year);
+        if (existingStat) {
+            existingStat.totalYearsConge += 1;
+            existingStat.conges.push({
+                id : conge.id_conge,
+                dd : formatDate(conge.date_debut_conge, 1),
+                df : formatDate(conge.date_fin_conge, 1),
+                duree : conge.duree_conge
+            });
+        } else {
+            acc.push({
+                year : year,
+                totalYearsConge : 1,
+                conges : [{
+                    id : conge.id_conge,
+                    dd : formatDate(conge.date_debut_conge, 1),
+                    df : formatDate(conge.date_fin_conge, 1),
+                    duree : conge.duree_conge
+                }]
+            });
+        }
+        return acc;
+    }, []);
 
     return (
         <>
@@ -191,6 +235,31 @@ const PersonnelDetails = () => {
                     </Card>
                 </Col>
               </Row>
+                {/*<Row>
+                    <Col className="order-xl-1" xl="8">
+                        <PDFViewer>
+                            <PersonnelDoc
+                                name={selectedPerson.nom_prenom_personnel}
+                                statistics={statistics}
+                            />
+                        </PDFViewer>
+                    </Col>
+                </Row>*/}
+                <Row>
+                    <Col className="order-xl-1" xl="8">
+                        <PDFDownloadLink document={<PersonnelDoc   
+                                name={selectedPerson.nom_prenom_personnel}
+                                statistics={statistics}                   
+                            />} fileName={`fiche_du_personnel_${selectedPerson.nom_prenom_personnel}.pdf`}>
+                            {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 
+                            <Button
+                                color="success"
+                            >
+                                Télécharger la fiche du personnel 
+                            </Button>)}
+                        </PDFDownloadLink>
+                    </Col>
+                </Row>
             </Container>
         </>
     );

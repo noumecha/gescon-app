@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Chart from "chart.js";
 import {
   Card,
@@ -49,9 +49,9 @@ const FichePersonnel = () => {
                   <Row className="align-items-center">
                     <div className="col">
                       <h6 className="text-uppercase text-light ls-1 mb-1">
-                        Personnels
+                        Nombres congés totals
                       </h6>
-                      <h2 className="text-white mb-0">En congés</h2>
+                      <h2 className="text-white mb-0">Par structure</h2>
                     </div>
                   </Row>
                 </CardHeader>
