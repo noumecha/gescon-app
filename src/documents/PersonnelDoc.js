@@ -4,6 +4,14 @@ import image from './docs-images/sceau-img.PNG';
 
 // Create styles
 const styles = StyleSheet.create({
+    // diveder : 
+    divider : {
+      display: 'block',
+      height: '2px',
+      width: '200px',
+      backgroundColor: '#000000',
+      marginTop : 20,
+    },
     // the container element
     page: {
       flexDirection: 'column',
@@ -191,88 +199,140 @@ const styles = StyleSheet.create({
 });
 
 // Create Document Component
-const PersonnelDoc = () => {
-    return (
-        <Document>
-        <Page size="A4" style={styles.page}>
-            {/* first row : entete */}
-            <View style={styles.container}>
-                {/* top left text */}
-                <View style={styles.topSectionOne}>
-                    <Text style={styles.h1TitleFirst}>
-                        REPUBLIQUE DU CAMEROUN
-                    </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h4Title}>
-                        Paix-Travail-Patrie
-                    </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h1Title}>
-                        MINISTERE DES FINANCES
-                    </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h1Title}>
-                        SECRETARIAT GENERAL
-                    </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h1Title}>
-                        DIRECTION GENERALE DU BUDGET
-                    </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h1Title}>
-                        SOUS-DIRECTION DES AFFAIRES GENERALES
-                    </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h1Title}>
-                        SERVICE DU PERSONNEL
-                    </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h4TitleNumber}>
-                        N°__________/MINFI/SG/DGB/SDAG/SP
-                    </Text>
-                </View>
-                {/* image */}
-                <View style={styles.topSectionImage}>
-                    <Image style={styles.imageSceau} src={image}/> 
-                </View>
-                {/* top right text */}
-                <View style={styles.topSectionTwo}>
-                    <Text style={styles.h1TitleFirst}>
-                        REPUBLIC OF CAMEROON
-                    </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h4Title}>
-                        Peace work home
-                    </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h1Title}>
-                        MINISTRY OF FINANCE
-                    </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h1Title}>
-                        GENERAL SECRETARIAT
-                    </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h1Title}>
-                        GENERAL BUDGET DIRECTORATE
-                    </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h1Title}>
-                        SUB-DIRECTION OF GENERAL AFFAIRS
-                    </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h1Title}>
-                        PERSONNEL DEPARTEMENT
-                    </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h4TitleDate}>
-                        Yaoundé le ___________________
-                    </Text>
-                </View>
-            </View>
-        </Page>
-      </Document>
-    );
+const PersonnelDoc = (props) => {
+  
+  const d = new Date();
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+          {/* first row : entete */}
+          <View style={styles.container}>
+              {/* top left text */}
+              <View style={styles.topSectionOne}>
+                  <Text style={styles.h1TitleFirst}>
+                      REPUBLIQUE DU CAMEROUN
+                  </Text>
+                  <Text>********</Text>
+                  <Text style={styles.h4Title}>
+                      Paix-Travail-Patrie
+                  </Text>
+                  <Text>********</Text>
+                  <Text style={styles.h1Title}>
+                      MINISTERE DES FINANCES
+                  </Text>
+                  <Text>********</Text>
+                  <Text style={styles.h1Title}>
+                      SECRETARIAT GENERAL
+                  </Text>
+                  <Text>********</Text>
+                  <Text style={styles.h1Title}>
+                      DIRECTION GENERALE DU BUDGET
+                  </Text>
+                  <Text>********</Text>
+                  <Text style={styles.h1Title}>
+                      SOUS-DIRECTION DES AFFAIRES GENERALES
+                  </Text>
+                  <Text>********</Text>
+                  <Text style={styles.h1Title}>
+                      SERVICE DU PERSONNEL
+                  </Text>
+                  <Text>********</Text>
+                  <Text style={styles.h4TitleNumber}>
+                      N°__________/MINFI/SG/DGB/SDAG/SP
+                  </Text>
+              </View>
+              {/* image */}
+              <View style={styles.topSectionImage}>
+                  <Image style={styles.imageSceau} src={image}/> 
+              </View>
+              {/* top right text */}
+              <View style={styles.topSectionTwo}>
+                  <Text style={styles.h1TitleFirst}>
+                      REPUBLIC OF CAMEROON
+                  </Text>
+                  <Text>********</Text>
+                  <Text style={styles.h4Title}>
+                      Peace work home
+                  </Text>
+                  <Text>********</Text>
+                  <Text style={styles.h1Title}>
+                      MINISTRY OF FINANCE
+                  </Text>
+                  <Text>********</Text>
+                  <Text style={styles.h1Title}>
+                      GENERAL SECRETARIAT
+                  </Text>
+                  <Text>********</Text>
+                  <Text style={styles.h1Title}>
+                      GENERAL BUDGET DIRECTORATE
+                  </Text>
+                  <Text>********</Text>
+                  <Text style={styles.h1Title}>
+                      SUB-DIRECTION OF GENERAL AFFAIRS
+                  </Text>
+                  <Text>********</Text>
+                  <Text style={styles.h1Title}>
+                      PERSONNEL DEPARTEMENT
+                  </Text>
+                  <Text>********</Text>
+                  <Text style={styles.h4TitleDate}>
+                      Yaoundé le ___________________
+                  </Text>
+              </View>
+          </View>
+          <View style={styles.containerTwo}>
+              <View style={styles.section}>
+                  <Text style={styles.h1CertifTitle}>
+                    FICHE STATISTIQUES DE {props.name}
+                  </Text>
+                  <Text style={styles.h2CertifSubtitle}>
+                    STATISTICAL SHEET OF {props.name}
+                  </Text>
+                  {props.statistics && props.statistics.length > 0 && (
+                    props.statistics.map((stat) => (
+                      <View key={stat} style={styles.section}>
+                        <Text style={styles.divider}>
+                        </Text>
+                        <Text style={styles.h2CertifSubtitle}>
+                          Statistiques de l'année {stat.year} : 
+                        </Text>
+                        <Text style={styles.pCertifText}>
+                          Nombre totals de congés :  {stat.totalYearsConge}
+                        </Text>
+                        <View style={styles.section}>
+                          {stat.conges.map((c) => (
+                            <View key={c} style={styles.section}>
+                              <Text style={styles.pCertifText}>
+                                --- ID du congé : {c.id} ---
+                              </Text>
+                              <Text style={styles.pCertifText}>
+                                Date de debut : {c.dd}
+                              </Text>
+                              <Text style={styles.pCertifText}>
+                                Date de fin : {c.df}
+                              </Text>
+                              <Text style={styles.pCertifText}>
+                                Duree : {c.duree} jours
+                              </Text>
+                            </View>
+                          ))}
+                        </View>
+                      </View>
+                    ))
+                  )}
+              </View>
+          </View>
+          <View style={styles.containerQr}>
+              <View style={styles.sectionQr}>
+                  <Text style={styles.qrText}>
+                      GESCON-APP - {d.getTime()} - {d.getFullYear()}
+                  </Text>
+              </View>
+          </View>
+      </Page>
+    </Document>
+  );
 
 };
 

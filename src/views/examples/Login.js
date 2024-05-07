@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // reactstrap components
 import { useEffect, useState } from "react";
 import {
