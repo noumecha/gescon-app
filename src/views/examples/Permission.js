@@ -368,6 +368,10 @@ const Permission = () => {
                 endDate: endDate,
                 repriseDate: repDate,
               }
+              /*const next_month_permission = {
+                month : formatDate(lastDateOfMonth(startDate)).getDate() - formatDate(startDate) === 2 ? formatDate(endDate) : null,
+                number : formatDate(lastDateOfMonth(startDate)).getDate() - formatDate(startDate) === 2 ? 1 : 0,
+              }*/
               const permission_data = {
                 startDate : startDate,
                 endDate : endDate,
