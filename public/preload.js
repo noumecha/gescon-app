@@ -93,6 +93,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
     retrieveDecision: (callback) => ipcRenderer.on('all-decision', callback),
     getSpecificDec: (arg) => ipcRenderer.send('get-specific-decision', arg),
     retrieveSpecificDec: (callback) => ipcRenderer.on('specific-decision', callback),
+    updateDecision: (req) => ipcRenderer.send('update-decision', req),
+    updateDecisionSuccess: (callback) => ipcRenderer.on('decision-updated-success', callback),
+    changeStatutDecision: (req) => ipcRenderer.send('change-decision-statut', req),
+    changeStatutDecisionSuccess: (callback) => ipcRenderer.on('decision-changed-success', callback),
     // demande :
     /*demandeCongeAddedSuccess: (callback) => ipcRenderer.on('demande-added-success-conge', callback),
     addDemandeConge: (req) => ipcRenderer.send('add-demande-conge',req),

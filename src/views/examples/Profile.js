@@ -17,7 +17,7 @@ import {
 } from "reactstrap";
 // core components
 import UserHeader from "components/Headers/UserHeader.js";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {Icon} from 'react-icons-kit';
 import {eyeOff} from 'react-icons-kit/feather/eyeOff';
 import {eye} from 'react-icons-kit/feather/eye';
@@ -173,9 +173,9 @@ const Profile = () => {
     }
   }
 
-  useEffect(() => {
+  /*useEffect(() => {
     console.log(`User object : ${user}`);
-  },[user]);
+  },[user]);*/
 
   return (
     <>
@@ -228,7 +228,7 @@ const Profile = () => {
                       onClick={() => toogleDisable()}
                       size="md"
                     >
-                      Modifier mes informations
+                      Mettre à jour
                     </Button>
                   </Col>
                 </Row>

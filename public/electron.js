@@ -23,8 +23,8 @@ function createWindow() {
     mainWindow.setMenuBarVisibility(false);
 
     mainWindow.loadURL(
-        //`http://localhost:3000`
-        `file://${path.join(__dirname, '../build/index.html')}`
+        `http://localhost:3000`
+        //`file://${path.join(__dirname, '../build/index.html')}`
         //isDev ? `http://localhost:3000` : `file://${path.join(__dirname, '/../build/index.html')}`
     );
 
@@ -71,14 +71,14 @@ function updatePersonnel(event, req) {
 }
 // functions for decision : 
 function getDecision(event, arg) {
-    pool.query('SELECT id_decision,numero_decision,objet_decision,signataire_decision,date_decision,libelle_type_personnel FROM decision,type_personnel WHERE decision.id_type_personnel = type_personnel.id_type_personnel', (err, res) => {
+    pool.query('SELECT id_decision,decision.id_type_personnel,numero_decision,objet_decision,signataire_decision,date_decision,libelle_type_personnel,statut_decision FROM decision,type_personnel WHERE decision.id_type_personnel = type_personnel.id_type_personnel', (err, res) => {
         if (err) throw err;
         event.sender.send('all-decision', res);
     });
 }
 
 function getSpecificDec(event, arg) {
-    pool.query('SELECT * FROM decision WHERE id_decision =?', [arg], (err, res) => {
+    pool.query('SELECT * FROM decision WHERE id_type_personnel =? AND statut_decision = "activé"', [arg], (err, res) => {
         if (err) throw err;
         event.sender.send('specific-decision', res);
     });
@@ -88,6 +88,20 @@ function addDecision(event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
         event.sender.send('decision-added-success', { message: 'Decision ajouté avec succès!' });
+    })
+}
+
+function changeStatutDecision(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('decision-changed-success');
+    })
+}
+
+function updateDecision(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('decision-updated-success', { message: 'Decision mis à jour avec succès!' });
     })
 }
 
@@ -384,7 +398,9 @@ app.whenReady().then(() => {
     // decision
     ipcMain.on('get-decision', getDecision);
     ipcMain.on('add-decision', addDecision);
+    ipcMain.on('update-decision', updateDecision);
     ipcMain.on('delete-decision', deleteDecision);
+    ipcMain.on('change-decision-statut', changeStatutDecision);
     ipcMain.on('get-specific-decision', getSpecificDec);
     // conge type  
     ipcMain.on('get-conge-type', getCongeType);
