@@ -97,10 +97,6 @@ const Permission = () => {
         setStateFunction(e.target.value);
     };
 
-    const editPermission = (p) => {
-        console.log("you want to edit the permission : ", p);
-    }
-
     function firstDateOfMonth(d){
 		//var date = new Date();
         var y = d.getFullYear();
@@ -618,12 +614,6 @@ const Permission = () => {
                                                         <i className="fas fa-ellipsis-v" />
                                                     </DropdownToggle>
                                                     <DropdownMenu className="dropdown-menu-arrow" right>
-                                                        <DropdownItem
-                                                            onClick={() => editPermission(p)}
-                                                            disabled
-                                                        >
-                                                            Modifier la permission
-                                                        </DropdownItem>
                                                         <DropdownItem
                                                             onClick={() => saveAttestationRepPermission(p)}
                                                             disabled={p.statut_permission === "terminé" ? false : true}
