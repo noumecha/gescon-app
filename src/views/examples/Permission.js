@@ -279,6 +279,13 @@ const Permission = () => {
                         },7000)
                         return;
                     }
+                    if (formatDate(startDate) === formatDate(userConge[index].date_debut_conge)) {
+                        setError(`Impossible de définir une permission pour cette date car ${sexe === 'M' ? 'M' : 'Mme'} ${name} a un congé prévu cette meme date`);
+                        setTimeout(() => {
+                            setError("");
+                        },7000)
+                        return;
+                    }
   
                 }
             }
