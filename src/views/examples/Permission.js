@@ -457,8 +457,7 @@ const Permission = () => {
                           console.log("le statut du personnel a été mis à jour");
                         }
                         if ((date.getDate() === permission[x].date_fin_permission.getDate() && date.getMonth() === permission[x].date_fin_permission.getMonth() && date.getFullYear() === permission[x].date_fin_permission.getFullYear()) || (date.getDate() > permission[x].date_fin_permission.getDate() && date.getMonth() === permission[x].date_fin_permission.getMonth() && date.getFullYear() === permission[x].date_fin_permission.getFullYear())) {
-                          const statut_permission = "terminé";
-                          const req_permission = `UPDATE permission SET statut_permission = "${statut_permission}" WHERE id_permission = ${permission[x].id_permission}`;
+                          const req_permission = `UPDATE permission SET statut_permission = "terminé" WHERE id_permission = ${permission[x].id_permission}`;
                           window.electronAPI.addPermission(req_permission);
                           setSuccess(`La permission de ${permission[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${permission[x].nom_prenom_personnel} a été actualisé`);
                           setStatus(`Le satut de la permission de ${permission[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${permission[x].nom_prenom_personnel} a été mis à jour !`);  
@@ -467,8 +466,7 @@ const Permission = () => {
                           }, 3000)
                         }
                         if (date.getDate() === new Date(permission[0].attestation_permission.repriseDate).getDate() && date.getMonth() === new Date(permission[0].attestation_permission.repriseDate).getMonth() && date.getFullYear() === new Date(permission[0].attestation_permission.repriseDate).getFullYear()) {
-                          const statut = "en poste";
-                          const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${permission[x].id_personnel};`;
+                          const req_personnel = `UPDATE personnel SET statut_personnel = "en poste" WHERE id_personnel = ${permission[x].id_personnel};`;
                           window.electronAPI.updatePersonnel(req_personnel);
                           console.log("le personnel est désormais en poste");
                         }
@@ -554,6 +552,15 @@ const Permission = () => {
                 <div className="col p-0">
                     <div className="col">
                         <Card className="shadow">
+                            <Row>
+                                <Col lg="12">
+                                    { success && 
+                                        <Alert className="text-center" color="success">
+                                            {success}
+                                        </Alert>
+                                    }
+                                </Col>
+                            </Row>
                             <CardHeader className="bg-white border-2 d-flex justify-content-center">
                                 <h3 className="mb-0 text-center">Listes des Permissions</h3>
                                 <Button
@@ -903,11 +910,6 @@ const Permission = () => {
                                         { error && 
                                             <Alert color="danger">
                                                 {error}
-                                            </Alert>
-                                        }
-                                        { success && 
-                                            <Alert color="success">
-                                                {success}
                                             </Alert>
                                         }
                                     </Col>
