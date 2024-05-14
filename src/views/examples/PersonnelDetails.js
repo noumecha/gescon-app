@@ -43,7 +43,8 @@ const PersonnelDetails = () => {
     }, [selectedPerson.id_personnel])
 
     useEffect(() => {
-        if (nberConge.length > 0 || nberPermission.length > 0) {
+        setTotalDays(selectedPerson.nb_jours_conges + selectedPerson.nb_jours_permission);
+        /*if (nberConge.length > 0 || nberPermission.length > 0) {
             let total = 0;
             nberConge.forEach(element => {
                 total += element.duree_conge;
@@ -57,8 +58,8 @@ const PersonnelDetails = () => {
             } else {
                 setTotalDays(total);
             }
-        }
-    }, [nberConge, nberPermission])
+        }*/
+    },[selectedPerson] /*[nberConge, nberPermission]*/)
 
     function formatDate(d, m) {
         const date = new Date(d);
