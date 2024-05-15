@@ -289,7 +289,76 @@ export function parseOptions(parent, options) {
     }
   }
 }
+// Charts for specific Stats 
+export const ChartStructureStats = (props) => {
+  const conges = props.structConge;
 
+  // usefull function 
+  function formatDate(d) {
+    const date = new Date(d);
+    const day = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    return new Date(year, month, day);
+  }  
+  
+  const getCongeMonth = (month) => {
+    let total = 0;
+    if (conges.length > 0) {
+      conges.forEach(element => {
+        if (formatDate(element.date_debut_conge).getMonth() === month) {
+          total += 1;
+        }
+      });
+    }
+    return total;
+  };
+
+  const chartOptions = {
+    scales: {
+      yAxes: [
+        {
+          gridLines: {
+            color: colors.gray[900],
+            zeroLineColor: colors.gray[900],
+          },
+          ticks: {
+            callback: function (value) {
+              if (Number.isInteger(value)) {
+                return  value;
+              }
+              return '';
+            },
+          },
+        },
+      ],
+    },
+    tooltips: {
+      callbacks: {
+        label: function (item, data) {
+          var yLabel = item.yLabel;
+          var content = yLabel ;
+
+          return content;
+        },
+      },
+    },
+  }
+
+  const totalCongeDatas = Array.from({ length: 12 }, (_, i) => getCongeMonth(i));
+
+  const chartDatas = {
+    labels: ["Jan", "Fev", "Mar", "Avr", "Mai", "Jun", "Jul", "Aûo", "Sep", "Oct", "Nov", "Dec"],
+    datasets: [
+      {
+        label: "Performance",
+        data : totalCongeDatas
+      },
+    ],
+  }
+
+  return <Line data={chartDatas} options={chartOptions} />
+};
 // Example 1 of Chart inside src/views/Index.js (Sales value - Card)
 export const ChartExample1 = () => {
   const [conges, setConges] = useState([]);
