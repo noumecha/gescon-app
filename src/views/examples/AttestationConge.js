@@ -239,6 +239,8 @@ const AttestationConge = () => {
                                                         endDate={att_con.attestation_conge.endDate}
                                                         repriseDate={att_con.attestation_conge.repriseDate}
                                                         typeConge={att_con.attestation_conge.typeConge}
+                                                        preposition={att_con.attestation_conge.preposition}
+                                                        grade={att_con.attestation_conge.grade}
                                                     />} fileName={`attestation_conge_${att_con.nom_prenom_personnel}_du_${att_con.attestation_conge.startDate}_au_${att_con.attestation_conge.endDate}.pdf`}>
                                                     {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 
                                                         <Button

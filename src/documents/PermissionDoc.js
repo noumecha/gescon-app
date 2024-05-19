@@ -296,7 +296,7 @@ const PermissionDoc = (props) => {
                     </Text>
                     <Text style={styles.pCertifText}>
                         Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
-                        {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service (au/à la) {props.structure} est bénéficiaire
+                        {props.grade}, Mle {props.matricule}, {props.poste} {props.preposition} {props.structure} est bénéficiaire
                         d'une permission de {props.duration} jours.
                     </Text>
                     <Text style={styles.pCertifText}>

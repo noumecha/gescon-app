@@ -190,7 +190,7 @@ const AttestationRepConge = () => {
                     <div className="col">
                         <Card className="shadow">
                             <CardHeader className="bg-white border-2 d-flex justify-content-center">
-                                <h3 className="mb-0 text-center">Listes des Attestations de Congés</h3>
+                                <h3 className="mb-0 text-center">Listes des Attestations de Reprise après Congés</h3>
                                 <Button
                                     size="sm"
                                     className="ml-3"
@@ -237,6 +237,8 @@ const AttestationRepConge = () => {
                                                     endDate={att_con.attestation_reprise_service.endDate}
                                                     repriseDate={att_con.attestation_reprise_service.repriseDate}
                                                     typeConge={att_con.attestation_reprise_service.typeConge}
+                                                    preposition={att_con.attestation_reprise_service.preposition}
+                                                    grade={att_con.attestation_reprise_service.grade}
                                                 />} fileName={`attestation_reprise_service_${att_con.nom_prenom_personnel}_du_${att_con.attestation_reprise_service.startDate}_au_${att_con.attestation_reprise_service.endDate}.pdf`}>
                                                 {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 
                                                     <Button

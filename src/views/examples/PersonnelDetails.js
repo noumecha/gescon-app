@@ -100,6 +100,32 @@ const PersonnelDetails = () => {
         }
         return acc;
     }, []);
+    // statistics permissions : 
+    let statisticsPermission = nberPermission.reduce((acc, permission) => {
+        let year = formatDate(permission.date_debut_permission, 0).getFullYear();
+        let existingStat = acc.find(stat => stat.year === year);
+        if (existingStat) {
+            existingStat.totalYearsPermission += 1;
+            existingStat.permissions.push({
+                id : permission.id_permission,
+                dd : formatDate(permission.date_debut_permission, 1),
+                df : formatDate(permission.date_fin_permission, 1),
+                duree : permission.duree_permission
+            });
+        } else {
+            acc.push({
+                year : year,
+                totalYearsPermission : 1,
+                permissions : [{
+                    id : permission.id_permission,
+                    dd : formatDate(permission.date_debut_permission, 1),
+                    df : formatDate(permission.date_fin_permission, 1),
+                    duree : permission.duree_permission
+                }]
+            });
+        }
+        return acc;
+    }, []);
 
     return (
         <>
@@ -236,21 +262,27 @@ const PersonnelDetails = () => {
                     </Card>
                 </Col>
               </Row>
-                {/*<Row>
+                <Row>
                     <Col className="order-xl-1" xl="8">
                         <PDFViewer>
                             <PersonnelDoc
                                 name={selectedPerson.nom_prenom_personnel}
                                 statistics={statistics}
+                                statisticsPermission={statisticsPermission}
+                                conges={selectedPerson.nb_jours_conges}
+                                permissions={selectedPerson.nb_jours_permission}
                             />
                         </PDFViewer>
                     </Col>
-                </Row>*/}
+                </Row>
                 <Row>
                     <Col className="order-xl-1" xl="8">
-                        <PDFDownloadLink document={<PersonnelDoc   
+                        <PDFDownloadLink document={<PersonnelDoc  
                                 name={selectedPerson.nom_prenom_personnel}
-                                statistics={statistics}                   
+                                statistics={statistics}
+                                statisticsPermission={statisticsPermission}
+                                conges={selectedPerson.nb_jours_conges}
+                                permissions={selectedPerson.nb_jours_permission}              
                             />} fileName={`fiche_du_personnel_${selectedPerson.nom_prenom_personnel}.pdf`}>
                             {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 
                             <Button

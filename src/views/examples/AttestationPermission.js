@@ -234,6 +234,8 @@ const AttestationPermission = () => {
                                                         startDate={att_perm.attestation_permission.startDate}
                                                         endDate={att_perm.attestation_permission.endDate}
                                                         repriseDate={att_perm.attestation_permission.repriseDate}
+                                                        preposition={att_perm.attestation_permission.preposition}
+                                                        grade={att_perm.attestation_permission.grade}
                                                     />} fileName={`attestation_depart_permission_${att_perm.matricule_personnel}_${att_perm.nom_prenom_personnel}_${att_perm.attestation_permission.startDate}_${att_perm.attestation_permission.endDate}.pdf`}>
                                                     {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 
                                                         <Button

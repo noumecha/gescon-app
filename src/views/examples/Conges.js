@@ -27,8 +27,6 @@ import {
 import Header from "components/Headers/Header.js";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-//import { PDFViewer,PDFDownloadLink } from '@react-pdf/renderer';
-//import CongeDoc from "documents/CongeDoc";
 
 const Conges = () => {
   const location = useLocation();
@@ -42,6 +40,8 @@ const Conges = () => {
   const [repriseDate, setRepriseDate] = useState("");
   const [selectedType, setSelectedType] = useState(typeConge.length > 0 ? typeConge[0].libelle_type_conge : "congé administratif partiel");
   const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom_personnel : "TCHUENTE");
+  const preposition = selectedPerson ? selectedPerson.preposition_personnel : "au";
+  const grade = selectedPerson ? selectedPerson.grade_personnel : "GRADE";
   const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule_personnel : "XD3 566");
   const [type, setType] = useState(selectedPerson ? selectedPerson.id_type_personnel === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
   const [selectedDec, setSelectedDec] = useState("");
@@ -194,6 +194,8 @@ const Conges = () => {
           endDate: endDate,
           repriseDate: repriseDate,
           typeConge: selectedType,
+          preposition: preposition,
+          grade : grade,
         }
         const conge_data = {
           startDate : startDate,
@@ -247,6 +249,8 @@ const Conges = () => {
         endDate: c.attestation_conge.endDate,
         repriseDate: c.attestation_conge.repriseDate,
         typeConge: c.attestation_conge.typeConge,
+        preposition : c.attestation_conge.preposition,
+        grade : c.attestation_conge.grade,
       }
       const created_at_att_rep_conge = new Date().toISOString().slice(0,19).replace('T',' ');
       const req = `UPDATE conge SET created_at_reprise_service = "${created_at_att_rep_conge}",attestation_reprise_service='${JSON.stringify(attestation_reprise)}',statut_att_rep_conge="non archivé" WHERE ${c.id_conge}=conge.id_conge`; 
