@@ -693,7 +693,7 @@ const Permission = () => {
                                             <td>{p.nom_prenom_personnel}</td>    
                                             <td>{p.date_debut_permission.getDate() + "/" + (parseInt(p.date_debut_permission.getMonth()+1) <= 9 ? "0"+parseInt(p.date_debut_permission.getMonth()+1) : parseInt(p.date_fin_permission.getMonth()+1)) + "/" + p.date_debut_permission.getFullYear()}</td>
                                             <td>{p.date_fin_permission.getDate() + "/" + (parseInt(p.date_fin_permission.getMonth()+1) <= 9 ? "0"+parseInt(p.date_fin_permission.getMonth()+1) : parseInt(p.date_fin_permission.getMonth()+1)) + "/" + p.date_fin_permission.getFullYear()}</td>
-                                            <td>{curr_date >= p.date_debut_permission && curr_date <= p.date_fin_permission ? Math.ceil((p.date_fin_permission - curr_date) / (1000 * 3600 * 24)) : Math.ceil((p.date_fin_permission - p.date_debut_permission)/ (1000 * 3600 * 24) + 1) }</td>
+                                            <td>{p.statut_permission !== "terminé" ? curr_date >= p.date_debut_permission && curr_date <= p.date_fin_permission ? Math.ceil((p.date_fin_permission - curr_date) / (1000 * 3600 * 24)) : Math.ceil((p.date_fin_permission - p.date_debut_permission)/ (1000 * 3600 * 24) + 1) : 0 }</td>
                                             <td>{p.statut_permission === "en cours"
                                                 ? <Badge color="success">
                                                     {p.statut_permission}

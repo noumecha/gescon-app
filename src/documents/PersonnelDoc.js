@@ -373,8 +373,8 @@ const PersonnelDoc = (props) => {
                 Annéés
               </Text>
               {props.statistics && props.statistics.length > 0 && (
-                props.statistics.map((stat) => (
-                  <View key={stat} style={styles.containerTableFirstRowHeaderContainer}>
+                props.statistics.map((stat, index) => (
+                  <View key={index} style={styles.containerTableFirstRowHeaderContainer}>
                     {stat.conges.map((c, index) => (
                     <Text key={c.id} style={styles.containerTableFirstRowHeader}>
                       Congé {parseInt(index + 1)}

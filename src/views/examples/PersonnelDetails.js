@@ -127,6 +127,9 @@ const PersonnelDetails = () => {
         return acc;
     }, []);
 
+    console.log(`statistics congés : ${JSON.stringify(statistics)}`);
+    console.log(`statistics permissions : ${JSON.stringify(statisticsPermission)} `);
+
     return (
         <>
             <Header />
@@ -262,7 +265,7 @@ const PersonnelDetails = () => {
                     </Card>
                 </Col>
               </Row>
-                <Row>
+                {/*<Row>
                     <Col className="order-xl-1" xl="8">
                         <PDFViewer>
                             <PersonnelDoc
@@ -274,7 +277,7 @@ const PersonnelDetails = () => {
                             />
                         </PDFViewer>
                     </Col>
-                </Row>
+                </Row>*/}
                 <Row>
                     <Col className="order-xl-1" xl="8">
                         <PDFDownloadLink document={<PersonnelDoc  
