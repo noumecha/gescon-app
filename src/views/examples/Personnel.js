@@ -48,6 +48,7 @@ const Personnel = () => {
     const [loadingSpinner, setLoadingSpinner] = useState(true);
     const loadingText = "Aucune donnée dans la base de données";
     const navigate = useNavigate();
+    const currDate = new Date();
 
     /** code for excel import */
     const handleFileSubmit = (e) => {
@@ -122,6 +123,37 @@ const Personnel = () => {
             console.error("Erreur Trouvé : " + err.message);
         }
     }
+    // useEffect() update for the new year 
+    /*const updateYear = async () => {
+        try {
+            for (let x = 0; x < personnel.length; x++) {
+                // --- ---- ---- 
+                if (personnel[x].nb_jours_conges < 18 && personnel[x].id_type_personnel === 2) {
+                    const req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges) WHERE id_personnel = ${personnel[x].id_personnel};`;
+                    window.electronAPI.updatePersonnel(req_personnel);
+                    window.electronAPI.congeAddedSuccess(() => {
+                        console.log(`personnel mis à jour pour la nouvelle année`);
+                    });
+                }
+                // remise à 0 pour ceux qui ont pris tout leur congé l'année précédente
+                if ((personnel[x].nb_jours_conges === 18 && personnel[x].id_type_personnel === 2) || (personnel[x].nb_jours_conges === 30 && personnel[x].id_type_personnel === 1)) {
+                    const req_personnel = `UPDATE personnel SET nb_jours_conges = 0 WHERE id_personnel = ${personnel[x].id_personnel};`;
+                    window.electronAPI.updatePersonnel(req_personnel);
+                    window.electronAPI.congeAddedSuccess(() => {
+                        console.log(`personnel mis à jour pour la nouvelle année`);
+                    });
+                }
+            }
+        } catch (error) {
+            console.log(`Erreur lors de la mise à jour annuelle ${error.message}`);
+        }
+    }
+
+    useEffect(() => {
+        if (currDate.getFullYear()) {
+            updateYear();
+        }
+    }, []);*/
 
     /** useeffect for common function and fetching */
     const fetchDatas = async () => {

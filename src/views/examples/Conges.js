@@ -36,7 +36,6 @@ const Conges = () => {
   const [userConge, setUserConge] = useState([]);
   const [typeConge, setTypeConge] = useState([]);
   const [startDate, setStartDate] = useState("");
-  const [duration, setDuration] = useState(selectedPerson ? selectedPerson.id_type_personnel === 1 ? "30" : "18" : "18");
   const [endDate, setEndDate] = useState("");
   const [repriseDate, setRepriseDate] = useState("");
   const [selectedType, setSelectedType] = useState(typeConge.length > 0 ? typeConge[0].libelle_type_conge : "congé administratif partiel");
@@ -56,6 +55,7 @@ const Conges = () => {
   const [document, setDocument] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [generateSuccess, setGenerateSuccess] = useState("");
   const [status, setStatus] = useState(`${sexe === 'M' ? 'M' : 'Mme'} ${name} à droit à ${nb_jours_conges} ${nb_jours_conges > 1 ? "jours" : "jour"} de congés`);
   const [visible, setVisible] = useState(true);
   const [conge, setConge] = useState([]);
@@ -68,6 +68,7 @@ const Conges = () => {
   const loadingText = "Aucune donnée dans la base de données";
   const [actived, setActived] = useState(selectedPerson === undefined ? true : false);
   const curr_date = new Date();
+  const [duration, setDuration] = useState(selectedPerson ? selectedPerson.id_type_personnel === 1 ? "30" : "18" : "18");
   let nbDaysConges = 0;
 
   const filterConge = search !== "" || statutFilter !== ""
@@ -269,7 +270,6 @@ const Conges = () => {
       const req_conge = `INSERT INTO conge 
         (date_debut_conge, date_fin_conge, duree_conge, created_at_conge,attestation_conge,id_type_conge,id_personnel,demande_conge,statut_conge,statut_attestation_conge,document_a_fournir) 
         VALUES ("${conge_data.startDate}","${conge_data.endDate}",${conge_data.duration},"${conge_data.curr_date}",'${JSON.stringify(attestation)}',${conge_data.id_type_conge},${conge_data.id_personnel},"${conge_data.demandeFile}","${conge_data.statut_conge}","${conge_data.statut_attestation_conge}","${conge_data.document}");`;
-      //const statut = curr_date >= conge_data.startDate && curr_date <= conge_data.endDate ? "en congé" : "en poste";
       const req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges + ${duration}) WHERE id_personnel = ${conge_data.id_personnel};`;
       window.electronAPI.addConge(req_conge);
       window.electronAPI.updatePersonnel(req_personnel);
@@ -290,7 +290,6 @@ const Conges = () => {
     try {
       c.attestation_conge = JSON.stringify(c.attestation_conge);
       c.attestation_conge = JSON.parse(c.attestation_conge);
-      console.log(`we are goin to generate an attestation of reprise for conge ${JSON.stringify(c.attestation_conge)}`);
       const attestation_reprise = {
         name: c.attestation_conge.name,
         matricule: c.attestation_conge.matricule,
@@ -311,11 +310,11 @@ const Conges = () => {
       const req = `UPDATE conge SET created_at_reprise_service = "${created_at_att_rep_conge}",attestation_reprise_service='${JSON.stringify(attestation_reprise)}',statut_att_rep_conge="non archivé" WHERE ${c.id_conge}=conge.id_conge`; 
       window.electronAPI.addArchiveAttestationRepConge(req);
       await window.electronAPI.addArchiveAttCongeRepSuccess((event, res) => {
-        setSuccess("Attestation de reprise générer avec succès");
-        setStatus(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
+        setGenerateSuccess("Attestation de reprise générer avec succès");
+        console.log(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
       });
       setTimeout(() => {
-        setSuccess("");
+        setGenerateSuccess("");
       }, 3000)
       setActived(true);
     } catch (error) {
@@ -337,9 +336,17 @@ const Conges = () => {
 
   // useEffect for calculate the end conge date base on the start date and duration
   useEffect(() => {
+    const changeDuration = () => {
+      if (selectedType === "congé maternité" && selectedPerson.sexe_personnel !== "M") {
+        setDuration("98");
+      }
+      if (selectedType === "congé maladie") {
+        setDuration("90");
+      }
+    };
     const calculateEndDate = () => {
       if (startDate && duration) {
-        if (selectedPerson.id_type_personnel === 2) {
+        if (selectedPerson.id_type_personnel === 2 && (selectedType === "congé administratif total" || selectedType === "congé administratif partiel")) {
           let st = new Date(startDate);
           let weekdaysToAdd = duration - 1;
           while (weekdaysToAdd > 0) {
@@ -373,12 +380,13 @@ const Conges = () => {
       }
     };
     calculateEndDate();
-  }, [startDate, duration,typeConge]);
+    changeDuration();
+  }, [startDate, duration,typeConge,selectedType, selectedPerson]);
 
   /** useEffect for updating personnel and congé base on some state of current date */
   useEffect(() => {
     const updatePersonnelState = async () => {
-    try {
+      try {
       //const statut = curr_date >= conge_data.startDate && curr_date <= conge_data.endDate ? "en congé" : "en poste";
       if (conge.length > 0) {
         let date = new Date();
@@ -399,8 +407,8 @@ const Conges = () => {
             const statut_conge = "terminé";
             const req_conge = `UPDATE conge SET statut_conge = "${statut_conge}" WHERE id_conge = ${conge[x].id_conge}`;
             window.electronAPI.addConge(req_conge);
-            setSuccess(`Le congé de ${conge[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${conge[x].nom_prenom_personnel} a été actualisé`);
-            setStatus(`Le satut du congé de ${conge[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${conge[x].nom_prenom_personnel} a été mis à jour !`);  
+            console.log(`Le congé de ${conge[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${conge[x].nom_prenom_personnel} a été actualisé`);
+            console.log(`Le satut du congé de ${conge[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${conge[x].nom_prenom_personnel} a été mis à jour !`);  
             setTimeout(() => {
               setSuccess("");
             }, 3000)
@@ -413,9 +421,9 @@ const Conges = () => {
           }
         }
       }
-    } catch (err) {
-      console.error("Erreur : " + err.message);
-    }
+      } catch (err) {
+        console.error("Erreur : " + err.message);
+      }
     }
     updatePersonnelState()
   }, [conge]);
@@ -438,7 +446,7 @@ const Conges = () => {
     }
     getSpecificConge();
     fetchDatas();
-  }, []);
+  },[]);
 
   const handleRefresh = () => {
     try {
@@ -492,6 +500,20 @@ const Conges = () => {
           </Col>
           <Col lg="12">
             <Card className="shadow">
+              <Row>
+                <Col md="12" className="text-center">
+                  {/* generateError && 
+                    <Alert color="danger">
+                      {generateError}
+                    </Alert>
+                  */}
+                  { generateSuccess && 
+                    <Alert color="success">
+                      {generateSuccess}
+                    </Alert>
+                  }
+                </Col>
+              </Row>
               <CardHeader className="bg-white border-2 d-flex justify-content-center">
                 <h3 className="mb-0 text-center">Listes des Congés</h3>
                 <Button
