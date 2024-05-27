@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 // reactstrap components
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -12,18 +13,65 @@ import {
   InputGroupText,
   InputGroup,
   Col,
+  Row,
+  Alert,
 } from "reactstrap";
 import { useAuth } from "services/AuthContext";
+import {Icon} from 'react-icons-kit';
+import {eyeOff} from 'react-icons-kit/feather/eyeOff';
+import {eye} from 'react-icons-kit/feather/eye';
+const bcrypt = require("bcryptjs")
 
 const Login = ({ onLogin }) => {
 
+  const [showPwd, setShowPwd] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [users, setUsers] = useState('');
+  const [error, setError] = useState('');
   const { login } = useAuth();
 
-  function handleLogin() {
-    login();
+  const toggleShowPwd = () => {
+    setShowPwd(!showPwd);
   }
+
+  function handleLogin() {
+    /*if (!password || !username) {
+      setError('Renseigner vos informations de connexion!');
+      setTimeout(() => {
+        setError("");
+      },4000)
+      return;
+    }
+    const matchedUser = users.find(
+      (user) => user.nom_utilisateur === username && bcrypt.compareSync(password, user.mdp_utilisateur)
+    );
+    if (matchedUser) {
+      login(matchedUser);
+      // console.log("match");
+    } else {
+      setError("nom d'utilisateur ou mot de passe incorrect");
+      setTimeout(() => {
+        setError("");
+      },4000);
+    }*/
+    login(users[0]);
+  }
+
+  const fetchUsers = async () => {
+    try {
+      window.electronAPI.getUsers();
+      await window.electronAPI.retrieveUsers((event, res) => {
+        setUsers(res);
+      })
+    } catch (error) {
+        console.error("Erreur : " + error.message);
+    }
+  }
+
+  useEffect (() => {
+    fetchUsers();
+  }, [])
 
   return (
     <>
@@ -60,15 +108,29 @@ const Login = ({ onLogin }) => {
                   </InputGroupAddon>
                   <Input
                     placeholder="Mot de passe"
-                    type="password"
                     autoComplete="new-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    type={showPwd ? "text" : "password"}
                   />
+                  <InputGroupAddon addonType="prepend">
+                    <InputGroupText onClick={toggleShowPwd}>
+                      <Icon className="absolute mr-10" icon={showPwd ? eye : eyeOff } size={18}/>
+                    </InputGroupText>
+                  </InputGroupAddon>
                 </InputGroup>
               </FormGroup>
+              <Row>
+                <Col lg="12">
+                  {error && 
+                    <Alert className="text-center" color="danger">
+                      {error}
+                    </Alert>
+                  }
+                </Col>
+              </Row>
               <div className="text-center">
-                <Button onClick={handleLogin} className="my-4" color="primary" type="button">
+                <Button onClick={handleLogin} className="" color="primary" type="button">
                   Se Connecter
                 </Button>
               </div>

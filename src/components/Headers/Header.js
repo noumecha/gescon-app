@@ -102,7 +102,7 @@ const Header = () => {
                           tag="h5"
                           className="text-uppercase text-muted mb-0"
                         >
-                          Performance
+                          Ratio
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0"> {nberPersonnel ? perf : 0}%</span>
                       </div>

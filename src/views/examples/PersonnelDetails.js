@@ -1,315 +1,303 @@
+/* eslint-disable no-unused-vars */
 import {
-    Button,
     Card,
     CardHeader,
     CardBody,
-    FormGroup,
-    Form,
-    Input,
     Container,
     Row,
     Col,
+    Button,
 } from "reactstrap";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "components/Headers/Header.js";
+import PersonnelDoc from "documents/PersonnelDoc";
+import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 
 const PersonnelDetails = () => {
     
     const location = useLocation();
     const { selectedPerson } = location.state || {};
-    // Display detailed information about the personnel
+    const [nberConge, setNberConge] = useState([]);
+    const [nberPermission, setNberPermission] = useState([]);
+    const [totalDays, setTotalDays] = useState(0);
+
+    useEffect(() => {
+        const func = async () => {
+            try {
+                const test_conge_req = `SELECT * FROM conge WHERE id_personnel = ${selectedPerson.id_personnel}`;
+                window.electronAPI.getSpecificConge(test_conge_req);
+                await window.electronAPI.retrieveSpecificConge((event, res) => {
+                    setNberConge(res);
+                })
+                const last_permission_req = `SELECT * FROM permission WHERE id_personnel = ${selectedPerson.id_personnel}`;
+                window.electronAPI.getLastPermission(last_permission_req);
+                await window.electronAPI.retrieveLastPermission((event, res) => {
+                    setNberPermission(res);
+                })
+            } catch (error) {
+                console.error("Erreur : " + error.message);
+            }
+        }
+        func();
+    }, [selectedPerson.id_personnel])
+
+    useEffect(() => {
+        setTotalDays(selectedPerson.nb_jours_conges + selectedPerson.nb_jours_permission);
+        /*if (nberConge.length > 0 || nberPermission.length > 0) {
+            let total = 0;
+            nberConge.forEach(element => {
+                total += element.duree_conge;
+            });
+            if (nberPermission.length > 0) {
+                let total_permission = 0;
+                nberPermission.forEach(element => {
+                    total_permission += element.duree_permission;
+                });
+                setTotalDays(total + total_permission);
+            } else {
+                setTotalDays(total);
+            }
+        }*/
+    },[selectedPerson] /*[nberConge, nberPermission]*/)
+
+    function formatDate(d, m) {
+        const date = new Date(d);
+        const day = date.getDate();
+        const month = date.getMonth();
+        const year = date.getFullYear();
+        if (m === 0) {
+            return new Date(year, month, day);
+        }
+        if (m === 1) {
+            return new Date(year, month, day).getDate() + "/" + (new Date(year, month, day).getMonth() < 10 ? "0"+parseInt(new Date(year, month, day).getMonth()+1) : parseInt(new Date(year, month, day).getMonth()+1))+ "/" + new Date(year, month, day).getFullYear()
+        }
+    }  
+
+    //let statistics = [stat1, stat2]
+    let statistics = nberConge.reduce((acc, conge) => {
+        let year = formatDate(conge.date_debut_conge, 0).getFullYear();
+        let existingStat = acc.find(stat => stat.year === year);
+        if (existingStat) {
+            existingStat.totalYearsConge += 1;
+            existingStat.conges.push({
+                id : conge.id_conge,
+                dd : formatDate(conge.date_debut_conge, 1),
+                df : formatDate(conge.date_fin_conge, 1),
+                duree : conge.duree_conge
+            });
+        } else {
+            acc.push({
+                year : year,
+                totalYearsConge : 1,
+                conges : [{
+                    id : conge.id_conge,
+                    dd : formatDate(conge.date_debut_conge, 1),
+                    df : formatDate(conge.date_fin_conge, 1),
+                    duree : conge.duree_conge
+                }]
+            });
+        }
+        return acc;
+    }, []);
+    // statistics permissions : 
+    let statisticsPermission = nberPermission.reduce((acc, permission) => {
+        let year = formatDate(permission.date_debut_permission, 0).getFullYear();
+        let existingStat = acc.find(stat => stat.year === year);
+        if (existingStat) {
+            existingStat.totalYearsPermission += 1;
+            existingStat.permissions.push({
+                id : permission.id_permission,
+                dd : formatDate(permission.date_debut_permission, 1),
+                df : formatDate(permission.date_fin_permission, 1),
+                duree : permission.duree_permission
+            });
+        } else {
+            acc.push({
+                year : year,
+                totalYearsPermission : 1,
+                permissions : [{
+                    id : permission.id_permission,
+                    dd : formatDate(permission.date_debut_permission, 1),
+                    df : formatDate(permission.date_fin_permission, 1),
+                    duree : permission.duree_permission
+                }]
+            });
+        }
+        return acc;
+    }, []);
+
+    console.log(`statistics congés : ${JSON.stringify(statistics)}`);
+    console.log(`statistics permissions : ${JSON.stringify(statisticsPermission)} `);
+
     return (
         <>
             <Header />
             {/* Page content */}
-            <Container className="mt--7" fluid>
-            <Row>
+            <Container className="mt--4" fluid>
+              <Row>
                 <Col className="order-xl-2 mb-5 mb-xl-0" xl="4">
-                    <Card className="card-profile shadow">
-                        <Row className="justify-content-center">
-                        <Col className="order-lg-2" lg="3">
-                            <div className="card-profile-image">
-                            <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                                <img
-                                alt="..."
-                                className="rounded-circle"
-                                src={require("../../assets/img/theme/team-4-800x800.jpg")}
-                                />
-                            </a>
-                            </div>
-                        </Col>
-                        </Row>
-                        <CardHeader className="text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
-                        <div className="d-flex justify-content-between">
-                            <Button
-                            className="mr-4"
-                            color="info"
-                            href="#pablo"
-                            onClick={(e) => e.preventDefault()}
-                            size="sm"
-                            >
-                            Connect
-                            </Button>
-                            <Button
-                            className="float-right"
-                            color="default"
-                            href="#pablo"
-                            onClick={(e) => e.preventDefault()}
-                            size="sm"
-                            >
-                            Message
-                            </Button>
+                  <Card className="card-profile shadow">
+                    <Row className="justify-content-center mb-7">
+                      <Col className="order-lg-2" lg="3">
+                        <div className="card-profile-image">
+                          <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                            <img
+                              alt="..."
+                              className="rounded-circle"
+                              src={require("../../assets/img/theme/user_good.png")}
+                            />
+                          </a>
                         </div>
-                        </CardHeader>
-                        <CardBody className="pt-0 pt-md-4">
-                        <Row>
-                            <div className="col">
-                            <div className="card-profile-stats d-flex justify-content-center mt-md-5">
-                                <div>
-                                <span className="heading">22</span>
-                                <span className="description">Friends</span>
-                                </div>
-                                <div>
-                                <span className="heading">10</span>
-                                <span className="description">Photos</span>
-                                </div>
-                                <div>
-                                <span className="heading">89</span>
-                                <span className="description">Comments</span>
-                                </div>
-                            </div>
-                            </div>
-                        </Row>
-                        <div className="text-center">
-                            <h3>
-                            Jessica Jones
-                            <span className="font-weight-light">, 27</span>
-                            </h3>
-                            <div className="h5 font-weight-300">
-                            <i className="ni location_pin mr-2" />
-                            Bucharest, Romania
-                            </div>
-                            <div className="h5 mt-4">
-                            <i className="ni business_briefcase-24 mr-2" />
-                            Solution Manager - Creative Tim Officer
-                            </div>
-                            <div>
-                            <i className="ni education_hat mr-2" />
-                            University of Computer Science
-                            </div>
-                            <hr className="my-4" />
-                            <p>
-                            Ryan — the name taken by Melbourne-raised, Brooklyn-based
-                            Nick Murphy — writes, performs and records all of his own
-                            music.
-                            </p>
-                            <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                            Show more
-                            </a>
+                      </Col>
+                    </Row>
+                    <CardBody className="my-4">
+                      <div className="text-center my-4">
+                        <div className="h3">
+                            Matricule : {selectedPerson.matricule_personnel}
                         </div>
-                        </CardBody>
-                    </Card>
+                        <div className="h3">
+                            Categorie : {selectedPerson.categorie_personnel}
+                        </div>
+                        <hr className="my-4" />
+                        <div className="h3 ">
+                            Statistiques
+                        </div>
+                        <div className="h4 mt-4 font-weight-400">
+                            Nombres de Congés : {nberConge.length}
+                        </div>
+                        <div className="h4 mt-4 font-weight-400">
+                            Nombres de Permissions : {nberPermission.length}
+                        </div>
+                        <div className="h4 mt-4 font-weight-400">
+                            Nombres total de jours : {totalDays}
+                        </div>
+                        <hr className="my-4" />
+                      </div>
+                    </CardBody>
+                  </Card>
                 </Col>
                 <Col className="order-xl-1" xl="8">
-                    <Card className="bg-secondary shadow">
-                        <CardHeader className="bg-white border-0">
+                    <Card>
+                        <CardHeader className="bg-info border-0">
                             <Row className="align-items-center">
-                                <Col xs="8">
-                                <h3 className="mb-0">
-                                    {selectedPerson.sexe_personnel === 'M' ? "M" : "Mme"} {selectedPerson.nom_prenom_personnel}
-                                </h3>
-                                </Col>
-                                <Col className="text-right" xs="4">
-                                <Button
-                                    color="primary"
-                                    href="#pablo"
-                                    onClick={(e) => e.preventDefault()}
-                                    size="sm"
-                                >
-                                    Settings
-                                </Button>
+                                <Col xs="6">
+                                    <h3 className="mb-0 text-white">Informations sur le personnel</h3>
                                 </Col>
                             </Row>
                         </CardHeader>
                         <CardBody>
-                            <Form>
-                                <h6 className="heading-small text-muted mb-4">
-                                    Imformations de base
-                                </h6>
-                                <div className="pl-lg-4">
-                                <Row>
-                                    <Col lg="6">
-                                        <FormGroup>
-                                            <label
-                                                className="form-control-label"
-                                                htmlFor="input-username"
-                                            >
-                                                Nom
-                                            </label>
-                                            <Input
-                                                className="form-control-alternative"
-                                                id="input-username"
-                                                value={selectedPerson.nom_prenom_personnel}
-                                                type="text"
-                                                readOnly
-                                            />
-                                        </FormGroup>
-                                    </Col>
-                                    <Col lg="6">
-                                        <FormGroup>
-                                            <label
-                                            className="form-control-label"
-                                            htmlFor="input-email"
-                                            >
-                                                Email address
-                                            </label>
-                                            <Input
-                                            className="form-control-alternative"
-                                            id="input-email"
-                                            placeholder="jesse@example.com"
-                                            type="email"
-                                            />
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col lg="6">
-                                    <FormGroup>
-                                        <label
-                                        className="form-control-label"
-                                        htmlFor="input-first-name"
-                                        >
-                                        First name
-                                        </label>
-                                        <Input
-                                        className="form-control-alternative"
-                                        defaultValue="Lucky"
-                                        id="input-first-name"
-                                        placeholder="First name"
-                                        type="text"
-                                        />
-                                    </FormGroup>
-                                    </Col>
-                                    <Col lg="6">
-                                    <FormGroup>
-                                        <label
-                                        className="form-control-label"
-                                        htmlFor="input-last-name"
-                                        >
-                                        Last name
-                                        </label>
-                                        <Input
-                                        className="form-control-alternative"
-                                        defaultValue="Jesse"
-                                        id="input-last-name"
-                                        placeholder="Last name"
-                                        type="text"
-                                        />
-                                    </FormGroup>
-                                    </Col>
-                                </Row>
-                                </div>
-                                <hr className="my-4" />
-                                {/* Address */}
-                                <h6 className="heading-small text-muted mb-4">
-                                Contact information
-                                </h6>
-                                <div className="pl-lg-4">
-                                <Row>
-                                    <Col md="12">
-                                        <FormGroup>
-                                            <label
-                                                className="form-control-label"
-                                                htmlFor="input-address"
-                                            >
-                                                Address
-                                            </label>
-                                            <Input
-                                                className="form-control-alternative"
-                                                defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
-                                                id="input-address"
-                                                placeholder="Home Address"
-                                                type="text"
-                                            />
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col lg="4">
-                                        <FormGroup>
-                                            <label
-                                                className="form-control-label"
-                                                htmlFor="input-city"
-                                            >
-                                                City
-                                            </label>
-                                            <Input
-                                                className="form-control-alternative"
-                                                defaultValue="New York"
-                                                id="input-city"
-                                                placeholder="City"
-                                                type="text"
-                                            />
-                                        </FormGroup>
-                                    </Col>
-                                    <Col lg="4">
-                                        <FormGroup>
-                                            <label
-                                                className="form-control-label"
-                                                htmlFor="input-country"
-                                            >
-                                                Country
-                                            </label>
-                                            <Input
-                                                className="form-control-alternative"
-                                                defaultValue="United States"
-                                                id="input-country"
-                                                placeholder="Country"
-                                                type="text"
-                                            />
-                                        </FormGroup>
-                                    </Col>
-                                    <Col lg="4">
-                                        <FormGroup>
-                                            <label
-                                                className="form-control-label"
-                                                htmlFor="input-country"
-                                            >
-                                                Postal code
-                                            </label>
-                                            <Input
-                                                className="form-control-alternative"
-                                                id="input-postal-code"
-                                                placeholder="Postal code"
-                                                type="number"
-                                            />
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
-                                </div>
-                                <hr className="my-4" />
-                                {/* Description */}
-                                <h6 className="heading-small text-muted mb-4">About me</h6>
-                                <div className="pl-lg-4">
-                                <FormGroup>
-                                    <label>About Me</label>
-                                    <Input
-                                    className="form-control-alternative"
-                                    placeholder="A few words about you ..."
-                                    rows="4"
-                                    defaultValue="GESCON-APP"
-                                    type="textarea"
-                                    />
-                                </FormGroup>
-                                </div>
-                            </Form>
+                            <Row className="text-left my-2">
+                                <Col lg="12">
+                                    <div className="h2">
+                                        Noms et Prenoms
+                                    </div>
+                                    <div className="h3 font-weight-400">
+                                        {selectedPerson.sexe_personnel === "M" ? "M" : "Mme"} {selectedPerson.nom_prenom_personnel}
+                                    </div>
+                                    <hr className="mt-2" />
+                                </Col>
+                                <Col lg="12">
+                                    <div className="h2">
+                                        Poste
+                                    </div>
+                                    <div className="h3 font-weight-400">
+                                        {selectedPerson.poste_personnel}
+                                    </div>
+                                    <hr className="mt-2" />
+                                </Col>
+                                <Col lg="12">
+                                    <div className="h2">
+                                        Structure
+                                    </div>
+                                    <div className="h3 font-weight-400">
+                                        {selectedPerson.structure_personnel}
+                                    </div>
+                                    <hr className="mt-2" />
+                                </Col>
+                                <Col lg="12">
+                                    <div className="h2">
+                                        Date de recrutement
+                                    </div>
+                                    <div className="h3 font-weight-400">
+                                        {selectedPerson.date_recrutement_personnel}
+                                    </div>
+                                    <hr className="mt-2" />
+                                </Col>
+                                <Col lg="12">
+                                    <div className="h2">
+                                        Grade
+                                    </div>
+                                    <div className="h3 font-weight-400">
+                                        {selectedPerson.grade_personnel}
+                                    </div>
+                                    <hr className="mt-2" />
+                                </Col>
+                                <Col lg="12">
+                                    <div className="h2">
+                                        Téléphone
+                                    </div>
+                                    <div className="h3 font-weight-400">
+                                        {selectedPerson.telephone_personnel}
+                                    </div>
+                                    <hr className="mt-2" />
+                                </Col>
+                                <Col lg="12">
+                                    <div className="h2">
+                                        Situation Matrimoniale
+                                    </div>
+                                    <div className="h3 font-weight-400">
+                                        {selectedPerson.situation_matrimoniale_personnel}
+                                    </div>
+                                    <hr className="mt-2" />
+                                </Col>
+                                <Col lg="12">
+                                    <div className="h2">
+                                        Région d'origine
+                                    </div>
+                                    <div className="h3 font-weight-400">
+                                        {selectedPerson.region_personnel}
+                                    </div>
+                                    <hr className="mt-2" />
+                                </Col>
+                            </Row>
                         </CardBody>
                     </Card>
                 </Col>
-            </Row>
-        </Container>
-    </>
+              </Row>
+                {/*<Row>
+                    <Col className="order-xl-1" xl="8">
+                        <PDFViewer>
+                            <PersonnelDoc
+                                name={selectedPerson.nom_prenom_personnel}
+                                statistics={statistics}
+                                statisticsPermission={statisticsPermission}
+                                conges={selectedPerson.nb_jours_conges}
+                                permissions={selectedPerson.nb_jours_permission}
+                            />
+                        </PDFViewer>
+                    </Col>
+                </Row>*/}
+                <Row>
+                    <Col className="order-xl-1" xl="8">
+                        <PDFDownloadLink document={<PersonnelDoc  
+                                name={selectedPerson.nom_prenom_personnel}
+                                statistics={statistics}
+                                statisticsPermission={statisticsPermission}
+                                conges={selectedPerson.nb_jours_conges}
+                                permissions={selectedPerson.nb_jours_permission}              
+                            />} fileName={`fiche_du_personnel_${selectedPerson.nom_prenom_personnel}.pdf`}>
+                            {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 
+                            <Button
+                                color="success"
+                            >
+                                Télécharger la fiche du personnel 
+                            </Button>)}
+                        </PDFDownloadLink>
+                    </Col>
+                </Row>
+            </Container>
+        </>
     );
 };
 

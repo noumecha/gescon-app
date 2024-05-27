@@ -17,19 +17,19 @@ import {
   Row,
   Col,
 } from "reactstrap";
-
+import { ChartExample1 } from "variables/charts";
 // core components
 import {
   chartOptions,
   parseOptions,
-  chartExample1,
-  chartExample2,
 } from "variables/charts.js";
 import Header from "components/Headers/Header.js";
+import { ChartExample2 } from "variables/charts";
 
 const Index = (props) => {
   const [activeNav, setActiveNav] = useState(1);
   const [chartExample1Data, setChartExample1Data] = useState("data1");
+  const [conge, setConge] = useState([]);
 
   if (window.Chart) {
     parseOptions(Chart, chartOptions());
@@ -43,8 +43,12 @@ const Index = (props) => {
   const [data, setData] = useState([])
   useEffect(() => {
     const func = async () => {
-      try {
-        const title = `Gescon App - ${new Date().getFullYear()}`;
+      try { 
+        window.electronAPI.getConge();
+        await window.electronAPI.retrieveConge((event, res) => {
+          setConge(res);
+        })
+        const title = `GESCONGES - ${new Date().getFullYear()}`;
         window.electronAPI.setTitle(title);
         const res = await window.electronAPI.ping();
         console.log("Ping : " ,res);
@@ -68,9 +72,9 @@ const Index = (props) => {
                 <Row className="align-items-center">
                   <div className="col">
                     <h6 className="text-uppercase text-light ls-1 mb-1">
-                      Globales
+                      Congés
                     </h6>
-                    <h2 className="text-white mb-0">Statistiques</h2>
+                    <h2 className="text-white mb-0">Statistiques Globales {conge.length > 0 ? ": " + conge.length + "" : ": " + conge.length} </h2>
                   </div>
                   <div className="col">
                     <Nav className="justify-content-end" pills>
@@ -93,11 +97,7 @@ const Index = (props) => {
               <CardBody>
                 {/* Chart */}
                 <div className="chart">
-                  <Line
-                    data={chartExample1[chartExample1Data]}
-                    options={chartExample1.options}
-                    getDatasetAtEvent={(e) => console.log(e)}
-                  />
+                  <ChartExample1 />
                 </div>
               </CardBody>
             </Card>
@@ -108,7 +108,7 @@ const Index = (props) => {
                 <Row className="align-items-center">
                   <div className="col">
                     <h6 className="text-uppercase text-muted ls-1 mb-1">
-                      Performance
+                      Permissions
                     </h6>
                     <h2 className="mb-0">Demandes Totales</h2>
                   </div>
@@ -117,10 +117,7 @@ const Index = (props) => {
               <CardBody>
                 {/* Chart */}
                 <div className="chart">
-                  <Bar
-                    data={chartExample2.data}
-                    options={chartExample2.options}
-                  />
+                  <ChartExample2 />
                 </div>
               </CardBody>
             </Card>

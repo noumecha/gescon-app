@@ -8,7 +8,7 @@ import Decision from "views/examples/Decision.js";
 import Permission from "views/examples/Permission";
 import AttestationConge from "views/examples/AttestationConge";
 import AttestationPermission from "views/examples/AttestationPermission";
-import FichePersonnel from "views/examples/FichePersonnel";
+//import FichePersonnel from "views/examples/FichePersonnel";
 import ArchiveAttestationConge from "views/examples/ArchiveAttestationConge";
 import ArchiveAttestationPermission from "views/examples/ArchiveAttestationPermission";
 import PersonnelDetails from "views/examples/PersonnelDetails";
@@ -56,13 +56,13 @@ var routes = [
     component: <PersonnelDetails />,
     layout: "/admin",
   },
-  {
+  /*{
     path: "/fiches",
     name: "Fiches Personnel",
     icon: "ni ni-collection text-blue",
     component: <FichePersonnel />,
     layout: "/admin",
-  },
+  },*/
   {
     path: "/attestation-conge",
     name: "Attestations congés",
@@ -122,7 +122,7 @@ var routes = [
   {
     path: "/attestation_rep_permissions",
     name: "Attestations reprise permissions",
-    icon: "ni ni-archive-2 text-blue",
+    icon: "ni ni-paper-diploma text-blue",
     component: <AttestationRepPermission />,
     layout: "/admin",
   },
@@ -136,7 +136,7 @@ var routes = [
   {
     path: "/attestation_rep_conges",
     name: "Attestations reprise congés",
-    icon: "ni ni-archive-2 text-blue",
+    icon: "ni ni-paper-diploma text-blue",
     component: <AttestationRepConge />,
     layout: "/admin",
   },
@@ -151,7 +151,7 @@ var routes = [
     path: "/user-profile",
     name: "Profile",
     icon: "ni ni-single-02 text-blue",
-    component: <Profile />,
+    component: <Profile name="ivan"/>,
     layout: "/admin",
   },
   {

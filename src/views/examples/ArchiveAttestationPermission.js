@@ -15,6 +15,7 @@ import {
     Col,
     Alert,
     Input,
+    Button,
 } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import { useState, useEffect } from "react";
@@ -28,6 +29,8 @@ const ArchiveAttestationPermission = () => {
     const pageCount = Math.ceil(archive_permission.length/perPage);
     const offset = pageNumber * perPage;
     const [deleteArchive, setDeleteArchive] = useState("");
+    const [loadingSpinner, setLoadingSpinner] = useState(true);
+    const loadingText = "Aucune donnée dans la base de données";
 
     const filterArchivePermission = search !== ""
     ? archive_permission.filter(attestation_conge => (
@@ -66,20 +69,38 @@ const ArchiveAttestationPermission = () => {
     }
 
     /** useeffect for common function and fetching */
-    useEffect(() => {
-        const func = async () => {
-            try {
-                window.electronAPI.getArchiveAttPermission();
-                await window.electronAPI.retrieveArchiveAttPermission((event, res) => {
-                    console.log("archives : " + res);
-                    setArchivePermission(res);
-                })
-            } catch (error) {
-                console.error("Erreur : " + error.message);
-            }
+
+    const fetchDatas = async () => {
+        try {
+            window.electronAPI.getArchiveAttPermission();
+            await window.electronAPI.retrieveArchiveAttPermission((event, res) => {
+                console.log("archives : " + res);
+                setArchivePermission(res);
+                setTimeout(() => 
+                setLoadingSpinner(false)
+                , 3000);
+            })
+        } catch (error) {
+            console.error("Erreur : " + error.message);
         }
-        func();
+    }
+
+    useEffect(() => {
+        fetchDatas();
     }, []);
+
+    const handleRefresh = () => {
+        try {
+          setLoadingSpinner(true);
+          setTimeout(() => 
+          setLoadingSpinner(false)
+          , 3000);
+          fetchDatas();
+          console.log("datas refreshed successfully");
+        } catch (err) {
+          console.error("error on refresh : " + err.message);
+        }
+    }
 
     return (
         <>
@@ -111,11 +132,17 @@ const ArchiveAttestationPermission = () => {
             </Row>
             <Row>
                 <div className="col p-0">
-                    {archive_permission && archive_permission.length > 0 ? (
                         <div className="col">
                             <Card className="shadow">
-                                <CardHeader className="border-0">
+                                <CardHeader className="bg-white border-2 d-flex justify-content-center">
                                     <h3 className="mb-0 text-center">Listes des Attestations de Permission Archivées</h3>
+                                    <Button
+                                        size="sm"
+                                        className="ml-3"
+                                        onClick={() => handleRefresh()}
+                                    >
+                                        Actualiser
+                                    </Button>
                                 </CardHeader>
                                 <Table className="align-items-center table-flush" responsive>
                                     <thead className="thead-light">
@@ -127,8 +154,17 @@ const ArchiveAttestationPermission = () => {
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        {filterArchivePermission.slice(offset, offset + perPage).map((archive, index) => (
+                                    <tbody>                                            
+                                        {loadingSpinner && (
+                                        <tr>
+                                            <td colSpan="7" className="text-center">
+                                            <div className="spinner-border" role="status">
+                                                <span className="sr-only">Loading...</span>
+                                            </div>
+                                            </td>
+                                        </tr>
+                                        )}
+                                        {filterArchivePermission && filterArchivePermission.length > 0 ? !loadingSpinner && (filterArchivePermission.slice(offset, offset + perPage).map((archive, index) => (
                                             <tr key={index}>
                                                 <td>{archive.matricule_personnel}</td>    
                                                 <td>{archive.nom_prenom_personnel}</td>
@@ -165,20 +201,18 @@ const ArchiveAttestationPermission = () => {
                                                     </UncontrolledDropdown>
                                                 </td>
                                             </tr>
-                                        ))}
+                                        ))) : 
+                                            !loadingSpinner && (
+                                            <tr>
+                                                <td colSpan="7" className="text-center">
+                                                    {loadingText}
+                                                </td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </Table>
                             </Card>
                         </div>
-                    ) : (  
-                        <div className="col">  
-                            <Card className="shadow">
-                                <CardHeader className="border-0">
-                                    <h3 className="mb-0 text-center"> Aucune attestation archivée dans la base de données </h3>
-                                </CardHeader>
-                            </Card>
-                        </div>
-                    )}
                 </div>
             </Row>
             <Row className="m-0">

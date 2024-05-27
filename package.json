@@ -1,5 +1,5 @@
 {
-  "name": "gescon-app",
+  "name": "gesconges",
   "version": "0.1.0",
   "description": "Desktop application for leaves",
   "homepage": "./",
@@ -71,6 +71,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@react-pdf/renderer": "^3.4.0",
+    "bcryptjs": "^2.4.3",
     "bootstrap": "^4.6.2",
     "browserify-zlib": "^0.2.0",
     "chart.js": "2.9.4",
@@ -96,6 +97,7 @@
     "react-qr-code": "^2.0.12",
     "react-router-dom": "6.21.1",
     "react-scripts": "^5.0.1",
+    "react-select": "^5.8.0",
     "reactstrap": "8.10.0",
     "sass": "1.69.5",
     "sequelize": "^6.37.1",

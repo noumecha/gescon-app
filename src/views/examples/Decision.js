@@ -16,6 +16,7 @@ import {
     DropdownToggle,
     Button,
     Label,
+    Badge,
   } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import { useState, useEffect } from "react";
@@ -32,19 +33,61 @@ const Decision = () => {
     const [decisionDate, setDecisionDate] = useState("");
     const [decisionType, setDecisionType] = useState("");
     const [dec, setDec] = useState({});
+    const [message, setMessage] = useState("Ajouter une nouvelle decision");
+    const [action, setAction] = useState(1);
+    const [decId, setDecId] = useState();
+    const [errorTop, setErrorTop] = useState();
 
+    function formatDate(d) {
+      const date = new Date(d);
+      const day = date.getDate();
+      const month = date.getMonth();
+      const year = date.getFullYear();
+      return new Date(year, month, day);
+    }
+
+    const handleSetUseDecision = (dec) => {
+      try {
+        if (dec.statut_decision === "activé") {
+          setErrorTop("Impossible d'activé cette permission car elle est déjà activé");
+          setTimeout(() => {
+              setErrorTop("");
+          }, 4000)
+          return;
+        }
+        let query = `UPDATE decision SET statut_decision = "activé" WHERE id_decision = ${dec.id_decision} AND id_type_personnel = ${dec.id_type_personnel}`;
+        window.electronAPI.updateDecision(query);
+        window.electronAPI.updateDecisionSuccess(() => {
+            setDeleteSuccess("Decision activé avec succès");
+            setTimeout(() => {
+                setDeleteSuccess("");
+            }, 3000)
+        });
+        let query_change = `UPDATE decision SET statut_decision = "désactivé" WHERE id_decision NOT IN (${dec.id_decision}) AND id_type_personnel = ${dec.id_type_personnel}`;
+        window.electronAPI.updateDecision(query_change);
+        window.electronAPI.updateDecisionSuccess(() => {
+            setDeleteSuccess("Plusieurs autre décisions on été désactivé");
+            setTimeout(() => {
+                setDeleteSuccess("");
+            }, 3000)
+        });
+      } catch (err) {
+        console.log(`Erreur d'activation de la décision : ${error.message}`);
+      }
+    };
 
     const handleDecisionEdit = (dec) => {
-        console.log("decision selected", dec);
-        /*setNumeroDecision(dec.numero_decision);
+        setNumeroDecision(dec.numero_decision);
+        setMessage(`Modifier la decision N°${dec.numero_decision}`);
         setObjetDecision(dec.objet_decision);
         setSignataireDecision(dec.signataire_decision);
-        const date = new Date(dec.date_decision);
-        date.setDate(date.getDate() + parseInt(1))
-        console.log("date: ",date);
-        setDecisionDate(dec.date_decision.toISOString().split("T")[0]);
-        setDecisionType(dec.type_decision);*/
+        const date = formatDate(dec.date_decision);
+        date.setDate(date.getDate() + 1);
+        setDecisionDate(date.toISOString().split("T")[0]);
+        setDecisionType(dec.type_decision);
+        setDecId(dec.id_decision);
         setDec(dec);
+        setAction(2);
     }
 
     const handleDecisionDelete = (dec) => {
@@ -74,7 +117,6 @@ const Decision = () => {
             return;
           } else {
             const data = {
-              //id_decision: decision[Object.keys(decision)[Object.keys(decision).length - 1]].id_decision + 1,
               numero_decision: numeroDecision.toUpperCase(),
               objet_decision: objetDecision,
               signataire_decision: signataireDecision,
@@ -86,15 +128,24 @@ const Decision = () => {
             const date = new Date(data.date_decision)
             const d = date.toISOString().slice(0, 19).replace('T', ' ');
             data.date_decision = d;
-            //console.log("decision date: " + d);
-            const req = `INSERT INTO decision (numero_decision,objet_decision,signataire_decision,id_type_personnel,date_decision,created_at_decision) VALUES ("${data.numero_decision}", "${data.objet_decision}", "${data.signataire_decision}", ${data.type_decision}, "${data.date_decision}","${data.created_at}")`;
-            //console.log("data: " + JSON.stringify(data));
-            //console.log("requete : " , req);
+            let req = "";
+            if (action === 1) {
+              req = `INSERT INTO decision (numero_decision,objet_decision,signataire_decision,id_type_personnel,date_decision,created_at_decision) VALUES ("${data.numero_decision}", "${data.objet_decision}", "${data.signataire_decision}", ${data.type_decision}, "${data.date_decision}","${data.created_at}")`;
+            } else {
+              req = `UPDATE decision SET numero_decision="${data.numero_decision}",objet_decision="${data.objet_decision}",signataire_decision="${data.signataire_decision}",id_type_personnel=${data.type_decision},date_decision="${data.date_decision}",created_at_decision="${data.created_at}" WHERE id_decision=${decId}`;
+            }
+            console.log("data: " + JSON.stringify(data));
+            console.log("requete : " , req);
             window.electronAPI.addDecision(req);
             setSuccess("Enregistré avec succès");
             setTimeout(() => {
                 setSuccess("");
             }, 3000)
+            setNumeroDecision("");
+            setObjetDecision("");
+            setSignataireDecision("");
+            setDecisionDate("");
+            setMessage("Ajouter une nouvelle decision")
           }
         } catch (err) {
             console.error("Erreur Trouvé : " + err.message);
@@ -138,6 +189,15 @@ const Decision = () => {
                                     }
                                 </Col>
                             </Row>
+                            <Row>
+                                <Col lg="12">
+                                    { errorTop && 
+                                        <Alert className="text-center" color="danger">
+                                            {errorTop}
+                                        </Alert>
+                                    }
+                                </Col>
+                            </Row>
                             <Table className="align-items-center table-flush" responsive>
                                 <thead className="thead-light">
                                     <tr>
@@ -146,6 +206,7 @@ const Decision = () => {
                                         <th>Signataire</th>
                                         <th>Date</th>
                                         <th>Type</th>
+                                        <th>Statut</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -157,6 +218,16 @@ const Decision = () => {
                                             <td>{decision.signataire_decision}</td>    
                                             <td>{decision.date_decision.getFullYear() + "-" + (parseInt(decision.date_decision.getMonth()+1) <= 9 ? "0"+parseInt(decision.date_decision.getMonth()+1) : parseInt(decision.date_decision.getMonth()+1)) + "-" + decision.date_decision.getDate()}</td>
                                             <td>{decision.libelle_type_personnel}</td>
+                                            <td>{decision.statut_decision === "activé"
+                                                ? <Badge color="success">
+                                                    {decision.statut_decision}
+                                                  </Badge>
+                                                : 
+                                                  <Badge color="warning">
+                                                    {decision.statut_decision}
+                                                  </Badge>
+                                                }
+                                              </td>
                                             <td className="text-right">
                                                 <UncontrolledDropdown>
                                                     <DropdownToggle
@@ -179,6 +250,11 @@ const Decision = () => {
                                                         >
                                                             Supprimer
                                                         </DropdownItem>
+                                                        <DropdownItem
+                                                          onClick={() => handleSetUseDecision(decision)}
+                                                        >
+                                                          activer
+                                                        </DropdownItem>
                                                     </DropdownMenu>
                                                 </UncontrolledDropdown>
                                             </td>
@@ -199,7 +275,7 @@ const Decision = () => {
                     <CardHeader className="bg-primary border-0">
                       <Row className="align-items-center">
                         <Col xs="12" md="12" lg="12">
-                            <h3 className="mb-0 text-white text-center">{ Object.keys(dec).length > 0 ? `Modifier la decsion N°${dec.numero_decision}` : "Ajouter une nouvelle decision"}</h3>
+                            <h3 className="mb-0 text-white text-center">{message}</h3>
                         </Col>
                       </Row>
                     </CardHeader>
@@ -304,7 +380,8 @@ const Decision = () => {
                                             defaultValue="choisir le type de congé"
                                             onChange={handleInputChange(setDecisionType)}
                                         >
-                                            <option>Decision {dec.libelle_type_personnel}</option>
+                                          <option>{decisionType === "Decision Fonctionnaire" ? decisionType : "Decision Contractuel"}</option>
+                                          <option>{decisionType === "Decision Contractuel" ? decisionType : "Decision Fonctionnaire"}</option>
                                         </Input>
                                         : 
                                         <Input

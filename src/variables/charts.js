@@ -1,9 +1,9 @@
+/* eslint-disable no-unreachable */
 //const Chart = require("chart.js");
 import Chart from "chart.js";
-//
-// Chart extension for making the bars rounded
-// Code from: https://codepen.io/jedtrow/full/ygRYgo
-//
+import { Bar, Line } from "react-chartjs-2";
+import { useState,useEffect } from "react";
+
 
 Chart.elements.Rectangle.prototype.draw = function () {
   var ctx = this._chart.ctx;
@@ -289,10 +289,32 @@ export function parseOptions(parent, options) {
     }
   }
 }
+// Charts for specific Stats 
+export const ChartStructureStats = (props) => {
+  const conges = props.structConge;
 
-// Example 1 of Chart inside src/views/Index.js (Sales value - Card)
-export let chartExample1 = {
-  options: {
+  // usefull function 
+  function formatDate(d) {
+    const date = new Date(d);
+    const day = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    return new Date(year, month, day);
+  }  
+  
+  const getCongeMonth = (month) => {
+    let total = 0;
+    if (conges.length > 0) {
+      conges.forEach(element => {
+        if (formatDate(element.date_debut_conge).getMonth() === month) {
+          total += 1;
+        }
+      });
+    }
+    return total;
+  };
+
+  const chartOptions = {
     scales: {
       yAxes: [
         {
@@ -302,9 +324,10 @@ export let chartExample1 = {
           },
           ticks: {
             callback: function (value) {
-              if (!(value % 10)) {
+              if (Number.isInteger(value)) {
                 return  value;
               }
+              return '';
             },
           },
         },
@@ -313,45 +336,161 @@ export let chartExample1 = {
     tooltips: {
       callbacks: {
         label: function (item, data) {
-          var label = data.datasets[item.datasetIndex].label || "";
           var yLabel = item.yLabel;
-          var content = "";
+          var content = yLabel ;
 
-          if (data.datasets.length > 1) {
-            content += label;
-          }
-
-          content += "$" + yLabel + "k";
           return content;
         },
       },
     },
-  },
-  data1: (canvas) => {
-    return {
-      labels: ["Jan", "Fev", "Mar", "Avr", "Mai", "Jun", "Jul", "Aûo", "Sep", "Oct", "Nov", "Dec"],
-      datasets: [
+  }
+
+  const totalCongeDatas = Array.from({ length: 12 }, (_, i) => getCongeMonth(i));
+
+  const chartDatas = {
+    labels: ["Jan", "Fev", "Mar", "Avr", "Mai", "Jun", "Jul", "Aûo", "Sep", "Oct", "Nov", "Dec"],
+    datasets: [
+      {
+        label: "Performance",
+        data : totalCongeDatas
+      },
+    ],
+  }
+
+  return <Line data={chartDatas} options={chartOptions} />
+};
+// Example 1 of Chart inside src/views/Index.js (Sales value - Card)
+export const ChartExample1 = () => {
+  const [conges, setConges] = useState([]);
+
+  function formatDate(d) {
+    const date = new Date(d);
+    const day = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    return new Date(year, month, day);
+  }  
+  
+  useEffect(() => {
+    const fetchDatas = async () => {
+      try {
+        window.electronAPI.getConge();
+        await window.electronAPI.retrieveConge((event, res) => {
+          setConges(res);
+        })
+      } catch (error) {
+        console.error("Erreur : " + error.message);
+      }
+    }
+    fetchDatas();
+  }, [])
+
+  const getCongeMonth = (month) => {
+    let total = 0;
+    if (conges.length > 0) {
+      conges.forEach(element => {
+        if (formatDate(element.date_debut_conge).getMonth() === month) {
+          total += 1;
+        }
+      });
+    }
+    return total;
+  };
+
+  const chartOptions = {
+    scales: {
+      yAxes: [
         {
-          label: "Performance",
-          data: [0, 10, 30, 15, 40, 20, 60, 60, 30, 40, 30, 70],
+          gridLines: {
+            color: colors.gray[900],
+            zeroLineColor: colors.gray[900],
+          },
+          ticks: {
+            callback: function (value) {
+              if (Number.isInteger(value)) {
+                return  value;
+              }
+              return '';
+            },
+          },
         },
       ],
-    };
-  },
+    },
+    tooltips: {
+      callbacks: {
+        label: function (item, data) {
+          var yLabel = item.yLabel;
+          var content = yLabel ;
+
+          return content;
+        },
+      },
+    },
+  }
+
+  const totalCongeDatas = Array.from({ length: 12 }, (_, i) => getCongeMonth(i));
+
+  const chartDatas = {
+    labels: ["Jan", "Fev", "Mar", "Avr", "Mai", "Jun", "Jul", "Aûo", "Sep", "Oct", "Nov", "Dec"],
+    datasets: [
+      {
+        label: "Performance",
+        data : totalCongeDatas
+      },
+    ],
+  }
+
+  return <Line data={chartDatas} options={chartOptions} />
 };
 
 // Example 2 of Chart inside src/views/Index.js (Total orders - Card)
-export let chartExample2 = {
-  options: {
+export const ChartExample2 = () => {
+  const [permissions, setPermissions] = useState([]);
+
+  function formatDate(d) {
+    const date = new Date(d);
+    const day = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    return new Date(year, month, day);
+  }
+
+  useEffect(() => {
+    const fetchDatas = async () => {
+      try {
+        window.electronAPI.getPermission();
+        await window.electronAPI.retrievePermission((event, res) => {
+          setPermissions(res);
+        })
+      } catch (error) {
+        console.error("Erreur : " + error.message);
+      }
+    }
+    fetchDatas();
+  }, [])
+
+  const getDemandeMonth = (month) => {
+    let total = 0;
+    if (permissions.length > 0) {
+      permissions.forEach(element => {
+        if (formatDate(element.date_debut_permission).getMonth() === month) {
+          total += 1;
+        }
+      });
+    }
+    return total;
+  };
+
+  const options = {
     scales: {
       yAxes: [
         {
           ticks: {
             callback: function (value) {
-              if (!(value % 10)) {
-                //return '$' + value + 'k'
-                return value;
+              if (Number.isInteger(value)) {
+                return  value;
               }
+              return '';
             },
           },
         },
@@ -371,17 +510,233 @@ export let chartExample2 = {
         },
       },
     },
-  },
-  data: {
-    labels: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  }
+  // slicing the months 
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+  const currentMonthIndex = new Date().getMonth();
+  const lastSixMonths = [];
+
+  for (let i = 1; i <= 5; i++) {
+    const prevMonthIndex = (currentMonthIndex - i + 12) % 12; // Handle wrap-around for the beginning of the year
+    lastSixMonths.unshift(months[prevMonthIndex]);
+  }
+
+  lastSixMonths.push(months[currentMonthIndex]);
+
+  // demandes per month : 
+  const totalCongeDatas = Array.from({ length: 12 }, (_, i) => getDemandeMonth(i));
+  const lastSixMonthsDemande = [];
+
+  for (let i = 1; i <= 5; i++) {
+    const prevMonthIndex = (currentMonthIndex - i + 12) % 12; // Handle wrap-around for the beginning of the year
+    lastSixMonthsDemande.unshift(totalCongeDatas[prevMonthIndex]);
+  }
+
+  lastSixMonthsDemande.push(totalCongeDatas[currentMonthIndex]);
+
+  const data = {
+    labels: lastSixMonths,
     datasets: [
       {
         label: "Sales",
-        data: [25, 20, 30, 22, 17, 29],
+        data: lastSixMonthsDemande,//[25, 20, 30, 22, 17, 29],
         maxBarThickness: 10,
       },
     ],
-  },
+  }
+
+  return <Bar data={data} options={options} />
+};
+
+export const ChartExample3 = () => {
+  const [conges, setConges] = useState([]);
+  const [structureNames, setStructureNames] = useState([]);
+
+  function formatDate(d) {
+    const date = new Date(d);
+    const day = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    return new Date(year, month, day);
+  }
+
+  useEffect(() => {
+    const fetchDatas = async () => {
+      try {
+        window.electronAPI.getStructuresNames();
+        await window.electronAPI.retrieveStructuresNames((event, res) => {
+          setStructureNames(res);
+        })
+        window.electronAPI.getConge();
+        await window.electronAPI.retrieveConge((event, res) => {
+          setConges(res);
+        })
+        /*window.electronAPI.getPermission();
+        await window.electronAPI.retrievePermission((event, res) => {
+          setPermissions(res);
+        })*/
+      } catch (error) {
+        console.error("Erreur : " + error.message);
+      }
+    }
+    fetchDatas();
+  }, [])
+
+  const getDemandeMonth = (month, struc) => {
+    let total = 0;
+    if (conges.length > 0) {
+      conges.forEach(element => {
+        /**/
+        if (element.structure_personnel === struc && formatDate(element.date_debut_conge).getMonth() === month) {
+          total += 1;
+        }
+      });
+    }
+    return total;
+  };
+
+  let mths = ["Dec", "Nov", "Oct", "Sep", "Auo", "Juil", "Juin", "Mai", "Avr", "Mar", "Fev", "Jan"];
+  const options_1 = {
+    scales: {
+      xAxes: [{ stacked: true }],
+      yAxes: [{ stacked: true }],
+    },
+    plugins: {
+      datalabels: {
+        formatter: function(value, context) {
+          const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
+          return total;
+        },
+        color: 'top',
+        anchor: 'end',
+        align: 'end'
+      }
+    }
+  };
+  /*const options = {
+    scales: {
+      yAxes: [
+        {
+          
+          ticks: {
+            /*callback: function (value, index) {
+              return mths[index]
+            },
+            callback: function (value) {
+              if (Number.isInteger(value)) {
+                return  value;
+              }
+              return '';
+            },
+          },
+        },
+      ],
+    },
+    tooltips: {
+      callbacks: {
+        label: function (tooltipItem, data) {
+          var label = data.datasets[tooltipItem.datasetIndex].label;
+          var yLabel = tooltipItem.yLabel;
+          var content = "";
+          if (data.datasets.length > 1) {
+            content += label;
+          }
+          content += yLabel;;
+          return content;
+        },
+      },
+    },
+  }*/
+
+  let tab = [];
+  structureNames.forEach(element => {
+    tab.push(element.structure_personnel);
+  });
+  //console.log(`simple tab : ${tab}`);
+  const struc = ["DGB","[SO]","SGDB","SGCCC","[SDAG]","SDCF","DI","DPC","DREF","DPB","DCOB","DDPP"];
+  let finalStrucNames = [];
+  let strucLabels = [];
+  tab.forEach(t => {
+    for(let i = 0; i < struc.length; i++) {
+      if (t.includes(struc[i])) {
+        //console.log(`tab ${t}`);
+        strucLabels.push(struc[i]);
+        finalStrucNames.push(t);
+      }
+    }
+  })
+  //console.log(`stucture tried : ${finalStrucNames}`);
+  let datas = []
+  for (let index = 0; index < finalStrucNames.length; index++) {
+    datas.push(getDemandeMonth(index, finalStrucNames[index]));
+  }
+  //console.log(`datas : ${datas}`);
+  function getMonthNumber(month) {
+    switch (month) {
+      case "Jan":
+        return 0;
+        break;
+      case "Fev":
+        return 1;
+        break;
+      case "Mar":
+        return 2;
+        break;
+      case "Avr":
+        return 3;
+        break;
+      case "Mai":
+        return 4;
+        break;
+      case "Juin":
+        return 5;
+        break;
+      case "Juil":
+        return 6;
+        break;
+      case "Auo":
+        return 7;
+        break;
+      case "Sep":
+        return 8;
+        break;
+      case "Oct":
+        return 9;
+        break;
+      case "Nov":
+        return 10;
+        break;
+      case "Dec":
+        return 11;
+        break;
+      default:
+        return 0;
+        break;
+    }
+  }
+
+  const datasets = mths.map(month => {
+    const data = finalStrucNames.map(structure => getDemandeMonth(getMonthNumber(month), structure));
+    return {
+      label: month,
+      data: data,
+      maxBarThickness: 10,
+    };
+  });
+
+  const data = {
+    labels: strucLabels,
+    /*datasets: [
+      {
+        label: "Sales",
+        data: datas,
+        maxBarThickness: 10,
+      },
+    ],*/
+    datasets: datasets,
+  }
+
+  return <Line data={data} options={options_1} />
 };
 
 /*module.exports = {

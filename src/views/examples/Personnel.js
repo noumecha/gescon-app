@@ -23,6 +23,7 @@ import {
     Alert,
     Nav,
     UncontrolledTooltip,
+    Button,
   } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import ReactPaginate from "react-paginate";
@@ -44,7 +45,10 @@ const Personnel = () => {
     const [status, setStatus] = useState("");
     const [success, setSuccess] = useState("");
     const [selectedPerson, setSelectedPerson] = useState(null);
+    const [loadingSpinner, setLoadingSpinner] = useState(true);
+    const loadingText = "Aucune donnée dans la base de données";
     const navigate = useNavigate();
+    const currDate = new Date();
 
     /** code for excel import */
     const handleFileSubmit = (e) => {
@@ -89,20 +93,26 @@ const Personnel = () => {
         try {
             for (let i = 0; i < excelData.length; i++) {
                 const type = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 1 : 2;
-                const statut = "en poste"; // en permission, en congé
-                //const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
-                const nb_jours_conges = 0;
+                const statut = "en poste";
+                const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
+                //const nb_jours_conges = 0;
                 const nb_jours_permission = 0;
+                const nb_jours_conges_maternite = 98;
+                const nb_jours_conges_maladie = 90;
+                const next_month_permission = {
+                    month: 0,
+                    amount: 0,
+                }
                 const req = `
                 INSERT INTO personnel 
-                (ordre_personnel, matricule_personnel, nom_prenom_personnel, grade_personnel, poste_personnel, structure_personnel, sexe_personnel, date_recrutement_personnel, situation_matrimoniale_personnel,
-                region_personnel, departement_personnel, date_naiss_personnel, telephone_personnel,id_type_personnel, categorie_personnel, arrondissement_personnel,nb_jours_permission,nb_jours_conges,statut_personnel)
+                (ordre_personnel, matricule_personnel, nom_prenom_personnel, grade_personnel, poste_personnel, structure_personnel, cellule_personnel, sexe_personnel, date_recrutement_personnel, situation_matrimoniale_personnel,
+                region_personnel, departement_personnel, date_naiss_personnel, telephone_personnel,id_type_personnel, categorie_personnel, arrondissement_personnel,nb_jours_permission,nb_jours_conges,nb_jours_conges_maladie,nb_jours_conges_maternite,statut_personnel,next_month_permission,preposition_personnel)
                 VALUES 
                 (${excelData[i].ORDRE},"${excelData[i].MATRICULE}","${excelData[i].NOM_PRENOM}",
-                "${excelData[i].GRADE}","${excelData[i].POSTE}","${excelData[i].STRUCTURE}","${excelData[i].SEXE}",
+                "${excelData[i].GRADE}","${excelData[i].POSTE}","${excelData[i].STRUCTURE}","${excelData[i].STRUCTURE_01}","${excelData[i].SEXE}",
                 "${excelData[i].DATE_RECRUTEMENT}","${excelData[i].SITUATION_MATRIMONIALE}","${excelData[i].REGION}",
                 "${excelData[i].DEPARTEMENT}","${excelData[i].DATE_NAISSANCE}","${excelData[i].TELEPHONE}","${type}",
-                "${excelData[i].CATEGORIE}","${excelData[i].ARRONDISSEMENT}","${nb_jours_permission}","${nb_jours_conges}","${statut}");`;
+                "${excelData[i].CATEGORIE}","${excelData[i].ARRONDISSEMENT}","${nb_jours_permission}","${nb_jours_conges}","${nb_jours_conges_maladie}","${nb_jours_conges_maternite}","${statut}",'${JSON.stringify(next_month_permission)}',"${excelData[i].PREPOSITION}");`;
                 window.electronAPI.addPersonnel(req);
             }
             window.electronAPI.personnelAddedSuccess(() => {
@@ -115,21 +125,72 @@ const Personnel = () => {
             console.error("Erreur Trouvé : " + err.message);
         }
     }
+    // useEffect() update for the new year 
+    /*const updateYear = async () => {
+        try {
+            for (let x = 0; x < personnel.length; x++) {
+                // --- ---- ---- 
+                if (personnel[x].nb_jours_conges < 18 && personnel[x].id_type_personnel === 2) {
+                    const req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges) WHERE id_personnel = ${personnel[x].id_personnel};`;
+                    window.electronAPI.updatePersonnel(req_personnel);
+                    window.electronAPI.congeAddedSuccess(() => {
+                        console.log(`personnel mis à jour pour la nouvelle année`);
+                    });
+                }
+                // remise à 0 pour ceux qui ont pris tout leur congé l'année précédente
+                if ((personnel[x].nb_jours_conges === 18 && personnel[x].id_type_personnel === 2) || (personnel[x].nb_jours_conges === 30 && personnel[x].id_type_personnel === 1)) {
+                    const req_personnel = `UPDATE personnel SET nb_jours_conges = 0 WHERE id_personnel = ${personnel[x].id_personnel};`;
+                    window.electronAPI.updatePersonnel(req_personnel);
+                    window.electronAPI.congeAddedSuccess(() => {
+                        console.log(`personnel mis à jour pour la nouvelle année`);
+                    });
+                }
+            }
+        } catch (error) {
+            console.log(`Erreur lors de la mise à jour annuelle ${error.message}`);
+        }
+    }
+
+    useEffect(() => {
+        if (currDate.getFullYear()) {
+            updateYear();
+        }
+    }, []);*/
 
     /** useeffect for common function and fetching */
-    useEffect(() => {
-        const func = async () => {
-            try {
-                window.electronAPI.getPersonnel();
-                await window.electronAPI.receivePersonnel((event, res) => {
-                    setPersonnel(res);
-                })
-            } catch (error) {
-                console.error("Erreur : " + error.message);
-            }
+    const fetchDatas = async () => {
+        try {
+            window.electronAPI.getPersonnel();
+            await window.electronAPI.receivePersonnel((event, res) => {
+                for (let index = 0; index < res.length; index++) {
+                    res[index].next_month_permission = JSON.parse(res[index].next_month_permission)                                                
+                }
+                setPersonnel(res);
+                setTimeout(() => 
+                setLoadingSpinner(false)
+                , 3000);
+            })
+        } catch (error) {
+            console.error("Erreur : " + error.message);
         }
-        func();
+    }
+
+    useEffect(() => {
+        fetchDatas();
     }, []);
+
+    const handleRefresh = () => {
+        try {
+          setLoadingSpinner(true);
+          setTimeout(() => 
+          setLoadingSpinner(false)
+          , 3000);
+          fetchDatas();
+          console.log("datas refreshed successfully");
+        } catch (err) {
+          console.error("error on refresh : " + err.message);
+        }
+    }
 
     /** for the pagination */
     const pageCount = Math.ceil(personnel.length/perPage);
@@ -173,7 +234,6 @@ const Personnel = () => {
     }
 
     const handleDetailClick = (person) => {
-        console.log("personnel details :", person);
         navigate("/admin/personnel-details", {state: {selectedPerson: person}});
         setSelectedPerson(person);
     }
@@ -201,8 +261,20 @@ const Personnel = () => {
             <Row>
                 <Col lg="12">
                     <form className="form-group custom-form" onSubmit={handleFileSubmit}>
-                        <input type="file" className="form-control" required onChange={handleFile}/>
-                        <button type="submit" className="mt-3 btn btn-primary btn-md">Importer le fichier</button>
+                        <input 
+                            type="file" 
+                            className="form-control" 
+                            required 
+                            disabled={personnel.length > 0 ? true : false}
+                            onChange={handleFile}
+                        />
+                        <button 
+                            type="submit" 
+                            disabled={personnel.length > 0 ? true : false}
+                            className="mt-3 btn btn-primary btn-md"
+                        >
+                            Importer le fichier
+                        </button>
                         {typeError&&(
                             <div className="mt-3 alert alert-danger" role="alert">
                                 {typeError}
@@ -213,7 +285,7 @@ const Personnel = () => {
             </Row>
             <Row>
                 <Col lg="12">
-                    {excelData ? (
+                    {excelData || personnel.length > 0 ? (
                         <div>
                             <div className="mt-3 alert alert-success" role="alert">
                                 <h3 className="mb-0 text-center text-white"> Fichier importer avec succès ! </h3>
@@ -288,11 +360,17 @@ const Personnel = () => {
             </Row>
             <Row>
                 <div className="col p-0">
-                    {personnel && personnel.length > 0 ? (
                         <div className="col">
                             <Card className="shadow">
-                                <CardHeader className="border-0">
+                                <CardHeader className="bg-white border-2 d-flex justify-content-center">
                                     <h3 className="mb-0 text-center">Listes du personnel </h3>
+                                    <Button
+                                        size="sm"
+                                        className="ml-3"
+                                        onClick={() => handleRefresh()}
+                                        >
+                                        Actualiser
+                                    </Button>
                                 </CardHeader>
                                 <Table className="align-items-center table-flush" responsive>
                                     <thead className="thead-light">
@@ -316,7 +394,16 @@ const Personnel = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {filterPersonnel.slice(offset, offset + perPage).map((person, index) => (
+                                        {loadingSpinner && (
+                                            <tr>
+                                                <td colSpan="7" className="text-center">
+                                                    <div className="spinner-border" role="status">
+                                                        <span className="sr-only">Loading...</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                        {filterPersonnel && filterPersonnel.length > 0 ? !loadingSpinner && (filterPersonnel.slice(offset, offset + perPage).map((person, index) => (
                                             <tr key={index}>
                                                 <td>{person.matricule_personnel}</td>    
                                                 <td>{person.nom_prenom_personnel}</td>    
@@ -365,11 +452,13 @@ const Personnel = () => {
                                                         <DropdownMenu className="dropdown-menu-arrow" right>
                                                             <DropdownItem
                                                                 onClick={() => handleCongeClick(person)}
+                                                                disabled={(person.nb_jours_conges + person.nb_jours_permission === 28 && person.id_type_personnel === 1) || (person.nb_jours_conges + person.nb_jours_permission === 40 && person.id_type_personnel === 2) ? true : false}
                                                             >
                                                                 Nouveau congé
                                                             </DropdownItem>
                                                             <DropdownItem
                                                                 onClick={() => handlePermissionClick(person)}
+                                                                disabled={(person.nb_jours_conges + person.nb_jours_permission === 28 && person.id_type_personnel === 1) || (person.nb_jours_conges + person.nb_jours_permission === 40 && person.id_type_personnel === 2) ? true : false}
                                                             >
                                                                 Nouvelle permission
                                                             </DropdownItem>
@@ -382,20 +471,18 @@ const Personnel = () => {
                                                     </UncontrolledDropdown>
                                                 </td>
                                             </tr>
-                                        ))}
+                                        ))) :              
+                                            !loadingSpinner && (
+                                                <tr>
+                                                    <td colSpan="7" className="text-center">
+                                                        {loadingText}
+                                                    </td>
+                                                </tr>
+                                        )}
                                     </tbody>
                                 </Table>
                             </Card>
                         </div>
-                    ) : (  
-                        <div className="col">  
-                            <Card className="shadow">
-                                <CardHeader className="border-0">
-                                    <h3 className="mb-0 text-center"> Aucun personnel dans la base de données </h3>
-                                </CardHeader>
-                            </Card>
-                        </div>
-                    )}
                 </div>
             </Row>
             <Row className="m-0 justify-content-center">

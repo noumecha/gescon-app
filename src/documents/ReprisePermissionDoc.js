@@ -5,7 +5,10 @@ import image from './docs-images/sceau-img.PNG';
 
 // Create styles
 const styles = StyleSheet.create({
-    // the container element
+    // the container element    
+    boldText: {
+        fontWeight: 'bold font',
+    },
     page: {
       flexDirection: 'column',
       display: 'flex',
@@ -289,22 +292,19 @@ const ReprisePermissionDoc = (props) => {
             <View style={styles.containerTwo}>
                 <View style={styles.section}>
                     <Text style={styles.h1CertifTitle}>
-                        ATTESTATION DE PERMISSION D'ABSCENCE
+                        CERTIFICAT DE REPRISE DE SERVICE
                     </Text>
                     <Text style={styles.h2CertifSubtitle}>
-                        ABSENCE PERMISSION CERTIFICATE
+                        RETURN OF SERVICE CERTIFICATE
                     </Text>
                     <Text style={styles.pCertifText}>
-                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
-                        {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service (au/à la) {props.structure} est bénéficiaire
-                        d'une permission de {props.duration} jours.
+                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M." : "Mme"} {props.name}, 
+                         {props.grade}, Matricule {props.matricule}, {props.poste} {props.preposition} {props.structure}, bénéficiaire
+                        d'une permission d'absence de {props.duration} {props.duration > 1 ? "jours ouvrables" : "jour ouvrable" } allant du <Text style={styles.boldText}>{props.startDate}</Text> au <Text style={styles.boldText}>{props.endDate}</Text> a effectivement
+                        repris le service le <Text style={styles.boldText}>{props.repriseDate}</Text> à 7 heures 30 précises.
                     </Text>
                     <Text style={styles.pCertifText}>
-                        L'intéressé{props.sexe === "M" ? "" : "e"} jouira de ladite permission pendant la période du {props.startDate} au {props.endDate} et 
-                        reprendra le service le {props.repriseDate} à 7 heures 30 précises.
-                    </Text>
-                    <Text style={styles.pCertifText}>
-                        En foi de quoi, la présente attestation est établie et délivrée à l'intéressé{props.sexe === "M" ? "" : "e"} pour
+                        En foi de quoi, le présent certificat de reprise de service est établie et délivrée à l'intéressé{props.sexe === "M" ? "" : "e"} pour
                         servir et valoir ce que de droit./-
                     </Text>
                 </View>
@@ -318,7 +318,7 @@ const ReprisePermissionDoc = (props) => {
                         - minfi/cab
                     </Text>
                     <Text style={styles.amParagraph2}>
-                        - minfi/sg/drh
+                        - minfi/dgb/sadg
                     </Text>
                     <Text style={styles.amParagraph3}>
                         - dgb/sdag/cfs-fs/df
