@@ -154,6 +154,13 @@ const Conges = () => {
           return;
         }
       }
+      if (selectedPerson.id_type_personnel === 2 && (formatDate(startDate).getDay() === 0 || formatDate(startDate).getDay() === 6)) {
+        setError("Le congé ne peut etre configurer que pour les jours ouvrables");
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return;
+      }
       if (selectedPerson.id_type_personnel === 1) {
         if (duration > 30 - selectedPerson.nb_jours_conges) {
           setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
@@ -211,7 +218,7 @@ const Conges = () => {
               },7000)
               return;
             }
-            if (formatDate(startDate) === formatDate(userConge[index].attestation_conge.date_debut_conge.repDate)) {
+            if (formatDate(startDate) === formatDate(userConge[index].attestation_conge.date_debut_conge)) {
               //console.log(`3`);
               setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M' : 'Mme'} ${name} a un congé prévu cette meme date`);
               setTimeout(() => {
@@ -239,9 +246,9 @@ const Conges = () => {
         decision: selectedDec, 
         duration: duration,
         structure: struc.replace("'", "`"),
-        startDate: startDate,
-        endDate: endDate,
-        repriseDate: repriseDate,
+        startDate: (formatDate(startDate).getDate() < 10 ? "0"+formatDate(startDate).getDate() : formatDate(startDate).getDate()) + "/" + (parseInt(formatDate(startDate).getMonth()+1) < 10 ? "0"+parseInt(formatDate(startDate).getMonth()+1) : parseInt(formatDate(startDate).getMonth()+1)) +"/"+formatDate(startDate).getFullYear(),
+        endDate: (formatDate(endDate).getDate() < 10 ? "0"+formatDate(endDate).getDate() : formatDate(endDate).getDate()) + "/" + (parseInt(formatDate(endDate).getMonth()+1) < 10 ? "0"+parseInt(formatDate(endDate).getMonth()+1) : parseInt(formatDate(endDate).getMonth()+1)) +"/"+formatDate(endDate).getFullYear(),
+        repriseDate: (formatDate(repriseDate).getDate() < 10 ? "0"+formatDate(repriseDate).getDate() : formatDate(repriseDate).getDate()) + "/" + (parseInt(formatDate(repriseDate).getMonth()+1) < 10 ? "0"+parseInt(formatDate(repriseDate).getMonth()+1) : parseInt(formatDate(repriseDate).getMonth()+1)) +"/"+formatDate(repriseDate).getFullYear(),
         typeConge: selectedType,
         preposition: preposition,
         grade : grade,
@@ -327,20 +334,42 @@ const Conges = () => {
   function nbDaysBetween(start, end) {
     return parseInt(Math.round((end.getTime() - start.getTime()) / (1000 * 3600 * 24)));
   }
+
   // useEffect for calculate the end conge date base on the start date and duration
   useEffect(() => {
-    /*if (typeConge && typeConge.length > 0) {
-      setSelectedType(typeConge[0].libelle_type_conge);
-    }*/
     const calculateEndDate = () => {
       if (startDate && duration) {
-        const start = new Date(startDate);
-        const end = new Date(start);
-        end.setDate(end.getDate() + parseInt(duration - 1));
-        setEndDate(end.toISOString().split("T")[0]);
-        const repDate = new Date(end);
-        repDate.setDate(end.getDate() + parseInt(1));
-        setRepriseDate(repDate.toISOString().split("T")[0]);
+        if (selectedPerson.id_type_personnel === 2) {
+          let st = new Date(startDate);
+          let weekdaysToAdd = duration - 1;
+          while (weekdaysToAdd > 0) {
+            st.setDate(st.getDate() + parseInt(1));
+            if (st.getDay() !== 0 && st.getDay() !== 6) {
+              weekdaysToAdd--;
+            }
+          }
+          console.log('end date : ' + st);
+          let next_day = new Date();
+          let rep = new Date();
+          next_day.setDate(st.getDate() + 1);
+          if (next_day.getDay() === 0 || next_day.getDay() === 6) {
+            rep.setDate(st.getDate() + 3);
+            console.log("rep date : " + rep);
+          } else {
+            rep.setDate(st.getDate() + 1);
+            console.log("rep date : " + rep);
+          }
+          setEndDate(st.toISOString().split("T")[0]);
+          setRepriseDate(rep.toISOString().split("T")[0]);
+        } else {
+          const start = new Date(startDate);
+          const end = new Date(start);
+          end.setDate(end.getDate() + parseInt(duration - 1));
+          setEndDate(end.toISOString().split("T")[0]);
+          const repDate = new Date(end);
+          repDate.setDate(end.getDate() + parseInt(1));
+          setRepriseDate(repDate.toISOString().split("T")[0]);
+        }
       }
     };
     calculateEndDate();
@@ -501,7 +530,7 @@ const Conges = () => {
                               <td>{c.nom_prenom_personnel}</td> 
                               <td>{c.date_debut_conge.getDate() + "/" + (parseInt(c.date_debut_conge.getMonth()+1) <= 9 ? "0"+parseInt(c.date_debut_conge.getMonth()+1) : parseInt(c.date_fin_conge.getMonth()+1)) + "/" + c.date_debut_conge.getFullYear() }</td>
                               <td>{c.date_fin_conge.getDate() + "/" + (parseInt(c.date_fin_conge.getMonth()+1) <= 9 ? "0"+parseInt(c.date_fin_conge.getMonth()+1) : parseInt(c.date_fin_conge.getMonth()+1)) + "/" + c.date_fin_conge.getFullYear()}</td>
-                              <td>{c.statut_conge !== "terminé" ? curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? Math.ceil((c.date_fin_conge - curr_date) / (1000 * 3600 * 24)) : Math.ceil((c.date_fin_conge - c.date_debut_conge)/ (1000 * 3600 * 24)) : 0 }</td>
+                              <td>{c.statut_conge === "programmé" ? c.attestation_conge.duration : c.statut_conge !== "terminé" ? curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? Math.ceil((c.date_fin_conge - curr_date) / (1000 * 3600 * 24)) : Math.ceil((c.date_fin_conge - c.date_debut_conge)/ (1000 * 3600 * 24)) : 0 }</td>
                               <td>{c.statut_conge === "en cours"
                                   ? <Badge color="success">
                                       {c.statut_conge}
@@ -844,14 +873,14 @@ const Conges = () => {
                           <Label for="date-fin">
                             Date de fin
                           </Label>
-                          <Input
-                            id="date-fin"
-                            name="date"
-                            value={endDate}
-                            placeholder="date"
-                            type="date"
-                            readOnly
-                          />
+                            <Input
+                              id="date-fin"
+                              name="date"
+                              value={endDate}
+                              placeholder="date"
+                              type="date"
+                              readOnly
+                            />
                         </FormGroup>
                       </Col>
                       <Col md="6">

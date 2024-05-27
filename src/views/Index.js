@@ -29,6 +29,7 @@ import { ChartExample2 } from "variables/charts";
 const Index = (props) => {
   const [activeNav, setActiveNav] = useState(1);
   const [chartExample1Data, setChartExample1Data] = useState("data1");
+  const [conge, setConge] = useState([]);
 
   if (window.Chart) {
     parseOptions(Chart, chartOptions());
@@ -42,7 +43,11 @@ const Index = (props) => {
   const [data, setData] = useState([])
   useEffect(() => {
     const func = async () => {
-      try {
+      try { 
+        window.electronAPI.getConge();
+        await window.electronAPI.retrieveConge((event, res) => {
+          setConge(res);
+        })
         const title = `Gescon App - ${new Date().getFullYear()}`;
         window.electronAPI.setTitle(title);
         const res = await window.electronAPI.ping();
@@ -69,7 +74,7 @@ const Index = (props) => {
                     <h6 className="text-uppercase text-light ls-1 mb-1">
                       Congés
                     </h6>
-                    <h2 className="text-white mb-0">Statistiques Globales</h2>
+                    <h2 className="text-white mb-0">Statistiques Globales {conge.length > 0 ? ": " + conge.length + "" : ": " + conge.length} </h2>
                   </div>
                   <div className="col">
                     <Nav className="justify-content-end" pills>
@@ -103,7 +108,7 @@ const Index = (props) => {
                 <Row className="align-items-center">
                   <div className="col">
                     <h6 className="text-uppercase text-muted ls-1 mb-1">
-                      Permissions & Congés
+                      Permissions
                     </h6>
                     <h2 className="mb-0">Demandes Totales</h2>
                   </div>

@@ -446,7 +446,6 @@ export const ChartExample1 = () => {
 // Example 2 of Chart inside src/views/Index.js (Total orders - Card)
 export const ChartExample2 = () => {
   const [permissions, setPermissions] = useState([]);
-  const [conges, setConges] = useState([]);
 
   function formatDate(d) {
     const date = new Date(d);
@@ -459,10 +458,6 @@ export const ChartExample2 = () => {
   useEffect(() => {
     const fetchDatas = async () => {
       try {
-        window.electronAPI.getConge();
-        await window.electronAPI.retrieveConge((event, res) => {
-          setConges(res);
-        })
         window.electronAPI.getPermission();
         await window.electronAPI.retrievePermission((event, res) => {
           setPermissions(res);
@@ -476,19 +471,12 @@ export const ChartExample2 = () => {
 
   const getDemandeMonth = (month) => {
     let total = 0;
-    if (conges.length > 0) {
-      conges.forEach(element => {
-        if (formatDate(element.date_debut_conge).getMonth() === month) {
+    if (permissions.length > 0) {
+      permissions.forEach(element => {
+        if (formatDate(element.date_debut_permission).getMonth() === month) {
           total += 1;
         }
       });
-      if (permissions.length > 0) {
-        permissions.forEach(element => {
-          if (formatDate(element.date_debut_permission).getMonth() === month) {
-            total += 1;
-          }
-        });
-      }
     }
     return total;
   };

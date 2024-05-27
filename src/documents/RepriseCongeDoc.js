@@ -4,7 +4,10 @@ import image from './docs-images/sceau-img.PNG';
 
 // Create styles
 const styles = StyleSheet.create({
-    // the container element
+    // the container element    
+    boldText: {
+        fontWeight: 'bold font',
+    },
     page: {
       flexDirection: 'column',
       display: 'flex',
@@ -282,10 +285,10 @@ const RepriseCongeDoc = (props) => {
                         CERTIFICATE OF RESUMPTION OF FUNCTION
                     </Text>
                     <Text style={styles.pCertifText}>
-                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
-                        {props.grade}, Matricule {props.matricule}, {props.poste} {props.preposition} {props.structure},bénéficiaire
-                        d'un {props.typeConge} de {props.duration} jours , accordé par décision N° {props.decision} du Ministre des Finances,
-                        allant du {props.startDate} au {props.endDate} a effectivement repris le service le {props.repriseDate} à 7 heures 30 précises.
+                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M." : "Mme"} <Text style={styles.boldText}>{props.name}</Text>, 
+                         {props.grade}, Matricule {props.matricule}, {props.poste} {props.preposition} {props.structure}, bénéficiaire
+                        d'un {props.typeConge} de {props.duration} jours, accordé par décision N° <Text style={styles.boldText}>{props.decision}</Text> du Ministre des Finances,
+                         allant du <Text style={styles.boldText}>{props.startDate}</Text> au <Text style={styles.boldText}>{props.endDate}</Text> a effectivement repris le service le <Text style={styles.boldText}>{props.repriseDate}</Text> à 7 heures 30 précises.
                     </Text>
                     <Text style={styles.pCertifText}>
                         En foi de quoi, le présent certificat de reprise de service est établi et délivré à l'intéressé{props.sexe === "M" ? "" : "e"} pour
