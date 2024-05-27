@@ -48,7 +48,7 @@ const Index = (props) => {
         await window.electronAPI.retrieveConge((event, res) => {
           setConge(res);
         })
-        const title = `Gescon App - ${new Date().getFullYear()}`;
+        const title = `GESCONGES - ${new Date().getFullYear()}`;
         window.electronAPI.setTitle(title);
         const res = await window.electronAPI.ping();
         console.log("Ping : " ,res);

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+//import { CardHeader } from "react-bootstrap";
 import Select from "react-select";
 import {
     Container,
@@ -6,7 +7,8 @@ import {
     Card,
     CardBody,
     CardTitle,
-    Col
+    Col,
+    CardHeader
 } from "reactstrap";
 import { ChartStructureStats } from "variables/charts";
 
@@ -198,8 +200,14 @@ const StructureStats = () => {
           <Row>
             <Col lg="12">
               <Card>
+                <CardHeader className="bg-transparent">
+                  <Row className="align-items-center">
+                    <div className="col">
+                      <h2 className="mb-0">Total : {conges.length}</h2>
+                    </div>
+                  </Row>
+                </CardHeader>
                 <CardBody>
-                  {/* Chart */}
                   <div className="chart">
                     <ChartStructureStats structConge={conges}/>
                   </div>

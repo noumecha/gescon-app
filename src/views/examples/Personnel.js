@@ -93,10 +93,12 @@ const Personnel = () => {
         try {
             for (let i = 0; i < excelData.length; i++) {
                 const type = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 1 : 2;
-                const statut = "en poste"; // en permission, en congé
-                //const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
-                const nb_jours_conges = 0;
+                const statut = "en poste";
+                const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
+                //const nb_jours_conges = 0;
                 const nb_jours_permission = 0;
+                const nb_jours_conges_maternite = 98;
+                const nb_jours_conges_maladie = 90;
                 const next_month_permission = {
                     month: 0,
                     amount: 0,
@@ -104,13 +106,13 @@ const Personnel = () => {
                 const req = `
                 INSERT INTO personnel 
                 (ordre_personnel, matricule_personnel, nom_prenom_personnel, grade_personnel, poste_personnel, structure_personnel, cellule_personnel, sexe_personnel, date_recrutement_personnel, situation_matrimoniale_personnel,
-                region_personnel, departement_personnel, date_naiss_personnel, telephone_personnel,id_type_personnel, categorie_personnel, arrondissement_personnel,nb_jours_permission,nb_jours_conges,statut_personnel,next_month_permission,preposition_personnel)
+                region_personnel, departement_personnel, date_naiss_personnel, telephone_personnel,id_type_personnel, categorie_personnel, arrondissement_personnel,nb_jours_permission,nb_jours_conges,nb_jours_conges_maladie,nb_jours_conges_maternite,statut_personnel,next_month_permission,preposition_personnel)
                 VALUES 
                 (${excelData[i].ORDRE},"${excelData[i].MATRICULE}","${excelData[i].NOM_PRENOM}",
                 "${excelData[i].GRADE}","${excelData[i].POSTE}","${excelData[i].STRUCTURE}","${excelData[i].STRUCTURE_01}","${excelData[i].SEXE}",
                 "${excelData[i].DATE_RECRUTEMENT}","${excelData[i].SITUATION_MATRIMONIALE}","${excelData[i].REGION}",
                 "${excelData[i].DEPARTEMENT}","${excelData[i].DATE_NAISSANCE}","${excelData[i].TELEPHONE}","${type}",
-                "${excelData[i].CATEGORIE}","${excelData[i].ARRONDISSEMENT}","${nb_jours_permission}","${nb_jours_conges}","${statut}",'${JSON.stringify(next_month_permission)}',"${excelData[i].PREPOSITION}");`;
+                "${excelData[i].CATEGORIE}","${excelData[i].ARRONDISSEMENT}","${nb_jours_permission}","${nb_jours_conges}","${nb_jours_conges_maladie}","${nb_jours_conges_maternite}","${statut}",'${JSON.stringify(next_month_permission)}',"${excelData[i].PREPOSITION}");`;
                 window.electronAPI.addPersonnel(req);
             }
             window.electronAPI.personnelAddedSuccess(() => {

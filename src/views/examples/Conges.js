@@ -47,16 +47,15 @@ const Conges = () => {
   const [selectedDec, setSelectedDec] = useState("");
   const [struc, setStruc] = useState(selectedPerson ? selectedPerson.structure_personnel : "Service Général");
   const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste_personnel : "Contrôleur");
-  //const [sexe, setSexe] = useState(selectedPerson ? selectedPerson.sexe_personnel : "M");
-  const sexe = selectedPerson ? selectedPerson.sexe_personnel : "M"
-  const nb_jours_conges = selectedPerson ? selectedPerson.id_type_personnel === 1 ? 30 - selectedPerson.nb_jours_conges : 18 - selectedPerson.nb_jours_conges : 0
-  const [telephone, setTelphone] = useState(selectedPerson ? selectedPerson.telephone_personnel : 696879475)
+  const sexe = selectedPerson ? selectedPerson.sexe_personnel : "M.";
+  const nb_jours_conges = selectedPerson ? selectedPerson.nb_jours_conges : 0;
+  const [telephone, setTelphone] = useState(selectedPerson ? selectedPerson.telephone_personnel : 696879475);
   const [demande, setDemande] = useState(null);
   const [document, setDocument] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [generateSuccess, setGenerateSuccess] = useState("");
-  const [status, setStatus] = useState(`${sexe === 'M' ? 'M' : 'Mme'} ${name} à droit à ${nb_jours_conges} ${nb_jours_conges > 1 ? "jours" : "jour"} de congés`);
+  const [status, setStatus] = useState(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a ${nb_jours_conges} ${nb_jours_conges > 1 ? "jours" : "jour"} de congés disponibles`);
   const [visible, setVisible] = useState(true);
   const [conge, setConge] = useState([]);
   const [search, setSearch] = useState("");
@@ -68,7 +67,7 @@ const Conges = () => {
   const loadingText = "Aucune donnée dans la base de données";
   const [actived, setActived] = useState(selectedPerson === undefined ? true : false);
   const curr_date = new Date();
-  const [duration, setDuration] = useState(selectedPerson ? selectedPerson.id_type_personnel === 1 ? "30" : "18" : "18");
+  const [duration, setDuration] = useState(selectedPerson ? selectedPerson.nb_jours_conges : "");
   let nbDaysConges = 0;
 
   const filterConge = search !== "" || statutFilter !== ""
@@ -147,7 +146,7 @@ const Conges = () => {
         return;
       }
       if (selectedPerson.id_type_personnel === 2) {
-        if (duration > 18 - selectedPerson.nb_jours_conges) {
+        if (duration > selectedPerson.nb_jours_conges && (selectedType === "congé administratif partiel" || selectedType === "congé administratif total")) {
           setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
           setTimeout(() => {
             setError("");
@@ -155,7 +154,7 @@ const Conges = () => {
           return;
         }
       }
-      if (selectedPerson.id_type_personnel === 2 && (formatDate(startDate).getDay() === 0 || formatDate(startDate).getDay() === 6)) {
+      if (formatDate(startDate).getDay() === 0 || formatDate(startDate).getDay() === 6) {
         setError("Le congé ne peut etre configurer que pour les jours ouvrables");
         setTimeout(() => {
           setError("");
@@ -163,7 +162,7 @@ const Conges = () => {
         return;
       }
       if (selectedPerson.id_type_personnel === 1) {
-        if (duration > 30 - selectedPerson.nb_jours_conges) {
+        if (duration > selectedPerson.nb_jours_conges && (selectedType === "congé administratif partiel" || selectedType === "congé administratif total")) {
           setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
           setTimeout(() => {
             setError("");
@@ -171,14 +170,14 @@ const Conges = () => {
           return;
         }
       }
-      if (selectedPerson.id_type_personnel === 1 && selectedPerson.nb_jours_conges >= 30) {
+      if ((selectedPerson.id_type_personnel === 1 && selectedPerson.nb_jours_conges === 0) && (selectedType !== "congé maladie" || selectedType !== "congé maternité")) {
         setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} a déja epuisé tout ces congés pour l'année`);
         setTimeout(() => {
           setError("");
         },7000)
         return;
       }
-      if (selectedPerson.id_type_personnel === 2 && selectedPerson.nb_jours_conges >= 18) {
+      if ((selectedPerson.id_type_personnel === 2 && selectedPerson.nb_jours_conges === 0) && (selectedType !== "congé maladie" || selectedType !== "congé maternité")) {
         setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} a déja epuisé tout ces congés pour l'année`);
         setTimeout(() => {
           setError("");
@@ -270,17 +269,18 @@ const Conges = () => {
       const req_conge = `INSERT INTO conge 
         (date_debut_conge, date_fin_conge, duree_conge, created_at_conge,attestation_conge,id_type_conge,id_personnel,demande_conge,statut_conge,statut_attestation_conge,document_a_fournir) 
         VALUES ("${conge_data.startDate}","${conge_data.endDate}",${conge_data.duration},"${conge_data.curr_date}",'${JSON.stringify(attestation)}',${conge_data.id_type_conge},${conge_data.id_personnel},"${conge_data.demandeFile}","${conge_data.statut_conge}","${conge_data.statut_attestation_conge}","${conge_data.document}");`;
-      const req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges + ${duration}) WHERE id_personnel = ${conge_data.id_personnel};`;
-      window.electronAPI.addConge(req_conge);
+      const req_personnel = `UPDATE personnel SET ${selectedType === "congé maternité" ? `(nb_jours_conges_maternite = nb_jours_conges_maternite - ${duration})` : selectedType === "congé maladie" ? `nb_jours_conges_maladie = (nb_jours_conges_maladie - ${duration})` : `nb_jours_conges = (nb_jours_conges - ${duration})`} WHERE id_personnel = ${conge_data.id_personnel};`;
+      console.log(req_personnel);
+      /*window.electronAPI.addConge(req_conge);
       window.electronAPI.updatePersonnel(req_personnel);
-      window.electronAPI.congeAddedSuccess(() => {
+      window.electronAPI.congeAddedSuccess(() => { 
         setSuccess("congé ajouté avec succès");
         setStatus(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
       });
       setTimeout(() => {
         setSuccess("");
       }, 3000)
-      setActived(true);
+      setActived(true);*/
     } catch (error) {
       console.error("Erreur saving congé : " + error.message);
     }
