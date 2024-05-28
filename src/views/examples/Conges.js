@@ -161,6 +161,20 @@ const Conges = () => {
         },7000)
         return;
       }
+      if (selectedType === "congé maternité" && selectedPerson.nb_jours_conges_maternite === 0) {
+        setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja eu un congé maternité pour cette année`);
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return;
+      }
+      if (selectedType === "congé maladie" && selectedPerson.nb_jours_conges_maladie === 0) {
+        setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja eu un congé maladie cette année`);
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return;
+      }
       if (selectedPerson.id_type_personnel === 1) {
         if (duration > selectedPerson.nb_jours_conges && (selectedType === "congé administratif partiel" || selectedType === "congé administratif total")) {
           setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
@@ -171,14 +185,14 @@ const Conges = () => {
         }
       }
       if ((selectedPerson.id_type_personnel === 1 && selectedPerson.nb_jours_conges === 0) && (selectedType !== "congé maladie" || selectedType !== "congé maternité")) {
-        setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} a déja epuisé tout ces congés pour l'année`);
+        setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja epuisé tout ces congés pour l'année`);
         setTimeout(() => {
           setError("");
         },7000)
         return;
       }
       if ((selectedPerson.id_type_personnel === 2 && selectedPerson.nb_jours_conges === 0) && (selectedType !== "congé maladie" || selectedType !== "congé maternité")) {
-        setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} a déja epuisé tout ces congés pour l'année`);
+        setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja epuisé tout ces congés pour l'année`);
         setTimeout(() => {
           setError("");
         },7000)
@@ -204,7 +218,7 @@ const Conges = () => {
             nbDaysConges += nbDaysBetween(formatDate(userConge[index].date_debut_conge),formatDate(userConge[index].date_fin_conge)) + 1;
             if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) && (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
               //console.log(`1`);
-              setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M' : 'Mme'} ${name} a déja un congé prévu`);
+              setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja un congé prévu`);
               setTimeout(() => {
                   setError("");
               },7000)
@@ -212,7 +226,7 @@ const Conges = () => {
             }
             if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) || (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
               //console.log(`2`);  
-              setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M' : 'Mme'} ${name} a déja pris un congé`);
+              setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja pris un congé`);
               setTimeout(() => {
                   setError("");
               },7000)
@@ -220,7 +234,7 @@ const Conges = () => {
             }
             if (formatDate(startDate) === formatDate(userConge[index].attestation_conge.date_debut_conge)) {
               //console.log(`3`);
-              setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M' : 'Mme'} ${name} a un congé prévu cette meme date`);
+              setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a un congé prévu cette meme date`);
               setTimeout(() => {
                   setError("");
               },7000)
@@ -228,7 +242,7 @@ const Conges = () => {
             }
             if (formatDate(startDate) === formatDate(userConge[index].date_debut_conge)) {
               //console.log(`3`);
-              setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M' : 'Mme'} ${name} a un congé prévu cette meme date`);
+              setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a un congé prévu cette meme date`);
               setTimeout(() => {
                   setError("");
               },7000)
@@ -271,16 +285,16 @@ const Conges = () => {
         VALUES ("${conge_data.startDate}","${conge_data.endDate}",${conge_data.duration},"${conge_data.curr_date}",'${JSON.stringify(attestation)}',${conge_data.id_type_conge},${conge_data.id_personnel},"${conge_data.demandeFile}","${conge_data.statut_conge}","${conge_data.statut_attestation_conge}","${conge_data.document}");`;
       const req_personnel = `UPDATE personnel SET ${selectedType === "congé maternité" ? `(nb_jours_conges_maternite = nb_jours_conges_maternite - ${duration})` : selectedType === "congé maladie" ? `nb_jours_conges_maladie = (nb_jours_conges_maladie - ${duration})` : `nb_jours_conges = (nb_jours_conges - ${duration})`} WHERE id_personnel = ${conge_data.id_personnel};`;
       console.log(req_personnel);
-      /*window.electronAPI.addConge(req_conge);
+      window.electronAPI.addConge(req_conge);
       window.electronAPI.updatePersonnel(req_personnel);
       window.electronAPI.congeAddedSuccess(() => { 
         setSuccess("congé ajouté avec succès");
-        setStatus(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
+        setStatus(`Le satut de ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a été mis à jour !`);
       });
       setTimeout(() => {
         setSuccess("");
       }, 3000)
-      setActived(true);*/
+      setActived(true);
     } catch (error) {
       console.error("Erreur saving congé : " + error.message);
     }
@@ -311,7 +325,7 @@ const Conges = () => {
       window.electronAPI.addArchiveAttestationRepConge(req);
       await window.electronAPI.addArchiveAttCongeRepSuccess((event, res) => {
         setGenerateSuccess("Attestation de reprise générer avec succès");
-        console.log(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
+        console.log(`Le satut de ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a été mis à jour !`);
       });
       setTimeout(() => {
         setGenerateSuccess("");
@@ -407,8 +421,8 @@ const Conges = () => {
             const statut_conge = "terminé";
             const req_conge = `UPDATE conge SET statut_conge = "${statut_conge}" WHERE id_conge = ${conge[x].id_conge}`;
             window.electronAPI.addConge(req_conge);
-            console.log(`Le congé de ${conge[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${conge[x].nom_prenom_personnel} a été actualisé`);
-            console.log(`Le satut du congé de ${conge[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${conge[x].nom_prenom_personnel} a été mis à jour !`);  
+            console.log(`Le congé de ${conge[x].sexe_personnel === 'M' ? 'M.' : 'Mme'} ${conge[x].nom_prenom_personnel} a été actualisé`);
+            console.log(`Le satut du congé de ${conge[x].sexe_personnel === 'M' ? 'M.' : 'Mme'} ${conge[x].nom_prenom_personnel} a été mis à jour !`);  
             setTimeout(() => {
               setSuccess("");
             }, 3000)

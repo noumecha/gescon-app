@@ -51,7 +51,7 @@ const Permission = () => {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const nb_jours_permission = selectedPerson ? selectedPerson.nb_jours_permission : 0;
-    const [status, setStatus] = useState(nb_jours_permission >= 10 ? `les nouvelles permissions de ${sexe === 'M' ? 'M' : 'Mme'} ${name} seront déduites de ses jours de congés` : `${sexe === 'M' ? 'M' : 'Mme'} ${name} a encore ${10 - nb_jours_permission} ${10 - nb_jours_permission > 1 ? "jours" : "jour"} de ${10 - nb_jours_permission > 1 ? "permissions" : "permission"} ${10 - nb_jours_permission > 1 ? "disponibles" : "disponible"}`);
+    const [status, setStatus] = useState(nb_jours_permission === 0 ? `les nouvelles permissions de ${sexe === 'M' ? 'M.' : 'Mme'} ${name} seront déduites de ses jours de congés` : `${sexe === 'M' ? 'M.' : 'Mme'} ${name} a ${nb_jours_permission} ${nb_jours_permission > 1 ? "jours" : "jour"} de ${nb_jours_permission > 1 ? "permissions" : "permission"} ${nb_jours_permission > 1 ? "disponibles" : "disponible"}`);
     const [visible, setVisible] = useState(true);
     const [search, setSearch] = useState("");
     const [statutFilter, setStatutFilter] = useState("");
@@ -203,7 +203,7 @@ const Permission = () => {
         console.log("Attestation de reprise générer avec succès");
       });
       setSuccess("Attestation de reprise générer avec succès");
-      setStatus(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
+      setStatus(`Le satut de ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a été mis à jour !`);
       setTimeout(() => {
         setSuccess("");
       }, 3000)
@@ -275,7 +275,7 @@ const Permission = () => {
             if (selectedPerson.statut_personnel !== "en poste") {
                 for (let index = 0; index < userConge.length; index++) {
                     if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) && (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
-                        setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} est ${selectedPerson.statut_personnel}`);
+                        setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} est ${selectedPerson.statut_personnel}`);
                         setTimeout(() => {
                             setError("");
                         },7000)
@@ -287,21 +287,28 @@ const Permission = () => {
                 for (let index = 0; index < userConge.length; index++) {
                     nbDaysConges += nbDaysBetween(formatDate(userConge[index].date_debut_conge),formatDate(userConge[index].date_fin_conge)) + 1;
                     if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) && (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
-                        setError(`Impossible de définir une permission pour cette date car ${sexe === 'M' ? 'M' : 'Mme'} ${name} a un congé prévu`);
+                        setError(`Impossible de définir une permission pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a un congé prévu`);
                         setTimeout(() => {
                             setError("");
                         },7000)
                         return;
                     }
                     if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) || (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
-                        setError(`Impossible de définir une permission pour cette date car ${sexe === 'M' ? 'M' : 'Mme'} ${name} a un congé prévu`);
+                        setError(`Impossible de définir une permission pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a un congé prévu`);
                         setTimeout(() => {
                             setError("");
                         },7000)
                         return;
                     }
-                    if (formatDate(startDate) === formatDate(userConge[index].date_debut_conge)) {
-                        setError(`Impossible de définir une permission pour cette date car ${sexe === 'M' ? 'M' : 'Mme'} ${name} a un congé prévu cette meme date`);
+                    if (formatDate(startDate).getDate() === formatDate(userConge[index].date_debut_conge).getDate() && formatDate(startDate).getMonth() === formatDate(userConge[index].date_debut_conge).getMonth() && formatDate(startDate).getFullYear() === formatDate(userConge[index].date_debut_conge).getFullYear() ) {
+                        setError(`Impossible de définir une permission pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a un congé prévu cette meme date`);
+                        setTimeout(() => {
+                            setError("");
+                        },7000)
+                        return;
+                    }
+                    if (formatDate(repDate).getDate() === formatDate(userConge[index].date_debut_conge).getDate() && formatDate(repDate).getMonth() === formatDate(userConge[index].date_debut_conge).getMonth() && formatDate(repDate).getFullYear() === formatDate(userConge[index].date_debut_conge).getFullYear()) {
+                        setError(`Impossible de définir une permission pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} prendra un congé prévu à cette meme date`);
                         setTimeout(() => {
                             setError("");
                         },7000)
@@ -327,7 +334,7 @@ const Permission = () => {
                     }
                     if (formatDate(startDate) >= formatDate(lastPermission[i].date_debut_permission) && formatDate(endDate) <= formatDate(lastPermission[i].date_fin_permission)) {
                         //nb += nbDaysBetween(formatDate(lastPermission[i].date_debut_permission),formatDate(lastPermission[i].date_fin_permission));
-                        setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} a déja pris une permission pour cette periode`);
+                        setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja pris une permission pour cette periode`);
                         setTimeout(() => {
                             setError("");
                         },7000)
@@ -335,7 +342,7 @@ const Permission = () => {
                     }
                     if ((formatDate(startDate) >= formatDate(lastPermission[i].date_debut_permission) && formatDate(startDate) <= formatDate(lastPermission[i].date_fin_permission)) || (formatDate(endDate) >= formatDate(lastPermission[i].date_debut_permission) && formatDate(endDate) <= formatDate(lastPermission[i].date_fin_permission))) {
                         //nb += nbDaysBetween(formatDate(lastPermission[i].date_debut_permission),formatDate(lastPermission[i].date_fin_permission));
-                        setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} a déja pris une permission pour cette periode`);
+                        setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja pris une permission pour cette periode`);
                         setTimeout(() => {
                             setError("");
                         },7000)
@@ -353,28 +360,28 @@ const Permission = () => {
                 console.log(`current month total permissions for this user : ${nb}`);
                 console.log(`total permission for this user : ${total_lasts_days}`);
                 if (nb === 3 && formatDate(startDate) <= lastDateOfMonth(formatDate(startDate)) && formatDate(endDate) > lastDateOfMonth(formatDate(startDate))) {
-                    setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} a déja pris 3 jours de permissions le mois de ${monthToText(formatDate(startDate).getMonth())}`);
+                    setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja pris 3 jours de permissions le mois de ${monthToText(formatDate(startDate).getMonth())}`);
                     setTimeout(() => {
                         setError("");
                     },7000)
                     return;
                 }
                 if (nb >= 3) {
-                    setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} a déja pris 3 jours de permissions ce mois`);
+                    setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja pris 3 jours de permissions ce mois`);
                     setTimeout(() => {
                         setError("");
                     },7000)
                     return;
                 }
                 if (nb === 2 && duration > 1  && lastDateOfMonth(startDate).getDate() - formatDate(startDate).getDate() + 1 > 2) {
-                    setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} n'a que 1 jour permission restant pour ce mois`);
+                    setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} n'a que 1 jour permission restant pour ce mois`);
                     setTimeout(() => {
                         setError("");
                     },7000)
                     return;
                 }
                 if (nb === 1 && duration > 2 && lastDateOfMonth(startDate).getDate() - formatDate(startDate).getDate() + 1 > 1) {
-                    setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} n'a que 2 jours permissions restants pour ce mois`);
+                    setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} n'a que 2 jours permissions restants pour ce mois`);
                     setTimeout(() => {
                         setError("");
                     },7000)
@@ -382,14 +389,14 @@ const Permission = () => {
                 }
             }
             // No more permissions 
-            if ((selectedPerson.id_type_personnel === 2 && nbDaysConges + total_lasts_days >= 28) || (selectedPerson.id_type_personnel === 1 && nbDaysConges + total_lasts_days >= 40)) {
-                setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} n'a plus de jours de permissions`);
+            if ((selectedPerson.id_type_personnel === 2 && selectedPerson.nb_jours_conges + total_lasts_days === 28) || (selectedPerson.id_type_personnel === 1 && selectedPerson.nb_jours_conges + total_lasts_days === 40)) {
+                setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} n'a plus de jours de permissions`);
                 setTimeout(() => {
                     setError("");
                 },7000)
                 return;
             }
-            // take over between the endDate and the startDate if the endDate in on the next month range and set it for the next month
+            // take over between the endDate and the startDate if the endDate is on the next month range and set it for the next month
             if (formatDate(lastDateOfMonth(startDate)).getDate() - formatDate(startDate).getDate() >= 0 && formatDate(lastDateOfMonth(startDate)).getDate() - formatDate(startDate).getDate() <= 2) {
                 nbDayPermCurrMonth.month = formatDate(startDate).getMonth();
                 nbDayPermCurrMonth.amount = lastDateOfMonth(startDate).getDate() - formatDate(startDate).getDate() + 1;
@@ -406,7 +413,7 @@ const Permission = () => {
                     console.log(`startDate month : ${formatDate(startDate).getMonth()}`);
                 }
                 if (nb === 3) {
-                    setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} a déja pris 3 jours de permissions le mois de ${monthToText(formatDate(startDate).getMonth())}`);
+                    setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja pris 3 jours de permissions le mois de ${monthToText(formatDate(startDate).getMonth())}`);
                     setTimeout(() => {
                         setError("");
                     },7000)
@@ -415,7 +422,7 @@ const Permission = () => {
             }
             //
             if ( formatDate(startDate).getMonth() === selectedPerson.next_month_permission.month && selectedPerson.next_month_permission.amount !== 0 && duration > selectedPerson.next_month_permission.amount) {
-                setError(`${sexe === 'M' ? 'M' : 'Mme'} ${name} n'a droit qu'à ${3 - selectedPerson.next_month_permission.amount} ${3 - selectedPerson.next_month_permission.amount > 1 ? "jours" : "jour"} de permission pour ce mois`);
+                setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} n'a droit qu'à ${3 - selectedPerson.next_month_permission.amount} ${3 - selectedPerson.next_month_permission.amount > 1 ? "jours" : "jour"} de permission pour ce mois`);
                 setTimeout(() => {
                     setError("");
                 },7000)
@@ -448,9 +455,6 @@ const Permission = () => {
                     startDate: (formatDate(startDate).getDate() < 10 ? "0"+formatDate(startDate).getDate() : formatDate(startDate).getDate()) + "/" + (parseInt(formatDate(startDate).getMonth()+1) < 10 ? "0"+parseInt(formatDate(startDate).getMonth()+1) : parseInt(formatDate(startDate).getMonth()+1)) +"/"+formatDate(startDate).getFullYear(),
                     endDate: (formatDate(endDate).getDate() < 10 ? "0"+formatDate(endDate).getDate() : formatDate(endDate).getDate()) + "/" + (parseInt(formatDate(endDate).getMonth()+1) < 10 ? "0"+parseInt(formatDate(endDate).getMonth()+1) : parseInt(formatDate(endDate).getMonth()+1)) +"/"+formatDate(endDate).getFullYear(),
                     repriseDate: (formatDate(repDate).getDate() < 10 ? "0"+formatDate(repDate).getDate() : formatDate(repDate).getDate()) + "/" + (parseInt(formatDate(repDate).getMonth()+1) < 10 ? "0"+parseInt(formatDate(repDate).getMonth()+1) : parseInt(formatDate(repDate).getMonth()+1)) +"/"+formatDate(repDate).getFullYear(),
-                    /*startDate: startDate,
-                    endDate: endDate,
-                    repriseDate: repDate,*/
                     preposition: preposition,
                     grade : grade,
                 }
@@ -474,11 +478,11 @@ const Permission = () => {
                   (date_debut_permission, date_fin_permission, duree_permission, created_at_permission,attestation_permission,id_personnel,demande_permission,statut_permission,statut_attestation_permission) 
                   VALUES ("${permission_data.startDate}","${permission_data.endDate}",${duree},"${permission_data.curr_date}",'${JSON.stringify(attestation)}',${permission_data.id_personnel},"${permission_data.demande}","${permission_data.statut_permission}","${permission_data.statut_attestation_permission}");`;
                 const statut = curr_date >= permission_data.startDate && curr_date <= permission_data.endDate ? "en permission" : "en poste";
-                const req_pers = `UPDATE personnel SET next_month_permission = '${JSON.stringify(next_month_permission)}',statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission + ${duration}) WHERE id_personnel = ${permission_data.id_personnel};`;
+                const req_pers = `UPDATE personnel SET next_month_permission = '${JSON.stringify(next_month_permission)}',statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${duration}) WHERE id_personnel = ${permission_data.id_personnel};`;
                 console.log(`permission query : ${req_permission}`);
                 console.log(`personnel query : ${req_pers}`);
                 window.electronAPI.addPermission(req_permission);
-                setStatus(`Le satut de ${sexe === 'M' ? 'M' : 'Mme'} ${name} a été mis à jour !`);
+                setStatus(`Le satut de ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a été mis à jour !`);
                 window.electronAPI.permissionAddedSuccess(() => {
                     setSuccess("permission ajoutée avec succès");
                     setTimeout(() => {
@@ -489,29 +493,29 @@ const Permission = () => {
                 window.electronAPI.updatePersonnelSuccess(() => {
                     console.log("personnel updated");
                 });
-                if (selectedPerson.id_type_personnel === 2 && total_lasts_days + parseInt(duration) > 10 && nbDaysConges < 18 ) {
+                if (selectedPerson.id_type_personnel === 2 && total_lasts_days + parseInt(duration) > 10 && selectedPerson.nb_jours_conges > 0) {
                     let diff = selectedPerson.nb_jours_permission + 1 === 10 ? (total_lasts_days + parseInt(duration)) - 10 : (total_lasts_days + parseInt(duration)) - selectedPerson.nb_jours_permission ;
-                    const req_personnel = `UPDATE personnel SET nb_jours_permission = 10,nb_jours_conges = (nb_jours_conges + ${diff}) WHERE id_personnel = ${selectedPerson.id_personnel};`;
+                    const req_personnel = `UPDATE personnel SET nb_jours_permission = 10,nb_jours_conges = (nb_jours_conges - ${diff}) WHERE id_personnel = ${selectedPerson.id_personnel};`;
                     console.log(`${req_personnel}`)
-                    window.electronAPI.updatePersonnel(req_personnel);
+                    /*window.electronAPI.updatePersonnel(req_personnel);
                     window.electronAPI.updatePersonnelSuccess(() => {
                         setSuccess("personnel mis à jour avec succès");
                         setTimeout(() => {
                             setSuccess("");
                         }, 3000)
-                    })
+                    })*/
                 }
-                if (selectedPerson.id_type_personnel === 1 && total_lasts_days + parseInt(duration) > 10 && nbDaysConges < 30 ) {
+                if (selectedPerson.id_type_personnel === 1 && total_lasts_days + parseInt(duration) > 10 && selectedPerson.nb_jours_conges > 0) {
                     let diff = selectedPerson.nb_jours_permission + 1 === 10 ? (total_lasts_days + parseInt(duration)) - 10 : (total_lasts_days + parseInt(duration)) - selectedPerson.nb_jours_permission ;
-                    const req_personnel = `UPDATE personnel SET nb_jours_permission = 10,nb_jours_conges = (nb_jours_conges + ${diff}) WHERE id_personnel = ${selectedPerson.id_personnel};`;
+                    const req_personnel = `UPDATE personnel SET nb_jours_permission = 10,nb_jours_conges = (nb_jours_conges - ${diff}) WHERE id_personnel = ${selectedPerson.id_personnel};`;
                     console.log(`${req_personnel}`)
-                    window.electronAPI.updatePersonnel(req_personnel);
+                    /*window.electronAPI.updatePersonnel(req_personnel);
                     window.electronAPI.updatePersonnelSuccess(() => {
                         setSuccess("personnel mis à jour avec succès");
                         setTimeout(() => {
                             setSuccess("");
                         }, 3000)
-                    })
+                    })*/
                 }
                 handleRefresh();
                 setLoadingSpinner(true);
@@ -556,8 +560,8 @@ const Permission = () => {
                         if ((date.getDate() === permission[x].date_fin_permission.getDate() && date.getMonth() === permission[x].date_fin_permission.getMonth() && date.getFullYear() === permission[x].date_fin_permission.getFullYear()) || (date.getDate() > permission[x].date_fin_permission.getDate() && date.getMonth() === permission[x].date_fin_permission.getMonth() && date.getFullYear() === permission[x].date_fin_permission.getFullYear())) {
                           const req_permission = `UPDATE permission SET statut_permission = "terminé" WHERE id_permission = ${permission[x].id_permission}`;
                           window.electronAPI.addPermission(req_permission);
-                          setSuccess(`La permission de ${permission[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${permission[x].nom_prenom_personnel} a été actualisé`);
-                          //setStatus(`Le satut de la permission de ${permission[x].sexe_personnel === 'M' ? 'M' : 'Mme'} ${permission[x].nom_prenom_personnel} a été mis à jour !`);  
+                          setSuccess(`La permission de ${permission[x].sexe_personnel === 'M' ? 'M.' : 'Mme'} ${permission[x].nom_prenom_personnel} a été actualisé`);
+                          //setStatus(`Le satut de la permission de ${permission[x].sexe_personnel === 'M' ? 'M.' : 'Mme'} ${permission[x].nom_prenom_personnel} a été mis à jour !`);  
                           setTimeout(() => {
                             setSuccess("");
                           }, 3000)
