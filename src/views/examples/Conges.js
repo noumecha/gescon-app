@@ -369,16 +369,16 @@ const Conges = () => {
               weekdaysToAdd--;
             }
           }
-          console.log('end date : ' + st);
+          //console.log('end date : ' + st);
           let next_day = new Date();
           let rep = new Date();
           next_day.setDate(st.getDate() + 1);
           if (next_day.getDay() === 0 || next_day.getDay() === 6) {
             rep.setDate(st.getDate() + 3);
-            console.log("rep date : " + rep);
+            //console.log("rep date : " + rep);
           } else {
             rep.setDate(st.getDate() + 1);
-            console.log("rep date : " + rep);
+            //console.log("rep date : " + rep);
           }
           setEndDate(st.toISOString().split("T")[0]);
           setRepriseDate(rep.toISOString().split("T")[0]);

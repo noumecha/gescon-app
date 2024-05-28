@@ -283,8 +283,17 @@ const Permission = () => {
                     }
                 }
             }
+            if (formatDate(startDate).getDay() === 0 || formatDate(startDate).getDay() === 6) {
+              setError("Les permissions ne peuvent être configurer que pour les jours ouvrables");
+              setTimeout(() => {
+                setError("");
+              },7000)
+              return;
+            }
             if (userConge.length > 0) {
                 for (let index = 0; index < userConge.length; index++) {
+                    console.log(`curr rep date : ${formatDate(repDate)}`);
+                    console.log(`curr debut conge date : ${formatDate(userConge[index].date_debut_conge)}`)
                     nbDaysConges += nbDaysBetween(formatDate(userConge[index].date_debut_conge),formatDate(userConge[index].date_fin_conge)) + 1;
                     if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) && (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
                         setError(`Impossible de définir une permission pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a un congé prévu`);
@@ -314,7 +323,6 @@ const Permission = () => {
                         },7000)
                         return;
                     }
-  
                 }
             }
             if (lastPermission.length > 0) {
