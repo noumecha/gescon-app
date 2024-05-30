@@ -217,35 +217,24 @@ const Permission = () => {
     useEffect(() => {
         const calculateEndDate = () => {
           if (startDate && duration) {
-            let st = formatDate(startDate);
+            let st = new Date(startDate);
             let weekdaysToAdd = duration - 1;
             while (weekdaysToAdd > 0) {
-              st.setDate(st.getDate() + parseInt(1));
+              st.setDate(st.getDate() + 1);
               if (st.getDay() !== 0 && st.getDay() !== 6) {
                 weekdaysToAdd--;
               }
             }
-            console.log(`st date ${st}`);
             let next_day = new Date();
             let rep = new Date();
             next_day.setDate(st.getDate() + 1);
             if (next_day.getDay() === 0 || next_day.getDay() === 6) {
-              rep.setDate(st.getDate() + parseInt(3));
-              console.log(`rep date ${rep}`);
+              rep.setDate(st.getDate() + 3);
             } else {
-              rep.setDate(st.getDate() + parseInt(1));
-              console.log(`rep date ${rep}`);
+              rep.setDate(st.getDate() + 1);
             }
             setEndDate(st.toISOString().split("T")[0]);
             setRepDate(rep.toISOString().split("T")[0]);
-            /*const start = new Date(startDate);
-            const end = new Date(start);
-            end.setDate(end.getDate() + parseInt(duration - 1));
-            // Mettre à jour l'interface utilisateur avec la date de fin
-            setEndDate(end.toISOString().split("T")[0]);
-            const reprDate = new Date(end);
-            reprDate.setDate(end.getDate() + parseInt(1));
-            setRepDate(reprDate.toISOString().split("T")[0]);*/
           }
         };
         calculateEndDate();
@@ -370,7 +359,6 @@ const Permission = () => {
                         fd.setDate(fd.getDate() + 1);
                     }
                     if (formatDate(startDate) >= formatDate(lastPermission[i].date_debut_permission) && formatDate(endDate) <= formatDate(lastPermission[i].date_fin_permission)) {
-                        //nb += nbDaysBetween(formatDate(lastPermission[i].date_debut_permission),formatDate(lastPermission[i].date_fin_permission));
                         setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja pris une permission pour cette periode`);
                         setTimeout(() => {
                             setError("");
@@ -378,7 +366,6 @@ const Permission = () => {
                         return;
                     }
                     if ((formatDate(startDate) >= formatDate(lastPermission[i].date_debut_permission) && formatDate(startDate) <= formatDate(lastPermission[i].date_fin_permission)) || (formatDate(endDate) >= formatDate(lastPermission[i].date_debut_permission) && formatDate(endDate) <= formatDate(lastPermission[i].date_fin_permission))) {
-                        //nb += nbDaysBetween(formatDate(lastPermission[i].date_debut_permission),formatDate(lastPermission[i].date_fin_permission));
                         setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja pris une permission pour cette periode`);
                         setTimeout(() => {
                             setError("");
