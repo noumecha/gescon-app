@@ -1,14 +1,33 @@
 import React from 'react';
-import { Page, Text, View, Document,Image, StyleSheet } from '@react-pdf/renderer';
+import { Page, Text, View, Document,Image, StyleSheet,Font } from '@react-pdf/renderer';
 import image from './docs-images/sceau-img.PNG';
 //import QrCode from './QrCode';
+import TimesNewRoman from './docs-fonts/times new roman.ttf';
+import TimesNewRomanBold from './docs-fonts/times new roman bold.ttf';
+
+// Create styles
+Font.register({ 
+    family: 'Times-Roman', 
+    fonts : [
+        {src: TimesNewRoman},
+        {src: TimesNewRomanBold, fontWeight: 700}
+    ]
+});
+Font.registerHyphenationCallback(word => [word])
+const fontStyles = StyleSheet.create({
+    normal: {
+        fontFamily: 'Times-Roman',
+        fontWeight: 'normal',
+    },
+    bold: {
+        fontFamily: 'Times-Bold',
+        fontWeight: 'bold',
+    }
+})
 
 // Create styles
 const styles = StyleSheet.create({
-    // the container element    
-    boldText: {
-        fontWeight: 'bold font',
-    },
+    // the container element
     page: {
       flexDirection: 'column',
       display: 'flex',
@@ -49,7 +68,7 @@ const styles = StyleSheet.create({
     },
     section: {
       display: 'flex',
-      alignItems: 'center',
+      //alignItems: 'center',
     },
     topSectionOne: {
         flex: 1,
@@ -298,10 +317,10 @@ const ReprisePermissionDoc = (props) => {
                         RETURN OF SERVICE CERTIFICATE
                     </Text>
                     <Text style={styles.pCertifText}>
-                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M." : "Mme"} {props.name}, 
-                         {props.grade}, Matricule {props.matricule}, {props.poste} {props.preposition} {props.structure}, bénéficiaire
-                        d'une permission d'absence de {props.duration} {props.duration > 1 ? "jours ouvrables" : "jour ouvrable" } allant du <Text style={styles.boldText}>{props.startDate}</Text> au <Text style={styles.boldText}>{props.endDate}</Text> a effectivement
-                        repris le service le <Text style={styles.boldText}>{props.repriseDate}</Text> à 7 heures 30 précises.
+                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M." : "Mme"} <Text style={fontStyles.bold}>{props.name}</Text>, 
+                         {props.grade}, Matricule <Text style={fontStyles.bold}>{props.matricule}</Text>, {props.poste} {props.preposition} {props.structure}, bénéficiaire
+                        d'une permission d'absence de (<Text style={fontStyles.bold}>{props.duration}</Text>) {props.duration > 1 ? "jours ouvrables" : "jour ouvrable" } allant du <Text style={fontStyles.bold}>{props.startDate}</Text> au <Text style={fontStyles.bold}>{props.endDate}</Text> a effectivement
+                        repris le service le <Text style={fontStyles.bold}>{props.repriseDate} à 7 heures 30 précises.</Text>
                     </Text>
                     <Text style={styles.pCertifText}>
                         En foi de quoi, le présent certificat de reprise de service est établie et délivrée à l'intéressé{props.sexe === "M" ? "" : "e"} pour

@@ -3,8 +3,6 @@ import { Page, Text, View, Document,Image, StyleSheet, Font } from '@react-pdf/r
 import image from './docs-images/sceau-img.PNG';
 import TimesNewRoman from './docs-fonts/times new roman.ttf';
 import TimesNewRomanBold from './docs-fonts/times new roman bold.ttf';
-/*import TimesNewRomanBoldItalic from '../assets/fonts/times new roman bold italic.ttf';
-import TimesNewRomanItalic from '../assets/fonts/times new roman italic.ttf';*/
 
 // Create styles
 Font.register({ 
@@ -21,7 +19,7 @@ const fontStyles = StyleSheet.create({
         fontWeight: 'normal',
     },
     bold: {
-        fontFamily: 'Times-Roman',
+        fontFamily: 'Times-Bold',
         fontWeight: 'bold',
     }
 })
@@ -63,7 +61,6 @@ const styles = StyleSheet.create({
     },
     section: {
       display: 'flex',
-      alignItems: 'center',
     },
     topSectionOne: {
         flex: 1,
@@ -100,8 +97,9 @@ const styles = StyleSheet.create({
       marginTop: 15,
       fontSize: 12,
       display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'flex-start',
       textAlign: 'justify',
-      border: '1px solid red',
     },
     // top text title
     h1TitleFirst: {
@@ -291,16 +289,15 @@ const CongeDoc = (props) => {
                     </Text>
                     <Text style={styles.pCertifText}>
                         Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M." : "Mme"} <Text style={fontStyles.bold}>{props.name}</Text>, {props.grade},
-                         Mle {props.matricule}, {props.poste} {props.preposition} {props.structure} est bénéficiaire
-                        d'un {props.typeConge} de {props.duration} {props.duration > 1 ? "jours" : "jour"}, accordé par décision N° <Text style={fontStyles.bold}>{props.decision}</Text> du Ministre des finances.
+                        <Text style={fontStyles.bold}> Mle {props.matricule}</Text>, {props.poste} {props.preposition} {props.structure} est bénéficiaire
+                        d'un {props.typeConge} de (<Text style={fontStyles.bold}>{props.duration}</Text>) {props.duration > 1 ? "jours" : "jour"}, accordé par décision <Text style={fontStyles.bold}>N°{props.decision}</Text> du Ministre des finances.
                     </Text>
                     <Text style={styles.pCertifText}>
                         L'intéressé{props.sexe === "M" ? "" : "e"} jouira dudit congé pendant la période allant du <Text style={fontStyles.bold}>{props.startDate}</Text> au <Text style={fontStyles.bold}>{props.endDate}</Text> et 
-                        reprendra le service le <Text style={fontStyles.bold}>{props.repriseDate}</Text> à 7 heures 30 précises.
+                        reprendra le service le <Text style={fontStyles.bold}>{props.repriseDate} à 7 heures 30 précises.</Text>
                     </Text>
                     <Text style={styles.pCertifText}>
-                        En foi de quoi, le présent certificat est établi et délivré à l'intéressé{props.sexe === "M" ? "" : "e"} pour
-                        servir et valoir ce que de droit./-
+                    En foi de quoi, le présent certificat est établi et délivré à l'intéressé{props.sexe === "M" ? "" : "e"} pour servir et valoir ce que de droit./-                                                                    
                     </Text>
                 </View>
             </View>
