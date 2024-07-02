@@ -128,6 +128,11 @@ const Conges = () => {
       })
       window.electronAPI.getCongeType();
       await window.electronAPI.retrieveCongeType((event, res) => {
+        for (let i = 0; i < res.length; i++) {
+          if (res[i].libelle_type_conge === "congé maternité" && selectedPerson.sexe_personnel === "M") {
+            res[i].libelle_type_conge = "congé paternité";
+          }
+        }
         setTypeConge(res);
       })
     } catch (error) {
@@ -283,7 +288,7 @@ const Conges = () => {
       const req_conge = `INSERT INTO conge 
         (date_debut_conge, date_fin_conge, duree_conge, created_at_conge,attestation_conge,id_type_conge,id_personnel,demande_conge,statut_conge,statut_attestation_conge,document_a_fournir) 
         VALUES ("${conge_data.startDate}","${conge_data.endDate}",${conge_data.duration},"${conge_data.curr_date}",'${JSON.stringify(attestation)}',${conge_data.id_type_conge},${conge_data.id_personnel},"${conge_data.demandeFile}","${conge_data.statut_conge}","${conge_data.statut_attestation_conge}","${conge_data.document}");`;
-      const req_personnel = `UPDATE personnel SET ${selectedType === "congé maternité" ? `(nb_jours_conges_maternite = nb_jours_conges_maternite - ${duration})` : selectedType === "congé maladie" ? `nb_jours_conges_maladie = (nb_jours_conges_maladie - ${duration})` : `nb_jours_conges = (nb_jours_conges - ${duration})`} WHERE id_personnel = ${conge_data.id_personnel};`;
+      const req_personnel = `UPDATE personnel SET ${selectedType === "congé maternité" || selectedType === "congé paternité" ? `(nb_jours_conges_maternite = nb_jours_conges_maternite - ${duration})` : selectedType === "congé maladie" ? `nb_jours_conges_maladie = (nb_jours_conges_maladie - ${duration})` : `nb_jours_conges = (nb_jours_conges - ${duration})`} WHERE id_personnel = ${conge_data.id_personnel};`;
       console.log(req_personnel);
       window.electronAPI.addConge(req_conge);
       window.electronAPI.updatePersonnel(req_personnel);
@@ -351,11 +356,20 @@ const Conges = () => {
   // useEffect for calculate the end conge date base on the start date and duration
   useEffect(() => {
     const changeDuration = () => {
-      if (selectedType === "congé maternité" && selectedPerson.sexe_personnel !== "M") {
+      if (selectedPerson && selectedType === "congé maternité" && selectedPerson.sexe_personnel !== "M") {
         setDuration("98");
       }
-      if (selectedType === "congé maladie") {
+      if (selectedPerson && selectedType === "congé paternité" && selectedPerson.sexe_personnel === "M") {
+        setDuration("3");
+      }
+      if (selectedPerson && selectedType === "congé mariage") {
+        setDuration("5");
+      }
+      if (selectedPerson && selectedType === "congé maladie") {
         setDuration("90");
+      }
+      if (selectedPerson && selectedType === "congé décès") {
+        setDuration("3");
       }
     };
     const calculateEndDate = () => {

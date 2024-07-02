@@ -36,7 +36,7 @@ const Login = ({ onLogin }) => {
   }
 
   function handleLogin() {
-    if (!password || !username) {
+    /*if (!password || !username) {
       setError('Renseigner vos informations de connexion!');
       setTimeout(() => {
         setError("");
@@ -54,8 +54,8 @@ const Login = ({ onLogin }) => {
       setTimeout(() => {
         setError("");
       },4000);
-    }
-    /*login(users[0]);*/
+    }*/
+    login(users[0]);
   }
 
   const fetchUsers = async () => {

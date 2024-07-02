@@ -97,7 +97,7 @@ const Personnel = () => {
                 const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
                 //const nb_jours_conges = 0;
                 const nb_jours_permission = 10;
-                const nb_jours_conges_maternite = 98;
+                const nb_jours_conges_maternite = excelData[i].SEXE === "M" ? 3 : 98;
                 const nb_jours_conges_maladie = 90;
                 const next_month_permission = {
                     month: 0,
