@@ -194,7 +194,8 @@ const Permission = () => {
         repriseDate: p.attestation_permission.repriseDate,
         typeConge: p.attestation_permission.typeConge,
         preposition: p.attestation_permission.preposition,
-        grade : p.attestation_permission.grade
+        grade : p.attestation_permission.grade,
+        created_at : new Date().toISOString().slice(0,19).replace('T',' ')
       }
       const created_at_att_rep_permission = new Date().toISOString().slice(0,19).replace('T',' ');
       const req = `UPDATE permission SET created_at_reprise_permission = "${created_at_att_rep_permission}",attestation_reprise_permission='${JSON.stringify(attestation_reprise)}',statut_att_reprise_permission="non archivé" WHERE ${p.id_permission}=permission.id_permission`; 
@@ -492,6 +493,7 @@ const Permission = () => {
                     repriseDate: (formatDate(repDate).getDate() < 10 ? "0"+formatDate(repDate).getDate() : formatDate(repDate).getDate()) + "/" + (parseInt(formatDate(repDate).getMonth()+1) < 10 ? "0"+parseInt(formatDate(repDate).getMonth()+1) : parseInt(formatDate(repDate).getMonth()+1)) +"/"+formatDate(repDate).getFullYear(),
                     preposition: preposition,
                     grade : grade,
+                    created_at : new Date().toISOString().slice(0,19).replace('T',' ')
                 }
                 const next_month_permission = {
                     month : nextMonthPermNb.month,

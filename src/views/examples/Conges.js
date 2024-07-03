@@ -128,11 +128,6 @@ const Conges = () => {
       })
       window.electronAPI.getCongeType();
       await window.electronAPI.retrieveCongeType((event, res) => {
-        for (let i = 0; i < res.length; i++) {
-          if (res[i].libelle_type_conge === "congé maternité" && selectedPerson.sexe_personnel === "M") {
-            res[i].libelle_type_conge = "congé paternité";
-          }
-        }
         setTypeConge(res);
       })
     } catch (error) {
@@ -271,6 +266,7 @@ const Conges = () => {
         typeConge: selectedType,
         preposition: preposition,
         grade : grade,
+        created_at : new Date().toISOString().slice(0,19).replace('T',' ')
       }
       const conge_data = {
         startDate : startDate,
@@ -280,7 +276,7 @@ const Conges = () => {
         curr_date : new Date().toISOString().slice(0,19).replace('T',' '),
         demande : demande,
         document : document,
-        id_type_conge : selectedType === "congé administratif partiel" ? 1 : selectedType === "congé administratif total" ? 2 : selectedType === "congé maternité" ? 3 : selectedType === "congé maladie" ? 4 : 0,
+        id_type_conge : selectedType === "congé administratif partiel" ? 1 : selectedType === "congé administratif total" ? 2 : selectedType === "congé maternité" || selectedType === "congé paternité" ? 3 : selectedType === "congé maladie" ? 4 : selectedType === "congé mariage" ? 7 : selectedType === "congé décès" ? 8 : 0,
         statut_attestation_conge : "non archivé",
         statut_conge : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en cours" : curr_date.toISOString().slice(0,19).replace('T',' ') >= endDate ? "terminé" : "programmé",
         statut_personnel : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en congé" : "en poste",
@@ -288,10 +284,24 @@ const Conges = () => {
       const req_conge = `INSERT INTO conge 
         (date_debut_conge, date_fin_conge, duree_conge, created_at_conge,attestation_conge,id_type_conge,id_personnel,demande_conge,statut_conge,statut_attestation_conge,document_a_fournir) 
         VALUES ("${conge_data.startDate}","${conge_data.endDate}",${conge_data.duration},"${conge_data.curr_date}",'${JSON.stringify(attestation)}',${conge_data.id_type_conge},${conge_data.id_personnel},"${conge_data.demandeFile}","${conge_data.statut_conge}","${conge_data.statut_attestation_conge}","${conge_data.document}");`;
-      const req_personnel = `UPDATE personnel SET ${selectedType === "congé maternité" || selectedType === "congé paternité" ? `(nb_jours_conges_maternite = nb_jours_conges_maternite - ${duration})` : selectedType === "congé maladie" ? `nb_jours_conges_maladie = (nb_jours_conges_maladie - ${duration})` : `nb_jours_conges = (nb_jours_conges - ${duration})`} WHERE id_personnel = ${conge_data.id_personnel};`;
+      let req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges - ${duration}) WHERE id_personnel = ${conge_data.id_personnel};`;
+      switch (selectedType) {
+        case 'congé maternité':
+        case 'congé paternité':
+          req_personnel = `UPDATE personnel SET nb_jours_conges_maternite = (nb_jours_conges_maternite + ${parseInt(duration)}) WHERE id_personnel = ${conge_data.id_personnel}`;
+          window.electronAPI.updatePersonnel(req_personnel);
+          break;
+        case 'congé maladie':
+          req_personnel = `UPDATE personnel SET nb_jours_conges_maladie = (nb_jours_conges_maladie + ${parseInt(duration)}) WHERE id_personnel = ${conge_data.id_personnel}`;
+          window.electronAPI.updatePersonnel(req_personnel);
+          break;
+        default:
+          window.electronAPI.updatePersonnel(req_personnel);
+          break;
+      }
       console.log(req_personnel);
       window.electronAPI.addConge(req_conge);
-      window.electronAPI.updatePersonnel(req_personnel);
+      //window.electronAPI.updatePersonnel(req_personnel);
       window.electronAPI.congeAddedSuccess(() => { 
         setSuccess("congé ajouté avec succès");
         setStatus(`Le satut de ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a été mis à jour !`);
@@ -324,6 +334,7 @@ const Conges = () => {
         typeConge: c.attestation_conge.typeConge,
         preposition : c.attestation_conge.preposition,
         grade : c.attestation_conge.grade,
+        created_at : new Date().toISOString().slice(0,19).replace('T',' ')
       }
       const created_at_att_rep_conge = new Date().toISOString().slice(0,19).replace('T',' ');
       const req = `UPDATE conge SET created_at_reprise_service = "${created_at_att_rep_conge}",attestation_reprise_service='${JSON.stringify(attestation_reprise)}',statut_att_rep_conge="non archivé" WHERE ${c.id_conge}=conge.id_conge`; 
@@ -407,6 +418,16 @@ const Conges = () => {
         }
       }
     };
+    const changeLibelle = () => {
+        if (typeConge.length > 0) {
+          for (let i = 0; i < typeConge.length; i++) {
+            if (typeConge[i].libelle_type_conge === "congé maternité" && selectedPerson && selectedPerson.sexe_personnel === "M") {
+              typeConge[i].libelle_type_conge = "congé paternité";
+            }
+          }
+        }
+    };
+    changeLibelle();
     calculateEndDate();
     changeDuration();
   }, [startDate, duration,typeConge,selectedType, selectedPerson]);

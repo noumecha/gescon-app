@@ -206,6 +206,7 @@ const AttestationRepPermission = () => {
                                         <th>Matricule</th>
                                         <th>Nom & Prenom</th>
                                         <th>Attestation</th>
+                                        <th>Date de Création</th>
                                         <th>Statut</th>
                                         <th>Actions</th>
                                     </tr>
@@ -248,6 +249,9 @@ const AttestationRepPermission = () => {
                                                         Télécharger l'attestation 
                                                     </Button>)}
                                                 </PDFDownloadLink>
+                                            </td>
+                                            <td>
+                                                {att_perm.created_at}
                                             </td> 
                                             <td>
                                                 {att_perm.statut_att_reprise_permission === "non archivé" ?  
