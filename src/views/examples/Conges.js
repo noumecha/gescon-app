@@ -162,7 +162,14 @@ const Conges = () => {
         return;
       }
       if (selectedType === "congé maternité" && selectedPerson.nb_jours_conges_maternite === 0) {
-        setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja eu un congé maternité pour cette année`);
+        setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja eu un ${sexe === 'M' ? 'congé paternité' : 'congé maternité'} pour cette année`);
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return;
+      }
+      if (selectedType === "congé décès" && selectedPerson.nb_jours_conges_deces === 0) {
+        setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a épuisé son quota de congés de décès`);
         setTimeout(() => {
           setError("");
         },7000)
@@ -265,7 +272,7 @@ const Conges = () => {
         repriseDate: (formatDate(repriseDate).getDate() < 10 ? "0"+formatDate(repriseDate).getDate() : formatDate(repriseDate).getDate()) + "/" + (parseInt(formatDate(repriseDate).getMonth()+1) < 10 ? "0"+parseInt(formatDate(repriseDate).getMonth()+1) : parseInt(formatDate(repriseDate).getMonth()+1)) +"/"+formatDate(repriseDate).getFullYear(),
         typeConge: selectedType,
         preposition: preposition,
-        grade : grade,
+        grade : grade.replace("'", "`"),
         created_at : new Date().toISOString().slice(0,19).replace('T',' ')
       }
       const conge_data = {
@@ -295,13 +302,23 @@ const Conges = () => {
           req_personnel = `UPDATE personnel SET nb_jours_conges_maladie = (nb_jours_conges_maladie + ${parseInt(duration)}) WHERE id_personnel = ${conge_data.id_personnel}`;
           window.electronAPI.updatePersonnel(req_personnel);
           break;
+        case 'congé mariage':
+          req_personnel = `UPDATE personnel SET nb_jours_conges_mariage	= (nb_jours_conges_mariage + ${parseInt(duration)}) WHERE id_personnel = ${conge_data.id_personnel}`;
+          window.electronAPI.updatePersonnel(req_personnel);
+          break;
+        case 'congé décès':
+          req_personnel = `UPDATE personnel SET nb_jours_conges_deces = (nb_jours_conges_deces - ${parseInt(duration)}) WHERE id_personnel = ${conge_data.id_personnel}`;
+          window.electronAPI.updatePersonnel(req_personnel);
+          break;
         default:
           window.electronAPI.updatePersonnel(req_personnel);
           break;
       }
-      console.log(req_personnel);
+      /*console.log(req_personnel);
+      console.log(req_conge);
+      setSuccess("congé ajouté avec succès");*/
       window.electronAPI.addConge(req_conge);
-      //window.electronAPI.updatePersonnel(req_personnel);
+      window.electronAPI.updatePersonnel(req_personnel);
       window.electronAPI.congeAddedSuccess(() => { 
         setSuccess("congé ajouté avec succès");
         setStatus(`Le satut de ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a été mis à jour !`);
