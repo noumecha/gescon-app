@@ -304,9 +304,11 @@ const Permission = () => {
             }
             if (userConge.length > 0) {
                 for (let index = 0; index < userConge.length; index++) {
-                    /**** using this for checking if the repDate corresponds to the conge debut date
-                    console.log(`curr rep date : ${formatDate(repDate).getDate()}`);
-                    console.log(`curr debut conge date : ${formatDate(userConge[index].date_debut_conge).getDate()}`)*/
+                    /**** using this for checking if the repDate corresponds to the conge debut date*/
+                    console.log(`curr rep date : ${formatDate(repDate)}`);
+                    let csd = formatDate(startDate).getDate() + '/' + (parseInt(formatDate(startDate).getMonth()+1) > 10 ? parseInt(formatDate(startDate).getMonth()+1) : "0"+parseInt(formatDate(startDate).getMonth()+1)) + '/' + formatDate(startDate).getFullYear();
+                    console.log(`curr start date : ${JSON.stringify(csd)}`);
+                    console.log(`last conge repdate : ${JSON.stringify(userConge[index].attestation_conge.repriseDate)}`);
                     //nbDaysConges += nbDaysBetween(formatDate(userConge[index].date_debut_conge),formatDate(userConge[index].date_fin_conge)) + 1;
                     nbDaysConges += userConge[index].duree_conge;
                     if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) && (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
@@ -337,19 +339,26 @@ const Permission = () => {
                         },7000)
                         return;
                     }
+                    if (JSON.stringify(userConge[index].attestation_conge.repriseDate) === JSON.stringify(csd)) {
+                        setError(`Impossible de définir une permission pour cette date car la date de debut coïncide avec une date de reprise de service`);
+                        setTimeout(() => {
+                            setError("");
+                        },7000)
+                        return;
+                    }
                 }
             }
             if (lastPermission.length > 0) {
                 for (let i = 0; i < lastPermission.length; i++) {                   
                     let lprd = new Date(formatDate(lastPermission[i].date_fin_permission));
                     lprd.setDate(lprd.getDate() + 1);
-                    /**** using this for checking if the repDate corresponds to the conge debut date
+                    /**** using this for checking if the repDate corresponds to the conge debut date*/
                     console.log(`============================ Permission ${i} =============================`);
                     //console.log(`curr rep date : ${formatDate(repDate)}`);
                     //console.log(`last permission start date : ${formatDate(lastPermission[i].date_debut_permission)}`)
                     console.log(`current permission start date : ${formatDate(startDate)}`)
                     console.log(`last permission rep date : ${lprd}`)
-                    console.log(`================================= [${i}] =================================`);*/ 
+                    console.log(`================================= [${i}] =================================`); 
                     total_lasts_days += nbDaysBetween(formatDate(lastPermission[i].date_debut_permission),formatDate(lastPermission[i].date_fin_permission)) + 1;
                     let fd = new Date(firstDateOfMonth(formatDate(lastPermission[i].date_debut_permission)));
                     for (let x = 0; x < lastPermission[i].duree_permission; x++) {
@@ -516,8 +525,8 @@ const Permission = () => {
                   VALUES ("${permission_data.startDate}","${permission_data.endDate}",${duree},"${permission_data.curr_date}",'${JSON.stringify(attestation)}',${permission_data.id_personnel},"${permission_data.demande}","${permission_data.statut_permission}","${permission_data.statut_attestation_permission}");`;
                 const statut = curr_date >= permission_data.startDate && curr_date <= permission_data.endDate ? "en permission" : "en poste";
                 const req_pers = `UPDATE personnel SET next_month_permission = '${JSON.stringify(next_month_permission)}',statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${duration}) WHERE id_personnel = ${permission_data.id_personnel};`;
-                console.log(`permission query : ${req_permission}`);
-                console.log(`personnel query : ${req_pers}`);
+                //console.log(`permission query : ${req_permission}`);
+                //console.log(`personnel query : ${req_pers}`);
                 /*window.electronAPI.addPermission(req_permission);
                 setStatus(`Le satut de ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a été mis à jour !`);
                 window.electronAPI.permissionAddedSuccess(() => {

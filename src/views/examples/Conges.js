@@ -222,40 +222,47 @@ const Conges = () => {
       }
       if (userConge.length > 0) {
         for (let index = 0; index < userConge.length; index++) {
-            nbDaysConges += nbDaysBetween(formatDate(userConge[index].date_debut_conge),formatDate(userConge[index].date_fin_conge)) + 1;
-            if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) && (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
-              //console.log(`1`);
-              setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja un congé prévu`);
-              setTimeout(() => {
-                  setError("");
-              },7000)
-              return;
-            }
-            if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) || (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
-              //console.log(`2`);  
-              setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja pris un congé`);
-              setTimeout(() => {
-                  setError("");
-              },7000)
-              return;
-            }
-            if (formatDate(startDate) === formatDate(userConge[index].attestation_conge.date_debut_conge)) {
-              //console.log(`3`);
-              setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a un congé prévu cette meme date`);
-              setTimeout(() => {
-                  setError("");
-              },7000)
-              return;
-            }
-            if (formatDate(startDate) === formatDate(userConge[index].date_debut_conge)) {
-              //console.log(`3`);
-              setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a un congé prévu cette meme date`);
-              setTimeout(() => {
-                  setError("");
-              },7000)
-              return;
-            }
-
+          let csd = formatDate(startDate).getDate() + '/' + (parseInt(formatDate(startDate).getMonth()+1) > 10 ? parseInt(formatDate(startDate).getMonth()+1) : "0"+parseInt(formatDate(startDate).getMonth()+1)) + '/' + formatDate(startDate).getFullYear();
+          nbDaysConges += nbDaysBetween(formatDate(userConge[index].date_debut_conge),formatDate(userConge[index].date_fin_conge)) + 1;
+          if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) && (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
+            //console.log(`1`);
+            setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja un congé prévu`);
+            setTimeout(() => {
+                setError("");
+            },7000)
+            return;
+          }
+          if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) || (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
+            //console.log(`2`);  
+            setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja pris un congé`);
+            setTimeout(() => {
+                setError("");
+            },7000)
+            return;
+          }
+          if (formatDate(startDate) === formatDate(userConge[index].attestation_conge.date_debut_conge)) {
+            //console.log(`3`);
+            setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a un congé prévu cette meme date`);
+            setTimeout(() => {
+                setError("");
+            },7000)
+            return;
+          }
+          if (formatDate(startDate) === formatDate(userConge[index].date_debut_conge)) {
+            //console.log(`3`);
+            setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a un congé prévu cette meme date`);
+            setTimeout(() => {
+                setError("");
+            },7000)
+            return;
+          }
+          if (JSON.stringify(userConge[index].attestation_conge.repriseDate) === JSON.stringify(csd)) {
+            setError(`Impossible de définir un congé pour cette date car la date de debut coïncide avec une date de reprise de service`);
+            setTimeout(() => {
+                setError("");
+            },7000)
+            return;
+          }
         }
       }
       const attestation = {
@@ -316,7 +323,7 @@ const Conges = () => {
       }
       /*console.log(req_personnel);
       console.log(req_conge);
-      setSuccess("congé ajouté avec succès");*/
+      setSuccess("congé ajouté avec succès");
       window.electronAPI.addConge(req_conge);
       window.electronAPI.updatePersonnel(req_personnel);
       window.electronAPI.congeAddedSuccess(() => { 
@@ -325,7 +332,7 @@ const Conges = () => {
       });
       setTimeout(() => {
         setSuccess("");
-      }, 3000)
+      }, 3000)*/
       setActived(true);
     } catch (error) {
       console.error("Erreur saving congé : " + error.message);
