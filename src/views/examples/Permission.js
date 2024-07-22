@@ -266,7 +266,7 @@ const Permission = () => {
         }
     }
 
-    // saving congé
+    // saving permission
     const savePermission = async (e) => {
         e.preventDefault();
         try {
@@ -302,13 +302,14 @@ const Permission = () => {
               },7000)
               return;
             }
+            // checking from congés
             if (userConge.length > 0) {
                 for (let index = 0; index < userConge.length; index++) {
                     /**** using this for checking if the repDate corresponds to the conge debut date*/
-                    console.log(`curr rep date : ${formatDate(repDate)}`);
+                    //console.log(`curr rep date : ${formatDate(repDate)}`);
                     let csd = formatDate(startDate).getDate() + '/' + (parseInt(formatDate(startDate).getMonth()+1) > 10 ? parseInt(formatDate(startDate).getMonth()+1) : "0"+parseInt(formatDate(startDate).getMonth()+1)) + '/' + formatDate(startDate).getFullYear();
-                    console.log(`curr start date : ${JSON.stringify(csd)}`);
-                    console.log(`last conge repdate : ${JSON.stringify(userConge[index].attestation_conge.repriseDate)}`);
+                    //console.log(`curr start date : ${JSON.stringify(csd)}`);
+                    //console.log(`last conge repdate : ${JSON.stringify(userConge[index].attestation_conge.repriseDate)}`);
                     //nbDaysConges += nbDaysBetween(formatDate(userConge[index].date_debut_conge),formatDate(userConge[index].date_fin_conge)) + 1;
                     nbDaysConges += userConge[index].duree_conge;
                     if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) && (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
@@ -351,7 +352,9 @@ const Permission = () => {
             if (lastPermission.length > 0) {
                 for (let i = 0; i < lastPermission.length; i++) {                   
                     let lprd = new Date(formatDate(lastPermission[i].date_fin_permission));
+                    let csd = formatDate(startDate).getDate() + '/' + (parseInt(formatDate(startDate).getMonth()+1) > 10 ? parseInt(formatDate(startDate).getMonth()+1) : "0"+parseInt(formatDate(startDate).getMonth()+1)) + '/' + formatDate(startDate).getFullYear();
                     lprd.setDate(lprd.getDate() + 1);
+                    console.log(`curr start date : ${JSON.stringify(csd)}`);
                     /**** using this for checking if the repDate corresponds to the conge debut date*/
                     console.log(`============================ Permission ${i} =============================`);
                     //console.log(`curr rep date : ${formatDate(repDate)}`);
@@ -384,6 +387,13 @@ const Permission = () => {
                     }
                     if (formatDate(startDate).getDate() === lprd.getDate() && formatDate(startDate).getMonth() === lprd.getMonth() && formatDate(startDate).getFullYear() === lprd.getFullYear()) {
                         setError(`Impossible de definir une permission à partir de cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} sera de retour d'une permission`);
+                        setTimeout(() => {
+                            setError("");
+                        },7000)
+                        return;
+                    }
+                    if (JSON.stringify(lastPermission[i].attestation_permission.repriseDate) === JSON.stringify(csd)) {
+                        setError(`Impossible de définir une permission pour cette date car la date de debut coïncide avec une date de reprise de service`);
                         setTimeout(() => {
                             setError("");
                         },7000)

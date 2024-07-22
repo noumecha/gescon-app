@@ -34,6 +34,7 @@ const Conges = () => {
   const { selectedPerson } = location.state || {};
   //const [decision, setDecision] = useState([]);
   const [userConge, setUserConge] = useState([]);
+  const [lastPermission, setLastPermission] = useState([]);
   const [typeConge, setTypeConge] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -129,6 +130,14 @@ const Conges = () => {
       window.electronAPI.getCongeType();
       await window.electronAPI.retrieveCongeType((event, res) => {
         setTypeConge(res);
+      })
+      const last_permission_req = `SELECT * FROM permission WHERE id_personnel = ${id_personnel}`;
+      window.electronAPI.getLastPermission(last_permission_req);
+      await window.electronAPI.retrieveLastPermission((event, res) => {        
+          for (let index = 0; index < res.length; index++) {
+              res[index].attestation_permission = JSON.parse(res[index].attestation_permission)                                                
+          }
+          setLastPermission(res);
       })
     } catch (error) {
         console.error("Erreur : " + error.message);
@@ -265,6 +274,20 @@ const Conges = () => {
           }
         }
       }
+      if (lastPermission.length > 0) {
+        for (let i = 0; i < lastPermission.length; i++) {
+          let csd = formatDate(startDate).getDate() + '/' + (parseInt(formatDate(startDate).getMonth()+1) > 10 ? parseInt(formatDate(startDate).getMonth()+1) : "0"+parseInt(formatDate(startDate).getMonth()+1)) + '/' + formatDate(startDate).getFullYear();
+          console.log(`curr start date : ${JSON.stringify(csd)}`);
+          console.log(` last permission repdate : ${JSON.stringify(lastPermission[i].attestation_permission.repriseDate)}`);
+          if (JSON.stringify(lastPermission[i].attestation_permission.repriseDate) === JSON.stringify(csd)) {
+            setError(`Impossible de définir une permission pour cette date car la date de debut coïncide avec une date de reprise de service`);
+            setTimeout(() => {
+                setError("");
+            },7000)
+            return;
+          }
+        }
+      }
       const attestation = {
         name: name,
         matricule: matricule,
@@ -321,9 +344,9 @@ const Conges = () => {
           window.electronAPI.updatePersonnel(req_personnel);
           break;
       }
-      /*console.log(req_personnel);
+      console.log(req_personnel);
       console.log(req_conge);
-      setSuccess("congé ajouté avec succès");
+      /*setSuccess("congé ajouté avec succès");
       window.electronAPI.addConge(req_conge);
       window.electronAPI.updatePersonnel(req_personnel);
       window.electronAPI.congeAddedSuccess(() => { 
