@@ -205,6 +205,7 @@ const AttestationRepConge = () => {
                                         <th>Matricule</th>
                                         <th>Nom & Prenom</th>
                                         <th>Attestation</th>
+                                        <th>Date de création</th>
                                         <th>Statut</th>
                                         <th>Actions</th>
                                     </tr>
@@ -247,6 +248,9 @@ const AttestationRepConge = () => {
                                                         Télécharger l'attestation 
                                                     </Button>)}
                                                 </PDFDownloadLink>
+                                            </td>
+                                            <td>
+                                                {att_con.created_at}
                                             </td> 
                                             <td>
                                                 {att_con.statut_att_rep_conge === "non archivé" ?  

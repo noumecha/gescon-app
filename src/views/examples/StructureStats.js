@@ -203,7 +203,7 @@ const StructureStats = () => {
                 <CardHeader className="bg-transparent">
                   <Row className="align-items-center">
                     <div className="col">
-                      <h2 className="mb-0">Total : {conges.length}</h2>
+                      <h2 className="mb-0">Total de Congés pris : {conges.length}</h2>
                     </div>
                   </Row>
                 </CardHeader>

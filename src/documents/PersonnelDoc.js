@@ -1,7 +1,6 @@
 import React from 'react';
 import { Page, Text, View, Document,Image, StyleSheet } from '@react-pdf/renderer';
 import image from './docs-images/sceau-img.PNG';
-
 // Create styles
 const styles = StyleSheet.create({
     // divider : 
@@ -90,6 +89,7 @@ const styles = StyleSheet.create({
       overflow: 'hidden',
       fontWeight: 'normal',
       position: 'absolute',
+      fontFamily: 'TimesNewRoman'
     },
     container: {
       display: 'flex',
