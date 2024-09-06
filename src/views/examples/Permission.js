@@ -598,22 +598,21 @@ const Permission = () => {
                 if (permission.length > 0) {
                     let date = new Date();
                     for (let x = 0; x < permission.length; x++) {
-                        permission[x].attestation_permission = JSON.parse(permission[x].attestation_permission)
-                        formatDate(permission[x].date_fin_permission);
-                        permission[x].date_fin_permission.setDate(permission[x].date_fin_permission.getDate());
-                        /*console.log(`conge : ${x}`);
-                        console.log(`=========================================`);
+                        permission[x].attestation_permission = JSON.parse(permission[x].attestation_permission);
+                        permission[x].attestation_permission.repriseDate = permission[x].attestation_permission.repriseDate.split('/');
+                        permission[x].attestation_permission.repriseDate = new Date(permission[x].attestation_permission.repriseDate[2], permission[x].attestation_permission.repriseDate[1], permission[x].attestation_permission.repriseDate[0]);
+                        console.log(`<--- permission : ${x} --->`);
                         console.log(`date : ${date}`)
-                        console.log(`date dfp : ${permission[x].date_fin_permission}`);
+                        console.log(`date ddp : ${permission[x].date_debut_permission.getMonth()}`)
+                        console.log(`date dfp : ${permission[x].date_fin_permission.getMonth()}`);
                         console.log(`attesttaion repdate : ${permission[x].attestation_permission.repriseDate}`);
-                        console.log(`=========================================`); */
                         if (date >= permission[x].date_debut_permission && (date <= permission[x].date_fin_permission)) {
                           const statut = "en permission";
                           const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${permission[x].id_personnel};`;
                           window.electronAPI.updatePersonnel(req_personnel);
                           console.log("le statut du personnel a été mis à jour");
                         }
-                        if ((date.getDate() === permission[x].date_fin_permission.getDate() && date.getMonth() === permission[x].date_fin_permission.getMonth() && date.getFullYear() === permission[x].date_fin_permission.getFullYear()) || (date.getDate() > permission[x].date_fin_permission.getDate() && date.getMonth() === permission[x].date_fin_permission.getMonth() && date.getFullYear() === permission[x].date_fin_permission.getFullYear())) {
+                        if (date.getDate() === permission[x].date_fin_permission.getDate() && date.getMonth() === permission[x].date_fin_permission.getMonth() && date.getFullYear() === permission[x].date_fin_permission.getFullYear()) {
                           const req_permission = `UPDATE permission SET statut_permission = "terminé" WHERE id_permission = ${permission[x].id_permission}`;
                           window.electronAPI.addPermission(req_permission);
                           setSuccess(`La permission de ${permission[x].sexe_personnel === 'M' ? 'M.' : 'Mme'} ${permission[x].nom_prenom_personnel} a été actualisé`);
@@ -622,7 +621,21 @@ const Permission = () => {
                             setSuccess("");
                           }, 3000)
                         }
-                        if (date.getDate() === new Date(permission[0].attestation_permission.repriseDate).getDate() && date.getMonth() === new Date(permission[0].attestation_permission.repriseDate).getMonth() && date.getFullYear() === new Date(permission[0].attestation_permission.repriseDate).getFullYear()) {
+                        if (date.getMonth() > permission[x].date_fin_permission.getMonth() && date.getFullYear() === permission[x].date_fin_permission.getFullYear()) {
+                          const req_permission = `UPDATE permission SET statut_permission = "terminé" WHERE id_permission = ${permission[x].id_permission}`;
+                          window.electronAPI.addPermission(req_permission);
+                          setSuccess(`La permission de ${permission[x].sexe_personnel === 'M' ? 'M.' : 'Mme'} ${permission[x].nom_prenom_personnel} a été actualisé`);
+                          //setStatus(`Le satut de la permission de ${permission[x].sexe_personnel === 'M' ? 'M.' : 'Mme'} ${permission[x].nom_prenom_personnel} a été mis à jour !`);  
+                          setTimeout(() => {
+                            setSuccess("");
+                          }, 3000)
+                        }
+                        if (date.getDate() === permission[x].attestation_permission.repriseDate.getDate() && date.getMonth() === permission[x].attestation_permission.repriseDate.getMonth() && date.getFullYear() === permission[x].attestation_permission.repriseDate.getFullYear()) {
+                          const req_personnel = `UPDATE personnel SET statut_personnel = "en poste" WHERE id_personnel = ${permission[x].id_personnel};`;
+                          window.electronAPI.updatePersonnel(req_personnel);
+                          console.log("le personnel est désormais en poste");
+                        }
+                        if (date.getMonth() > permission[x].attestation_permission.repriseDate.getMonth() && date.getFullYear() === permission[x].attestation_permission.repriseDate.getFullYear()) {
                           const req_personnel = `UPDATE personnel SET statut_personnel = "en poste" WHERE id_personnel = ${permission[x].id_personnel};`;
                           window.electronAPI.updatePersonnel(req_personnel);
                           console.log("le personnel est désormais en poste");

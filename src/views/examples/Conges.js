@@ -388,7 +388,7 @@ const Conges = () => {
       window.electronAPI.addArchiveAttestationRepConge(req);
       await window.electronAPI.addArchiveAttCongeRepSuccess((event, res) => {
         setGenerateSuccess("Attestation de reprise générer avec succès");
-        console.log(`Le satut de ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a été mis à jour !`);
+        console.log(`Le satut de ${attestation_reprise.sexe === 'M' ? 'M.' : 'Mme'} ${name} a été mis à jour !`);
       });
       setTimeout(() => {
         setGenerateSuccess("");
@@ -487,19 +487,21 @@ const Conges = () => {
       if (conge.length > 0) {
         let date = new Date();
         for (let x = 0; x < conge.length; x++) {
-          conge[x].attestation_conge = JSON.parse(conge[x].attestation_conge)
-          formatDate(conge[0].date_fin_conge);
-          conge[0].date_fin_conge.setDate(conge[0].date_fin_conge.getDate());
-          //console.log(`date : ${date.getMonth()}`)
-          /*console.log(`date dfc : ${conge[0].date_fin_conge.getDate()}`);
-          console.log(`attesttaion : ${new Date(conge[0].attestation_conge.repriseDate).getMonth()}`);*/
+          conge[x].attestation_conge = JSON.parse(conge[x].attestation_conge);
+          conge[x].attestation_conge.repriseDate = conge[x].attestation_conge.repriseDate.split('/');
+          conge[x].attestation_conge.repriseDate = new Date(conge[x].attestation_conge.repriseDate[2], conge[x].attestation_conge.repriseDate[1], conge[x].attestation_conge.repriseDate[0]);
+          console.log(`<--- conge ${x} --->`);
+          console.log(`current date : ${date}`);
+          console.log(`date ddc : ${conge[x].date_debut_conge}`);
+          console.log(`date dfc : ${conge[x].date_fin_conge}`);
+          console.log(`attesttaion : ${conge[x].attestation_conge.repriseDate}`);
           if (date >= conge[x].date_debut_conge && date <= conge[x].date_fin_conge) {
             const statut = "en congé";
             const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${conge[x].id_personnel};`;
             window.electronAPI.updatePersonnel(req_personnel);
             console.log("le statut du personnel a été mis à jour");
           }
-          if ((date.getDate() === conge[x].date_fin_conge.getDate() && date.getMonth() === conge[x].date_fin_conge.getMonth() && date.getFullYear() === conge[x].date_fin_conge.getFullYear()) || (date.getDate() > conge[x].date_fin_conge.getDate() && date.getMonth() === conge[x].date_fin_conge.getMonth() && date.getFullYear() === conge[x].date_fin_conge.getFullYear())) {
+          if ((date.getDate() === conge[x].date_fin_conge.getDate() && date.getMonth() === conge[x].date_fin_conge.getMonth() && date.getFullYear() === conge[x].date_fin_conge.getFullYear())) {
             const statut_conge = "terminé";
             const req_conge = `UPDATE conge SET statut_conge = "${statut_conge}" WHERE id_conge = ${conge[x].id_conge}`;
             window.electronAPI.addConge(req_conge);
@@ -509,7 +511,23 @@ const Conges = () => {
               setSuccess("");
             }, 3000)
           }
-          if (date.getDate() === new Date(conge[0].attestation_conge.repriseDate).getDate() && date.getMonth() === new Date(conge[0].attestation_conge.repriseDate).getMonth() && date.getFullYear() === new Date(conge[0].attestation_conge.repriseDate).getFullYear()) {
+          if (date.getMonth() > conge[x].date_fin_conge.getMonth() && date.getFullYear() === conge[x].date_fin_conge.getFullYear()) {
+            const statut_conge = "terminé";
+            const req_conge = `UPDATE conge SET statut_conge = "${statut_conge}" WHERE id_conge = ${conge[x].id_conge}`;
+            window.electronAPI.addConge(req_conge);
+            console.log(`Le congé de ${conge[x].sexe_personnel === 'M' ? 'M.' : 'Mme'} ${conge[x].nom_prenom_personnel} a été actualisé`);
+            console.log(`Le satut du congé de ${conge[x].sexe_personnel === 'M' ? 'M.' : 'Mme'} ${conge[x].nom_prenom_personnel} a été mis à jour !`);  
+            setTimeout(() => {
+              setSuccess("");
+            }, 3000)
+          }
+          if (date.getDate() === conge[x].attestation_conge.repriseDate.getDate() && date.getMonth() === conge[x].attestation_conge.repriseDate.getMonth() && date.getFullYear() === conge[x].attestation_conge.repriseDate.getFullYear()) {
+            const statut = "en poste";
+            const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${conge[x].id_personnel};`;
+            window.electronAPI.updatePersonnel(req_personnel);
+            console.log("le personnel est désormais en poste");
+          }
+          if (date.getMonth() > conge[x].attestation_conge.repriseDate.getMonth() && date.getFullYear() === conge[x].attestation_conge.repriseDate.getFullYear()) {
             const statut = "en poste";
             const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${conge[x].id_personnel};`;
             window.electronAPI.updatePersonnel(req_personnel);
