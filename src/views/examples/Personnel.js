@@ -44,6 +44,7 @@ const Personnel = () => {
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState("");
     const [success, setSuccess] = useState("");
+    const [error, setError] = useState("");
     const [selectedPerson, setSelectedPerson] = useState(null);
     const [loadingSpinner, setLoadingSpinner] = useState(true);
     const loadingText = "Aucune donnée dans la base de données";
@@ -130,7 +131,10 @@ const Personnel = () => {
                 }, 3000)
             });
         } catch (err) {
-            console.error("Erreur Trouvé : " + err.message);
+            setError("Aucun fichier trouvé !");
+            setTimeout(() => {
+                setError("");
+            }, 3000)
         }
     }
     // useEffect() update for the new year 
@@ -263,6 +267,12 @@ const Personnel = () => {
                     { success && 
                         <Alert className="text-center" color="success">
                             {success}
+                        </Alert>
+                    }
+                    {
+                        error && 
+                        <Alert className="text-center" color="danger">
+                            {error}
                         </Alert>
                     }
                 </Col>
@@ -532,7 +542,7 @@ const Personnel = () => {
             </Row>
             <Row>
                 <div className="col p-0">
-                    <button type="submit" className="mt-3 btn btn-secondary btn-md">Exporter le fichier</button>
+                    <button type="submit" disabled className="mt-3 btn btn-secondary btn-md">Exporter le fichier</button>
                     <button type="submit" className="mt-3 btn btn-secondary btn-md" onClick={addPersonnel}>Intégrer à la base de données</button>
                 </div>
             </Row>

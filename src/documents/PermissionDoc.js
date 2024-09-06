@@ -322,7 +322,7 @@ const PermissionDoc = (props) => {
                     </Text>
                     <Text style={styles.pCertifText}>
                         L'intéressé{props.sexe === "M" ? "" : "e"} jouira de ladite permission pendant la période allant du <Text style={fontStyles.bold}>{props.startDate}</Text> au <Text style={fontStyles.bold}>{props.endDate}</Text> et 
-                        reprendra le service le <Text style={fontStyles.bold}>{props.repriseDate}à 7 heures 30 précises.</Text> 
+                        reprendra le service le <Text style={fontStyles.bold}>{props.repriseDate} à 7 heures 30 précises.</Text> 
                     </Text>
                     <Text style={styles.pCertifText}>
                         En foi de quoi, la présente attestation est établie et délivrée à l'intéressé{props.sexe === "M" ? "" : "e"} pour

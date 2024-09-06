@@ -247,7 +247,7 @@ const AttestationPermission = () => {
                                                     </PDFDownloadLink>
                                                 </td>
                                                 <td>
-                                                    {att_perm.created_at}
+                                                    {att_perm.attestation_permission.created_at}
                                                 </td> 
                                                 <td>
                                                     {att_perm.statut_attestation_permission === "non archivé" ?  

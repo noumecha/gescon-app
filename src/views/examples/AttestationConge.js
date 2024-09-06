@@ -125,7 +125,8 @@ const AttestationConge = () => {
             window.electronAPI.getAttestationConge();
             await window.electronAPI.retrieveAttestationConge((event, res) => {
                 for (let index = 0; index < res.length; index++) {
-                    res[index].attestation_conge = JSON.parse(res[index].attestation_conge)                                                
+                    res[index].attestation_conge = JSON.parse(res[index].attestation_conge)   
+                    //console.log(res[index].attestation_conge.created_at);                                        
                 }
                 setAttestationConge(res);
                 setTimeout(() => 
@@ -252,7 +253,7 @@ const AttestationConge = () => {
                                                     </PDFDownloadLink>
                                                 </td>
                                                 <td>
-                                                    {att_con.created_at}
+                                                    {att_con.attestation_conge.created_at}
                                                 </td>
                                                 <td>
                                                     {att_con.statut_attestation_conge === "non archivé" ?  
