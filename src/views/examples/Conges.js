@@ -344,9 +344,9 @@ const Conges = () => {
           window.electronAPI.updatePersonnel(req_personnel);
           break;
       }
-      console.log(req_personnel);
-      console.log(req_conge);
-      /*setSuccess("congé ajouté avec succès");
+      //console.log(req_personnel);
+      //console.log(req_conge);
+      setSuccess("congé ajouté avec succès");
       window.electronAPI.addConge(req_conge);
       window.electronAPI.updatePersonnel(req_personnel);
       window.electronAPI.congeAddedSuccess(() => { 
@@ -355,7 +355,7 @@ const Conges = () => {
       });
       setTimeout(() => {
         setSuccess("");
-      }, 3000)*/
+      }, 3000)
       setActived(true);
     } catch (error) {
       console.error("Erreur saving congé : " + error.message);

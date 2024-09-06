@@ -250,7 +250,7 @@ const AttestationRepConge = () => {
                                                 </PDFDownloadLink>
                                             </td>
                                             <td>
-                                                {att_con.created_at}
+                                                {att_con.attestation_reprise_service.created_at}
                                             </td> 
                                             <td>
                                                 {att_con.statut_att_rep_conge === "non archivé" ?  
