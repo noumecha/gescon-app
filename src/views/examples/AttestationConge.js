@@ -125,7 +125,8 @@ const AttestationConge = () => {
             window.electronAPI.getAttestationConge();
             await window.electronAPI.retrieveAttestationConge((event, res) => {
                 for (let index = 0; index < res.length; index++) {
-                    res[index].attestation_conge = JSON.parse(res[index].attestation_conge)                                                
+                    res[index].attestation_conge = JSON.parse(res[index].attestation_conge)   
+                    //console.log(res[index].attestation_conge.created_at);                                        
                 }
                 setAttestationConge(res);
                 setTimeout(() => 
@@ -207,6 +208,7 @@ const AttestationConge = () => {
                                             <th>Matricule</th>
                                             <th>Nom & Prenom</th>
                                             <th>Attestation</th>
+                                            <th>Date de création</th>
                                             <th>Statut</th>
                                             <th>Actions</th>
                                         </tr>
@@ -239,6 +241,8 @@ const AttestationConge = () => {
                                                         endDate={att_con.attestation_conge.endDate}
                                                         repriseDate={att_con.attestation_conge.repriseDate}
                                                         typeConge={att_con.attestation_conge.typeConge}
+                                                        preposition={att_con.attestation_conge.preposition}
+                                                        grade={att_con.attestation_conge.grade}
                                                     />} fileName={`attestation_conge_${att_con.nom_prenom_personnel}_du_${att_con.attestation_conge.startDate}_au_${att_con.attestation_conge.endDate}.pdf`}>
                                                     {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 
                                                         <Button
@@ -247,7 +251,10 @@ const AttestationConge = () => {
                                                             Télécharger l'attestation 
                                                         </Button>)}
                                                     </PDFDownloadLink>
-                                                </td> 
+                                                </td>
+                                                <td>
+                                                    {att_con.attestation_conge.created_at}
+                                                </td>
                                                 <td>
                                                     {att_con.statut_attestation_conge === "non archivé" ?  
                                                         <Badge color="danger">

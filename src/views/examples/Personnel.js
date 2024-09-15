@@ -44,10 +44,12 @@ const Personnel = () => {
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState("");
     const [success, setSuccess] = useState("");
+    const [error, setError] = useState("");
     const [selectedPerson, setSelectedPerson] = useState(null);
     const [loadingSpinner, setLoadingSpinner] = useState(true);
     const loadingText = "Aucune donnée dans la base de données";
     const navigate = useNavigate();
+    const currDate = new Date();
 
     /** code for excel import */
     const handleFileSubmit = (e) => {
@@ -92,38 +94,91 @@ const Personnel = () => {
         try {
             for (let i = 0; i < excelData.length; i++) {
                 const type = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 1 : 2;
-                const statut = "en poste"; // en permission, en congé
-                //const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
-                const nb_jours_conges = 0;
-                const nb_jours_permission = 0;
+                const statut = "en poste";
+                const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
+                //const nb_jours_conges = 0;
+                const nb_jours_permission = 10;
+                const nb_jours_conges_maternite = 0;
+                const nb_jours_conges_mariage = 0;
+                const nb_jours_conges_maladie = 0;
+                const nb_jours_conges_deces = 6;
+                const next_month_permission = {
+                    month: 0,
+                    amount: 0,
+                }
                 const req = `
-                INSERT INTO personnel 
-                (ordre_personnel, matricule_personnel, nom_prenom_personnel, grade_personnel, poste_personnel, structure_personnel, cellule_personnel, sexe_personnel, date_recrutement_personnel, situation_matrimoniale_personnel,
-                region_personnel, departement_personnel, date_naiss_personnel, telephone_personnel,id_type_personnel, categorie_personnel, arrondissement_personnel,nb_jours_permission,nb_jours_conges,statut_personnel)
-                VALUES 
-                (${excelData[i].ORDRE},"${excelData[i].MATRICULE}","${excelData[i].NOM_PRENOM}",
-                "${excelData[i].GRADE}","${excelData[i].POSTE}","${excelData[i].STRUCTURE}","${excelData[i].STRUCTURE_01}","${excelData[i].SEXE}",
-                "${excelData[i].DATE_RECRUTEMENT}","${excelData[i].SITUATION_MATRIMONIALE}","${excelData[i].REGION}",
-                "${excelData[i].DEPARTEMENT}","${excelData[i].DATE_NAISSANCE}","${excelData[i].TELEPHONE}","${type}",
-                "${excelData[i].CATEGORIE}","${excelData[i].ARRONDISSEMENT}","${nb_jours_permission}","${nb_jours_conges}","${statut}");`;
+                    INSERT INTO personnel 
+                    (ordre_personnel, matricule_personnel, nom_prenom_personnel, grade_personnel, poste_personnel, structure_personnel, cellule_personnel, sexe_personnel, date_recrutement_personnel, situation_matrimoniale_personnel,
+                    region_personnel, departement_personnel, date_naiss_personnel, telephone_personnel,id_type_personnel, categorie_personnel, arrondissement_personnel,nb_jours_permission,nb_jours_conges,nb_jours_conges_maladie,nb_jours_conges_maternite,nb_jours_conges_deces,nb_jours_conges_mariage,statut_personnel,next_month_permission,preposition_personnel)
+                    VALUES 
+                    (${excelData[i].ORDRE},"${excelData[i].MATRICULE}","${excelData[i].NOM_PRENOM}",
+                    "${excelData[i].GRADE}","${excelData[i].POSTE}","${excelData[i].STRUCTURE}","${excelData[i].STRUCTURE_01}","${excelData[i].SEXE}",
+                    "${excelData[i].DATE_RECRUTEMENT}","${excelData[i].SITUATION_MATRIMONIALE}","${excelData[i].REGION}",
+                    "${excelData[i].DEPARTEMENT}","${excelData[i].DATE_NAISSANCE}","${excelData[i].TELEPHONE}","${type}",
+                    "${excelData[i].CATEGORIE}","${excelData[i].ARRONDISSEMENT}","${nb_jours_permission}","${nb_jours_conges}","${nb_jours_conges_maladie}","${nb_jours_conges_maternite}","${nb_jours_conges_deces}","${nb_jours_conges_mariage}","${statut}",'${JSON.stringify(next_month_permission)}',"${excelData[i].PREPOSITION}")
+                ;`;
+                /*console.log(req);
+                WHERE NOT EXISTS (
+                    SELECT * FROM personnel
+                    WHERE matricule_personnel = "${excelData[i].MATRICULE}"
+                )*/
                 window.electronAPI.addPersonnel(req);
             }
             window.electronAPI.personnelAddedSuccess(() => {
                 setSuccess("Personnel ajouté avec succès");
+                setTimeout(() => {
+                    setSuccess("");
+                }, 3000)
             });
-            setTimeout(() => {
-                setSuccess("");
-            }, 3000)
         } catch (err) {
-            console.error("Erreur Trouvé : " + err.message);
+            setError("Aucun fichier trouvé !");
+            setTimeout(() => {
+                setError("");
+            }, 3000)
         }
     }
+    // useEffect() update for the new year 
+    /*const updateYear = async () => {
+        try {
+            for (let x = 0; x < personnel.length; x++) {
+                // --- ---- ---- 
+                if (personnel[x].nb_jours_conges < 18 && personnel[x].id_type_personnel === 2) {
+                    const req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges) WHERE id_personnel = ${personnel[x].id_personnel};`;
+                    window.electronAPI.updatePersonnel(req_personnel);
+                    window.electronAPI.congeAddedSuccess(() => {
+                        console.log(`personnel mis à jour pour la nouvelle année`);
+                    });
+                }
+                // remise à 0 pour ceux qui ont pris tout leur congé l'année précédente
+                if ((personnel[x].nb_jours_conges === 18 && personnel[x].id_type_personnel === 2) || (personnel[x].nb_jours_conges === 30 && personnel[x].id_type_personnel === 1)) {
+                    const req_personnel = `UPDATE personnel SET nb_jours_conges = 0 WHERE id_personnel = ${personnel[x].id_personnel};`;
+                    window.electronAPI.updatePersonnel(req_personnel);
+                    window.electronAPI.congeAddedSuccess(() => {
+                        console.log(`personnel mis à jour pour la nouvelle année`);
+                    });
+                }
+                // update conge maladie 
+                // update conge maternite
+            }
+        } catch (error) {
+            console.log(`Erreur lors de la mise à jour annuelle ${error.message}`);
+        }
+    }
+
+    useEffect(() => {
+        if (currDate.getFullYear()) {
+            updateYear();
+        }
+    }, []);*/
 
     /** useeffect for common function and fetching */
     const fetchDatas = async () => {
         try {
             window.electronAPI.getPersonnel();
             await window.electronAPI.receivePersonnel((event, res) => {
+                for (let index = 0; index < res.length; index++) {
+                    res[index].next_month_permission = JSON.parse(res[index].next_month_permission)                                                
+                }
                 setPersonnel(res);
                 setTimeout(() => 
                 setLoadingSpinner(false)
@@ -212,6 +267,12 @@ const Personnel = () => {
                     { success && 
                         <Alert className="text-center" color="success">
                             {success}
+                        </Alert>
+                    }
+                    {
+                        error && 
+                        <Alert className="text-center" color="danger">
+                            {error}
                         </Alert>
                     }
                 </Col>
@@ -411,13 +472,13 @@ const Personnel = () => {
                                                         <DropdownMenu className="dropdown-menu-arrow" right>
                                                             <DropdownItem
                                                                 onClick={() => handleCongeClick(person)}
-                                                                disabled={(person.nb_jours_conges + person.nb_jours_permission >= 28 && person.id_type_personnel === 1) || (person.nb_jours_conges + person.nb_jours_permission >= 40 && person.id_type_personnel === 2) ? true : false}
+                                                                disabled={(person.nb_jours_conges + person.nb_jours_permission === 28 && person.id_type_personnel === 1) || (person.nb_jours_conges + person.nb_jours_permission === 40 && person.id_type_personnel === 2) ? true : false}
                                                             >
                                                                 Nouveau congé
                                                             </DropdownItem>
                                                             <DropdownItem
                                                                 onClick={() => handlePermissionClick(person)}
-                                                                //disabled={person.nb_jours_permission >= 10 ? true : false}
+                                                                disabled={(person.nb_jours_conges + person.nb_jours_permission === 28 && person.id_type_personnel === 1) || (person.nb_jours_conges + person.nb_jours_permission === 40 && person.id_type_personnel === 2) ? true : false}
                                                             >
                                                                 Nouvelle permission
                                                             </DropdownItem>
@@ -481,7 +542,7 @@ const Personnel = () => {
             </Row>
             <Row>
                 <div className="col p-0">
-                    <button type="submit" className="mt-3 btn btn-secondary btn-md">Exporter le fichier</button>
+                    <button type="submit" disabled className="mt-3 btn btn-secondary btn-md">Exporter le fichier</button>
                     <button type="submit" className="mt-3 btn btn-secondary btn-md" onClick={addPersonnel}>Intégrer à la base de données</button>
                 </div>
             </Row>

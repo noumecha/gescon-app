@@ -1,16 +1,85 @@
 import React from 'react';
 import { Page, Text, View, Document,Image, StyleSheet } from '@react-pdf/renderer';
 import image from './docs-images/sceau-img.PNG';
-
 // Create styles
 const styles = StyleSheet.create({
-    // diveder : 
+    // divider : 
     divider : {
       display: 'block',
       height: '2px',
       width: '200px',
       backgroundColor: '#000000',
       marginTop : 20,
+    },
+    // css table : 
+    containerTable: {
+      display: 'flex',
+      position: 'relative',
+      flexDirection: 'column',
+      alignItems: 'center',
+      marginTop: 20,
+      marginLeft: 30,
+      marginRight: 30,
+    },
+    h2CertifSubtitleTable: {
+      fontSize: 12,
+      marginTop: 3,
+      marginBottom: 15,
+      fontWeight: 'normal',
+      color: '#000000',
+      textAlign: 'center',
+    },
+    containerTableFirstRow: {
+      display: 'flex',
+      position: 'relative',
+      flexDirection: 'row',
+    },
+    containerTableFirstRowYear: {
+      display: 'flex',
+      padding: 7,
+      fontSize: 12,
+      width: 60,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      border: '1px solid black',
+    },
+    containerTableFirstRowTotal: {
+      display: 'flex',
+      padding: 7,
+      fontSize: 12,
+      fontWeight: 'bold',
+      width: 60,
+      textAlign: 'center',
+      border: '1px solid black',
+    },
+    containerTableFirstRowHeaderContainer: {
+      display: 'flex',
+      flexDirection: 'row',
+    },
+    containerTableFirstRowHeader: {
+      display: 'flex',
+      padding: 7,
+      fontSize: 12,
+      textAlign: 'center',
+      fontWeight: 'bold',
+      width: 150,
+      border: '1px solid black',
+    },
+    containerTableFirstRowContentContainer : {
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      textAlign: 'center',
+      width: 150,
+      padding: 0,
+      margin: 0,
+      fontSize: 12,
+    },
+    containerTableFirstRowContent : {
+      flex: 1,
+      paddingTop: 7,
+      paddingBottom: 7,
+      border: '1px solid black',
     },
     // the container element
     page: {
@@ -20,6 +89,7 @@ const styles = StyleSheet.create({
       overflow: 'hidden',
       fontWeight: 'normal',
       position: 'absolute',
+      fontFamily: 'TimesNewRoman'
     },
     container: {
       display: 'flex',
@@ -205,7 +275,7 @@ const PersonnelDoc = (props) => {
 
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
+      <Page orientation='landscape' size="A4" style={styles.page}>
           {/* first row : entete */}
           <View style={styles.container}>
               {/* top left text */}
@@ -289,40 +359,125 @@ const PersonnelDoc = (props) => {
                   <Text style={styles.h2CertifSubtitle}>
                     STATISTICAL SHEET OF {props.name}
                   </Text>
-                  {props.statistics && props.statistics.length > 0 && (
-                    props.statistics.map((stat) => (
-                      <View key={stat} style={styles.section}>
-                        <Text style={styles.divider}>
-                        </Text>
-                        <Text style={styles.h2CertifSubtitle}>
-                          Statistiques de l'année {stat.year} : 
-                        </Text>
-                        <Text style={styles.pCertifText}>
-                          Nombre totals de congés :  {stat.totalYearsConge}
-                        </Text>
-                        <View style={styles.section}>
-                          {stat.conges.map((c) => (
-                            <View key={c} style={styles.section}>
-                              <Text style={styles.pCertifText}>
-                                --- ID du congé : {c.id} ---
-                              </Text>
-                              <Text style={styles.pCertifText}>
-                                Date de debut : {c.dd}
-                              </Text>
-                              <Text style={styles.pCertifText}>
-                                Date de fin : {c.df}
-                              </Text>
-                              <Text style={styles.pCertifText}>
-                                Duree : {c.duree} jours
-                              </Text>
-                            </View>
-                          ))}
-                        </View>
-                      </View>
-                    ))
-                  )}
               </View>
           </View>
+          {/** stats for conges */}
+          {props.statistics && props.statistics.length > 0 ? (
+            <View style={styles.containerTable}>
+            <Text style={styles.h2CertifSubtitleTable}>
+              STATISTIQUES DES CONGES : 
+            </Text>
+            {/** first row of the table */}
+            <View style={styles.containerTableFirstRow}>
+              <Text style={styles.containerTableFirstRowYear}>
+                Annéés
+              </Text>
+              {props.statistics && props.statistics.length > 0 && (
+                props.statistics.map((stat, index) => (
+                  <View key={index} style={styles.containerTableFirstRowHeaderContainer}>
+                    {stat.conges.map((c, index) => (
+                    <Text key={c.id} style={styles.containerTableFirstRowHeader}>
+                      Congé {parseInt(index + 1)}
+                    </Text>
+                  ))}
+                  </View>
+                ))
+              )}
+              <Text style={styles.containerTableFirstRowTotal}>
+                Total
+              </Text>
+            </View>
+            {/** second row of the table */}
+            {props.statistics && props.statistics.length > 0 && (
+              props.statistics.map((stat) => (
+              <View key={stat} style={styles.containerTableFirstRow}>
+                <Text style={styles.containerTableFirstRowYear}>
+                  {stat.year}
+                </Text>
+                {stat.conges.map((c) => (
+                  <View key={c} style={styles.containerTableFirstRowContentContainer}>
+                    <Text style={styles.containerTableFirstRowContent}>
+                      {c.dd}
+                    </Text>
+                    <Text style={styles.containerTableFirstRowContent}>
+                      {c.df}
+                    </Text>                    
+                  </View>
+                ))}
+                {/** Total */}
+                <Text style={styles.containerTableFirstRowTotal}>
+                  {props.conges}
+                </Text>
+              </View>
+              ))
+            )}
+            </View>
+          ) : 
+          (
+            <View style={styles.containerTable}>
+              <Text style={styles.h2CertifSubtitleTable}>
+                AUCUN CONGE PRIS !
+              </Text>
+            </View>
+          )}
+          {/** stats for permissions */}
+          {props.statisticsPermission && props.statisticsPermission.length > 0 ? (
+            <View style={styles.containerTable}>
+              <Text style={styles.h2CertifSubtitleTable}>
+                STATISTIQUES DES PERMISSIONS : 
+              </Text>
+              {/** first row of the table */}
+              <View style={styles.containerTableFirstRow}>
+                <Text style={styles.containerTableFirstRowYear}>
+                  Annéés
+                </Text>
+                {props.statisticsPermission && props.statisticsPermission.length > 0 && (
+                  props.statisticsPermission.map((stat) => (
+                    <View key={stat} style={styles.containerTableFirstRowHeaderContainer}>
+                      {stat.permissions.map((p, index) => (
+                        <Text key={stat} style={styles.containerTableFirstRowHeader}>
+                          Permission {parseInt(index + 1)}
+                        </Text>
+                      ))}
+                    </View>
+                  ))
+                )}
+                <Text style={styles.containerTableFirstRowTotal}>
+                  Total
+                </Text>
+              </View>
+              {/** second row of the table */}
+              {props.statisticsPermission && props.statisticsPermission.length > 0 && (
+                props.statisticsPermission.map((stat) => (
+                <View key={stat} style={styles.containerTableFirstRow}>
+                  <Text style={styles.containerTableFirstRowYear}>
+                    {stat.year}
+                  </Text>
+                  {stat.permissions.map((p) => (
+                    <View key={p} style={styles.containerTableFirstRowContentContainer}>
+                      <Text style={styles.containerTableFirstRowContent}>
+                        {p.dd}
+                      </Text>
+                      <Text style={styles.containerTableFirstRowContent}>
+                        {p.df}
+                      </Text>                    
+                    </View>
+                  ))}
+                  {/** Total */}
+                  <Text style={styles.containerTableFirstRowTotal}>
+                    {props.permissions}
+                  </Text>
+                </View>
+                ))
+              )}
+            </View>
+          ) : (
+            <View style={styles.containerTable}>
+              <Text style={styles.h2CertifSubtitleTable}>
+                AUCUNE PERMISSION PRISE !
+              </Text>
+            </View>
+          )}
           <View style={styles.containerQr}>
               <View style={styles.sectionQr}>
                   <Text style={styles.qrText}>

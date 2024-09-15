@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+//import { CardHeader } from "react-bootstrap";
 import Select from "react-select";
 import {
     Container,
@@ -6,11 +7,14 @@ import {
     Card,
     CardBody,
     CardTitle,
-    Col
+    Col,
+    CardHeader
 } from "reactstrap";
+import { ChartStructureStats } from "variables/charts";
 
 const StructureStats = () => {
 
+    const [conges, setConges] = useState([]);
     const [filter, setFilter] = useState(null);
     const [personnel, setPersonnel] = useState([]);
     const [strucPers, setstrucPers] = useState(0);
@@ -27,7 +31,21 @@ const StructureStats = () => {
       setFilter(f);
     };
 
+    const fetchConges = async () => {
+      try {
+        let req = `SELECT * FROM conge,personnel WHERE personnel.structure_personnel = ${filter ? JSON.stringify(filter.value) : "null"} AND personnel.id_personnel = conge.id_personnel;`;
+        //console.log(req);
+        window.electronAPI.getSpecificConge(req);
+        await window.electronAPI.retrieveSpecificConge((event, res) => {
+          setConges(res);
+        })
+      } catch (error) {
+        console.error("Erreur : " + error.message);
+      }
+    }
+
     const showStructuresStats = () => {
+        fetchConges();
         let total_struc_personnel = 0;
         let total_struc_conge = 0;
         if (filter === null) {
@@ -78,10 +96,10 @@ const StructureStats = () => {
     useEffect(() => {
         fetchDatas();
     }, []);
-    
+
     return (
         <>
-        <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
+        <div className="header bg-gradient-info pb-3 pt-5 pt-md-8">
             <Container fluid>
                 <Row className="">
                     <Col lg="9">
@@ -162,7 +180,7 @@ const StructureStats = () => {
                               tag="h5"
                               className="text-uppercase text-muted mb-0"
                             >
-                              Performance
+                              Ratio
                             </CardTitle>
                             <span className="h2 font-weight-bold mb-0"> { perf ? perf : 0}%</span>
                           </div>
@@ -178,6 +196,26 @@ const StructureStats = () => {
                 </Row>
             </Container>
         </div>
+        <Container fluid className="mt-2">
+          <Row>
+            <Col lg="12">
+              <Card>
+                <CardHeader className="bg-transparent">
+                  <Row className="align-items-center">
+                    <div className="col">
+                      <h2 className="mb-0">Total de Congés pris : {conges.length}</h2>
+                    </div>
+                  </Row>
+                </CardHeader>
+                <CardBody>
+                  <div className="chart">
+                    <ChartStructureStats structConge={conges}/>
+                  </div>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+        </Container>
       </>
     );
 }

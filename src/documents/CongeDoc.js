@@ -1,40 +1,59 @@
 import React from 'react';
-import { Page, Text, View, Document,Image, StyleSheet } from '@react-pdf/renderer';
+import { Page, Text, View, Document,Image, StyleSheet, Font } from '@react-pdf/renderer';
 import image from './docs-images/sceau-img.PNG';
+import TimesNewRoman from './docs-fonts/times new roman.ttf';
+import TimesNewRomanBold from './docs-fonts/times new roman bold.ttf';
 
 // Create styles
+Font.register({ 
+    family: 'Times-Roman', 
+    fonts : [
+        {src: TimesNewRoman},
+        {src: TimesNewRomanBold, fontWeight: 700}
+    ]
+});
+Font.registerHyphenationCallback(word => [word])
+const fontStyles = StyleSheet.create({
+    normal: {
+        fontFamily: 'Times-Roman',
+        fontWeight: 'normal',
+    },
+    bold: {
+        fontFamily: 'Times-Bold',
+        fontWeight: 'bold',
+    }
+})
 const styles = StyleSheet.create({
-    // the container element
     page: {
-      flexDirection: 'column',
-      display: 'flex',
-      backgroundColor: 'white',
-      overflow: 'hidden',
-      fontWeight: 'normal',
-      position: 'absolute',
+        flexDirection: 'column',
+        display: 'flex',
+        backgroundColor: 'white',
+        overflow: 'hidden',
+        position: 'absolute',
+        fontFamily: 'Times-Roman',
     },
     container: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      position: 'relative',
-      flexDirection: 'row',
-      marginTop: 40,
+        display: 'flex',
+        justifyContent: 'space-between',
+        position: 'relative',
+        flexDirection: 'row',
+        marginTop: 40,
     },
     containerTwo: {
-      display: 'flex',
-      marginLeft: 30,
-      marginRight: 30,
-      justifyContent: 'space-evenly',
-      flexDirection: 'column',
+        display: 'flex',
+        marginLeft: 30,
+        marginRight: 30,
+        justifyContent: 'space-evenly',
+        flexDirection: 'column',
     },
     containerThree: {
-      display: 'flex',
-      alignItems: 'flex-start',
-      marginTop: 30,
-      marginLeft: 30,
-      marginRight: 30,
-      justifyContent: 'space-evenly',
-      flexDirection: 'column',
+        display: 'flex',
+        alignItems: 'flex-start',
+        marginTop: 30,
+        marginLeft: 30,
+        marginRight: 30,
+        justifyContent: 'space-evenly',
+        flexDirection: 'column',
     },
     // footer left section
     sectionLeftBottom: {
@@ -42,7 +61,6 @@ const styles = StyleSheet.create({
     },
     section: {
       display: 'flex',
-      alignItems: 'center',
     },
     topSectionOne: {
         flex: 1,
@@ -64,7 +82,6 @@ const styles = StyleSheet.create({
       fontSize: 14,
       marginTop: 25,
       display: 'flex',
-      fontWeight: 'bold',
       color: '#000000',
       textAlign: 'center',
       textDecoration: 'underline',
@@ -72,7 +89,6 @@ const styles = StyleSheet.create({
     h2CertifSubtitle: {
       fontSize: 12,
       marginTop: 3,
-      fontWeight: 'normal',
       color: '#000000',
       textAlign: 'center',
     },
@@ -81,40 +97,37 @@ const styles = StyleSheet.create({
       marginTop: 15,
       fontSize: 12,
       display: 'flex',
-      textAlign: 'justify'
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      textAlign: 'justify',
     },
     // top text title
     h1TitleFirst: {
       fontSize: 10,
-      fontWeight: 'bold',
       color: '#000000',
       textAlign: 'center'
     },
     h1Title: {
         fontSize: 10,
         marginTop: -5,
-        fontWeight: 'bold',
         color: '#000000',
         textAlign: 'center'
     },
     h4Title: {
         fontSize: 10,
         marginTop: -5,
-        fontWeight: 'normal',
         color: '#000000',
         textAlign: 'center'
     },
     h4TitleNumber: {
         fontSize: 10,
         marginTop: 10,
-        fontWeight: 'bold',
         color: '#000000',
         textAlign: 'center'
     },
     h4TitleDate: {
       fontSize: 10,
       marginTop: 10,
-      fontWeight: 'bold',
       color: '#000000',
       textAlign: 'center'
     },
@@ -122,7 +135,6 @@ const styles = StyleSheet.create({
     amTitle: {
       fontSize: 12,
       textAlign: 'left',
-      fontWeight: 'bold',
       marginTop: 3,
       textDecoration: 'underline',
     },  
@@ -131,14 +143,12 @@ const styles = StyleSheet.create({
       marginTop: 3,
       marginLeft: 5,
       textTransform: 'uppercase',
-      fontWeight: 'bold',
     },
     amParagraph2: {
       fontSize: 10,    
       marginTop: 3,
       marginLeft: 10,
       textTransform: 'uppercase',
-      fontWeight: 'bold',
       textAlign: 'left',
     },
     amParagraph3: {
@@ -146,21 +156,18 @@ const styles = StyleSheet.create({
       marginTop: 3,
       marginLeft: 15,
       textTransform: 'uppercase',
-      fontWeight: 'bold',
     },
     amParagraph4: {
       fontSize: 10,    
       marginTop: 3,
       marginLeft: 20,
       textTransform: 'uppercase',
-      fontWeight: 'bold',
     },
     amParagraph5: {
         fontSize: 10,    
         marginTop: 3,
         marginLeft: 25,
         textTransform: 'uppercase',
-        fontWeight: 'bold',
     },
     // center first section logo
     imageSceau: {
@@ -186,7 +193,6 @@ const styles = StyleSheet.create({
         marginTop: 3,
         marginLeft: 5,
         textTransform: 'uppercase',
-        fontWeight: 'bold',
     }
 });
 
@@ -282,18 +288,16 @@ const CongeDoc = (props) => {
                         CERTIFICAT OF DEPARTURE ON LEAVE
                     </Text>
                     <Text style={styles.pCertifText}>
-                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M" : "Mme"} {props.name}, 
-                        {props.type} d'Administration, Mle {props.matricule}, {props.poste} en service (au/à la) {props.structure} est bénéficiaire
-                        d'un {props.typeConge} de {props.duration} jours , accordé par décision N° {props.decision}
-                         {/*du DATE_DEC*/} du Ministre des finances.
+                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M." : "Mme"} <Text style={fontStyles.bold}>{props.name}</Text>, {props.grade},
+                        <Text style={fontStyles.bold}> Mle {props.matricule}</Text>, {props.poste} {props.preposition} {props.structure} est bénéficiaire
+                        d'un {props.typeConge} de (<Text style={fontStyles.bold}>{props.duration}</Text>) {props.duration > 1 ? "jours" : "jour"}, accordé par décision <Text style={fontStyles.bold}>N°{props.decision}</Text> du Ministre des finances.
                     </Text>
                     <Text style={styles.pCertifText}>
-                        L'intéressé{props.sexe === "M" ? "" : "e"} jouira dudit congé pendant la période du {props.startDate} au {props.endDate} et 
-                        reprendra le service le {props.repriseDate} à 7 heures 30 précises.
+                        L'intéressé{props.sexe === "M" ? "" : "e"} jouira dudit congé pendant la période allant du <Text style={fontStyles.bold}>{props.startDate}</Text> au <Text style={fontStyles.bold}>{props.endDate}</Text> et 
+                        reprendra le service le <Text style={fontStyles.bold}>{props.repriseDate} à 7 heures 30 précises.</Text>
                     </Text>
                     <Text style={styles.pCertifText}>
-                        En foi de quoi, le présent certificat est établi et délivré à l'intéressé{props.sexe === "M" ? "" : "e"} pour
-                        servir et valoir ce que de droit./-
+                    En foi de quoi, le présent certificat est établi et délivré à l'intéressé{props.sexe === "M" ? "" : "e"} pour servir et valoir ce que de droit./-                                                                    
                     </Text>
                 </View>
             </View>

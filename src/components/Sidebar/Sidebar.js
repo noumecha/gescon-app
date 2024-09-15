@@ -143,7 +143,7 @@ const Sidebar = (props) => {
         {/* Brand */}
         {logo ? (
           <NavbarBrand className="pt-0" {...navbarBrandProps}>
-            GESCON-APP
+            GESCONGES
             {/*<img
               alt={logo.imgAlt}
               className="navbar-brand-img"

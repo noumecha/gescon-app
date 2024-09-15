@@ -16,7 +16,7 @@ const Login = () => {
                   className="font-weight-bold ml-1"
                   href=""
                 >
-                  GESCON-APP
+                  GESCONGES
                 </a>
               </div>
             </Col>

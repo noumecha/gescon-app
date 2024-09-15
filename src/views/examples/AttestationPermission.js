@@ -205,6 +205,7 @@ const AttestationPermission = () => {
                                             <th>Matricule</th>
                                             <th>Nom & Prenom</th>
                                             <th>Attestation</th>
+                                            <th>Date de Création</th>
                                             <th>Statut</th>
                                             <th>Actions</th>
                                         </tr>
@@ -234,7 +235,9 @@ const AttestationPermission = () => {
                                                         startDate={att_perm.attestation_permission.startDate}
                                                         endDate={att_perm.attestation_permission.endDate}
                                                         repriseDate={att_perm.attestation_permission.repriseDate}
-                                                    />} fileName={`attestation_${att_perm.matricule_personnel}.pdf`}>
+                                                        preposition={att_perm.attestation_permission.preposition}
+                                                        grade={att_perm.attestation_permission.grade}
+                                                    />} fileName={`attestation_depart_permission_${att_perm.matricule_personnel}_${att_perm.nom_prenom_personnel}_${att_perm.attestation_permission.startDate}_${att_perm.attestation_permission.endDate}.pdf`}>
                                                     {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 
                                                         <Button
                                                             color="success"
@@ -242,6 +245,9 @@ const AttestationPermission = () => {
                                                             Télécharger l'attestation 
                                                         </Button>)}
                                                     </PDFDownloadLink>
+                                                </td>
+                                                <td>
+                                                    {att_perm.attestation_permission.created_at}
                                                 </td> 
                                                 <td>
                                                     {att_perm.statut_attestation_permission === "non archivé" ?  

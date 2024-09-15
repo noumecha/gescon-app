@@ -206,6 +206,7 @@ const AttestationRepPermission = () => {
                                         <th>Matricule</th>
                                         <th>Nom & Prenom</th>
                                         <th>Attestation</th>
+                                        <th>Date de Création</th>
                                         <th>Statut</th>
                                         <th>Actions</th>
                                     </tr>
@@ -238,6 +239,8 @@ const AttestationRepPermission = () => {
                                                     endDate={att_perm.attestation_reprise_permission.endDate}
                                                     repriseDate={att_perm.attestation_reprise_permission.repriseDate}
                                                     typeConge={att_perm.attestation_reprise_permission.typeConge}
+                                                    preposition={att_perm.attestation_reprise_permission.preposition}
+                                                    grade={att_perm.attestation_reprise_permission.grade}
                                                 />} fileName={`attestation_reprise_permission_${att_perm.nom_prenom_personnel}_du_${att_perm.attestation_reprise_permission.startDate}_au_${att_perm.attestation_reprise_permission.endDate}.pdf`}>
                                                 {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 
                                                     <Button
@@ -246,6 +249,9 @@ const AttestationRepPermission = () => {
                                                         Télécharger l'attestation 
                                                     </Button>)}
                                                 </PDFDownloadLink>
+                                            </td>
+                                            <td>
+                                                {att_perm.attestation_reprise_permission.created_at}
                                             </td> 
                                             <td>
                                                 {att_perm.statut_att_reprise_permission === "non archivé" ?  
