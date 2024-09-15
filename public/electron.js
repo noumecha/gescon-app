@@ -45,6 +45,13 @@ const pool = mysql.createPool({
 }) 
 
 // fucntion for the personnel : 
+function addPersonnelDette(event, req) {
+    pool.query(req, (err) => {
+        if (err) throw err;
+        event.sender.send('add-personnel-dette-success');
+    });
+}
+//addPersonnelDetteSuccess:
 function addPersonnel(event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
@@ -392,6 +399,7 @@ app.whenReady().then(() => {
         });
     });
     ipcMain.on('add-personnel', addPersonnel);
+    ipcMain.on('add-personnel-dette',addPersonnelDette);
     ipcMain.on('get-personnel', getPersonnel);
     ipcMain.on('get-specific-personnel', getSpecificPersonnel);
     ipcMain.on('update-personnel', updatePersonnel);

@@ -48,15 +48,15 @@ const Conges = () => {
   const [selectedDec, setSelectedDec] = useState("");
   const [struc, setStruc] = useState(selectedPerson ? selectedPerson.structure_personnel : "Service Général");
   const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste_personnel : "Contrôleur");
-  const sexe = selectedPerson ? selectedPerson.sexe_personnel : "M.";
-  const nb_jours_conges = selectedPerson ? selectedPerson.nb_jours_conges : 0;
+  const sexe = !selectedPerson ? "M" : selectedPerson.sexe_personnel ;
+  const nb_jours_conges = selectedPerson ? selectedPerson.nb_jours_conges + selectedPerson.dette_conge : 18;
   const [telephone, setTelphone] = useState(selectedPerson ? selectedPerson.telephone_personnel : 696879475);
   const [demande, setDemande] = useState(null);
   const [document, setDocument] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [generateSuccess, setGenerateSuccess] = useState("");
-  const [status, setStatus] = useState(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a ${nb_jours_conges} ${nb_jours_conges > 1 ? "jours" : "jour"} de congés disponibles`);
+  const [status, setStatus] = useState(`${formatPersonnelName(sexe)} a ${nb_jours_conges} ${nb_jours_conges > 1 ? "jours" : "jour"} de congés disponibles`);
   const [visible, setVisible] = useState(true);
   const [conge, setConge] = useState([]);
   const [search, setSearch] = useState("");
@@ -68,7 +68,7 @@ const Conges = () => {
   const loadingText = "Aucune donnée dans la base de données";
   const [actived, setActived] = useState(selectedPerson === undefined ? true : false);
   const curr_date = new Date();
-  const [duration, setDuration] = useState(selectedPerson ? selectedPerson.nb_jours_conges : "");
+  const [duration, setDuration] = useState(selectedPerson ? selectedPerson.nb_jours_conges + selectedPerson.dette_conge : "");
   let nbDaysConges = 0;
 
   const filterConge = search !== "" || statutFilter !== ""
@@ -154,15 +154,40 @@ const Conges = () => {
         },7000)
         return;
       }
+      // testing for contractual personnel
       if (selectedPerson.id_type_personnel === 2) {
-        if (duration > selectedPerson.nb_jours_conges && (selectedType === "congé administratif partiel" || selectedType === "congé administratif total")) {
-          setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
+        if ((duration > selectedPerson.nb_jours_conges + selectedPerson.dette_conge) && (formatDate(startDate).getFullYear() === curr_date.getFullYear()) && (selectedType === "congé administratif partiel" || selectedType === "congé administratif total")) {
+          setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponibles pour cette année");
           setTimeout(() => {
             setError("");
           },7000)
           return;
         }
+        if ((duration > selectedPerson.nb_jours_conges + selectedPerson.dette_conge) && (selectedType === "congé administratif partiel" || selectedType === "congé administratif total")) {
+          setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponibles");
+          setTimeout(() => {
+            setError("");
+          },7000)
+          return;
+        }
+        // taking conge before the current year : 
+        if ((curr_date.getFullYear() - formatDate(startDate).getFullYear()) > 3) {
+          setError(`Impossible de définir un congé pour plus de 3 ans en arrière !`);
+          setTimeout(() => {
+              setError("");
+          },7000)
+          return;
+        }
       }
+        // --> my last code for this section : (selectedType !== "congé maladie" || selectedType !== "congé maternité")
+      if ((selectedPerson.id_type_personnel === 2 && ((selectedPerson.nb_jours_conges + selectedPerson.dette_conge) === 0)) && (selectedType === "congé administratif partiel" || selectedType === "congé administratif total")) {
+        setError(`${formatPersonnelName(sexe)} a déja epuisé tout ces congés pour l'année`);
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return;
+      }
+      // tests for all personnel
       if (formatDate(startDate).getDay() === 0 || formatDate(startDate).getDay() === 6) {
         setError("Le congé ne peut etre configurer que pour les jours ouvrables");
         setTimeout(() => {
@@ -170,27 +195,35 @@ const Conges = () => {
         },7000)
         return;
       }
-      if (selectedType === "congé maternité" && selectedPerson.nb_jours_conges_maternite === 0) {
-        setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja eu un ${sexe === 'M' ? 'congé paternité' : 'congé maternité'} pour cette année`);
+      if (selectedType === "congé maternité" && selectedPerson.nb_jours_conges_maternite === 98) {
+        setError(`${formatPersonnelName(sexe)} a déja eu un ${sexe === 'M' ? 'congé de paternité' : 'congé de maternité'} pour cette année`);
         setTimeout(() => {
           setError("");
         },7000)
         return;
       }
-      if (selectedType === "congé décès" && selectedPerson.nb_jours_conges_deces === 0) {
-        setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a épuisé son quota de congés de décès`);
+      if (selectedType === "congé décès" && selectedPerson.nb_jours_conges_deces === 6) {
+        setError(`${formatPersonnelName(sexe)} a épuisé son quota de congés de décès`);
         setTimeout(() => {
           setError("");
         },7000)
         return;
       }
-      if (selectedType === "congé maladie" && selectedPerson.nb_jours_conges_maladie === 0) {
-        setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja eu un congé maladie cette année`);
+      if (selectedType === "congé maladie" && selectedPerson.nb_jours_conges_maladie === 90 && (formatDate(startDate).getFullYear() === curr_date.getFullYear())) {
+        setError(`${formatPersonnelName(sexe)} a déja eu un congé maladie cette année`);
         setTimeout(() => {
           setError("");
         },7000)
         return;
       }
+      if (selectedType === "congé mariage" && selectedPerson.nb_jours_conges_mariage === 5 && (formatDate(startDate).getFullYear() === curr_date.getFullYear())) {
+        setError(`${formatPersonnelName(sexe)} a déja eu un congé de mariage cette année`);
+        setTimeout(() => {
+          setError("");
+        },7000)
+        return;
+      }
+      // tests for administratif personnel
       if (selectedPerson.id_type_personnel === 1) {
         if (duration > selectedPerson.nb_jours_conges && (selectedType === "congé administratif partiel" || selectedType === "congé administratif total")) {
           setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
@@ -200,20 +233,15 @@ const Conges = () => {
           return;
         }
       }
-      if ((selectedPerson.id_type_personnel === 1 && selectedPerson.nb_jours_conges === 0) && (selectedType !== "congé maladie" || selectedType !== "congé maternité")) {
-        setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja epuisé tout ces congés pour l'année`);
+        // -> last code for this section : (selectedType !== "congé maladie" || selectedType !== "congé maternité")
+      if ((selectedPerson.id_type_personnel === 1 && selectedPerson.nb_jours_conges === 0) && (selectedType === "congé administratif partiel" || selectedType === "congé administratif total")) {
+        setError(`${formatPersonnelName(sexe)} a déja epuisé tout ces congés pour l'année`);
         setTimeout(() => {
           setError("");
         },7000)
         return;
       }
-      if ((selectedPerson.id_type_personnel === 2 && selectedPerson.nb_jours_conges === 0) && (selectedType !== "congé maladie" || selectedType !== "congé maternité")) {
-        setError(`${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja epuisé tout ces congés pour l'année`);
-        setTimeout(() => {
-          setError("");
-        },7000)
-        return;
-      }
+      // verification of empty fields
       if (typeConge === "" || name === "" || startDate === "" || endDate === "" || duration === "" || repriseDate === "" || selectedType === "" || matricule === "" || type === "" || selectedDec === "" || struc === "" || poste === "") {
         setError('Veuillez remplir tous les champs');
         setTimeout(() => {
@@ -221,21 +249,23 @@ const Conges = () => {
         }, 7000)
         return;
       }
-      if (formatDate(startDate).getFullYear() !== curr_date.getFullYear()) {
-        //console.log(`3`);
-        setError(`Impossible de définir un congé pour une année ultérieure ou antérieure`);
+      // remove taking leave for the next-year
+      if (formatDate(startDate).getFullYear() > curr_date.getFullYear()) {
+        setError(`Impossible de définir un congé pour une année ultérieure`);
         setTimeout(() => {
             setError("");
         },7000)
         return;
       }
+     // taking lasts leaves date for blocking the same dates
       if (userConge.length > 0) {
         for (let index = 0; index < userConge.length; index++) {
-          let csd = formatDate(startDate).getDate() + '/' + (parseInt(formatDate(startDate).getMonth()+1) > 10 ? parseInt(formatDate(startDate).getMonth()+1) : "0"+parseInt(formatDate(startDate).getMonth()+1)) + '/' + formatDate(startDate).getFullYear();
+          let csd = formatDate(startDate).getDate() + '/' + formatDateMonthForm(startDate) + '/' + formatDate(startDate).getFullYear();
           nbDaysConges += nbDaysBetween(formatDate(userConge[index].date_debut_conge),formatDate(userConge[index].date_fin_conge)) + 1;
+          console.log(nbDaysConges);
           if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) && (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
             //console.log(`1`);
-            setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja un congé prévu`);
+            setError(`Impossible de définir un congé pour cette date car ${formatPersonnelName(sexe)} a déja un congé prévu`);
             setTimeout(() => {
                 setError("");
             },7000)
@@ -243,7 +273,7 @@ const Conges = () => {
           }
           if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) || (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
             //console.log(`2`);  
-            setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a déja pris un congé`);
+            setError(`Impossible de définir un congé pour cette date car ${formatPersonnelName(sexe)} a déja pris un congé`);
             setTimeout(() => {
                 setError("");
             },7000)
@@ -251,7 +281,7 @@ const Conges = () => {
           }
           if (formatDate(startDate) === formatDate(userConge[index].attestation_conge.date_debut_conge)) {
             //console.log(`3`);
-            setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a un congé prévu cette meme date`);
+            setError(`Impossible de définir un congé pour cette date car ${formatPersonnelName(sexe)} a un congé prévu cette meme date`);
             setTimeout(() => {
                 setError("");
             },7000)
@@ -259,7 +289,7 @@ const Conges = () => {
           }
           if (formatDate(startDate) === formatDate(userConge[index].date_debut_conge)) {
             //console.log(`3`);
-            setError(`Impossible de définir un congé pour cette date car ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a un congé prévu cette meme date`);
+            setError(`Impossible de définir un congé pour cette date car ${formatPersonnelName(sexe)} a un congé prévu cette meme date`);
             setTimeout(() => {
                 setError("");
             },7000)
@@ -274,13 +304,14 @@ const Conges = () => {
           }
         }
       }
+      // testings for lasts personnel permissions
       if (lastPermission.length > 0) {
         for (let i = 0; i < lastPermission.length; i++) {
-          let csd = formatDate(startDate).getDate() + '/' + (parseInt(formatDate(startDate).getMonth()+1) > 10 ? parseInt(formatDate(startDate).getMonth()+1) : "0"+parseInt(formatDate(startDate).getMonth()+1)) + '/' + formatDate(startDate).getFullYear();
-          console.log(`curr start date : ${JSON.stringify(csd)}`);
-          console.log(` last permission repdate : ${JSON.stringify(lastPermission[i].attestation_permission.repriseDate)}`);
+          let csd = formatDate(startDate).getDate() + '/' + formatDateMonthForm(startDate)  + '/' + formatDate(startDate).getFullYear();
+          //console.log(`curr start date : ${JSON.stringify(csd)}`);
+          //console.log(` last permission repdate : ${JSON.stringify(lastPermission[i].attestation_permission.repriseDate)}`);
           if (JSON.stringify(lastPermission[i].attestation_permission.repriseDate) === JSON.stringify(csd)) {
-            setError(`Impossible de définir une permission pour cette date car la date de debut coïncide avec une date de reprise de service`);
+            setError(`Impossible de définir un congé pour cette date car la date de debut coïncide avec une date de reprise de service`);
             setTimeout(() => {
                 setError("");
             },7000)
@@ -288,6 +319,7 @@ const Conges = () => {
           }
         }
       }
+      // leave attestation datas
       const attestation = {
         name: name,
         matricule: matricule,
@@ -297,14 +329,15 @@ const Conges = () => {
         decision: selectedDec, 
         duration: duration,
         structure: struc.replace("'", "`"),
-        startDate: (formatDate(startDate).getDate() < 10 ? "0"+formatDate(startDate).getDate() : formatDate(startDate).getDate()) + "/" + (parseInt(formatDate(startDate).getMonth()+1) < 10 ? "0"+parseInt(formatDate(startDate).getMonth()+1) : parseInt(formatDate(startDate).getMonth()+1)) +"/"+formatDate(startDate).getFullYear(),
-        endDate: (formatDate(endDate).getDate() < 10 ? "0"+formatDate(endDate).getDate() : formatDate(endDate).getDate()) + "/" + (parseInt(formatDate(endDate).getMonth()+1) < 10 ? "0"+parseInt(formatDate(endDate).getMonth()+1) : parseInt(formatDate(endDate).getMonth()+1)) +"/"+formatDate(endDate).getFullYear(),
-        repriseDate: (formatDate(repriseDate).getDate() < 10 ? "0"+formatDate(repriseDate).getDate() : formatDate(repriseDate).getDate()) + "/" + (parseInt(formatDate(repriseDate).getMonth()+1) < 10 ? "0"+parseInt(formatDate(repriseDate).getMonth()+1) : parseInt(formatDate(repriseDate).getMonth()+1)) +"/"+formatDate(repriseDate).getFullYear(),
+        startDate: formatDateDayForm(startDate) + "/" + formatDateMonthForm(startDate) +"/"+formatDate(startDate).getFullYear(),
+        endDate: formatDateDayForm(endDate) + "/" + formatDateMonthForm(endDate) + "/"+formatDate(endDate).getFullYear(),
+        repriseDate: formatDateDayForm(repriseDate) + "/" + formatDateMonthForm(repriseDate) + "/" + formatDate(repriseDate).getFullYear(),
         typeConge: selectedType,
         preposition: preposition,
         grade : grade.replace("'", "`"),
         created_at : new Date().toISOString().slice(0,19).replace('T',' ')
       }
+      // datas for the leave
       const conge_data = {
         startDate : startDate,
         endDate : endDate,
@@ -318,44 +351,48 @@ const Conges = () => {
         statut_conge : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en cours" : curr_date.toISOString().slice(0,19).replace('T',' ') >= endDate ? "terminé" : "programmé",
         statut_personnel : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en congé" : "en poste",
       }
+      // query for saving leaves
       const req_conge = `INSERT INTO conge 
         (date_debut_conge, date_fin_conge, duree_conge, created_at_conge,attestation_conge,id_type_conge,id_personnel,demande_conge,statut_conge,statut_attestation_conge,document_a_fournir) 
         VALUES ("${conge_data.startDate}","${conge_data.endDate}",${conge_data.duration},"${conge_data.curr_date}",'${JSON.stringify(attestation)}',${conge_data.id_type_conge},${conge_data.id_personnel},"${conge_data.demandeFile}","${conge_data.statut_conge}","${conge_data.statut_attestation_conge}","${conge_data.document}");`;
-      let req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges - ${duration}) WHERE id_personnel = ${conge_data.id_personnel};`;
+      let req_personnel;
       switch (selectedType) {
         case 'congé maternité':
         case 'congé paternité':
           req_personnel = `UPDATE personnel SET nb_jours_conges_maternite = (nb_jours_conges_maternite + ${parseInt(duration)}) WHERE id_personnel = ${conge_data.id_personnel}`;
-          window.electronAPI.updatePersonnel(req_personnel);
           break;
         case 'congé maladie':
           req_personnel = `UPDATE personnel SET nb_jours_conges_maladie = (nb_jours_conges_maladie + ${parseInt(duration)}) WHERE id_personnel = ${conge_data.id_personnel}`;
-          window.electronAPI.updatePersonnel(req_personnel);
           break;
         case 'congé mariage':
           req_personnel = `UPDATE personnel SET nb_jours_conges_mariage	= (nb_jours_conges_mariage + ${parseInt(duration)}) WHERE id_personnel = ${conge_data.id_personnel}`;
-          window.electronAPI.updatePersonnel(req_personnel);
           break;
         case 'congé décès':
           req_personnel = `UPDATE personnel SET nb_jours_conges_deces = (nb_jours_conges_deces - ${parseInt(duration)}) WHERE id_personnel = ${conge_data.id_personnel}`;
-          window.electronAPI.updatePersonnel(req_personnel);
           break;
         default:
-          window.electronAPI.updatePersonnel(req_personnel);
+          req_personnel = '';
           break;
       }
-      console.log(req_personnel);
-      console.log(req_conge);
-      /*setSuccess("congé ajouté avec succès");
+      if (selectedPerson.nb_jours_conges === parseInt(0)) {
+        req_personnel = `UPDATE personnel SET dette_conge = (dette_conge - ${parseInt(duration)}) WHERE id_personnel = ${conge_data.id_personnel};`;
+      } else {
+        let diff_dette_conge = duration - selectedPerson.nb_jours_conges;
+        req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges - ${parseInt(selectedPerson.nb_jours_conges)}), dette_conge = (dette_conge - ${parseInt(diff_dette_conge)} ) WHERE id_personnel = ${conge_data.id_personnel};`;
+      }
+      // saving leaves
+      /*console.log(req_personnel);
+      console.log(req_conge);*/
+      setSuccess("congé ajouté avec succès");
       window.electronAPI.addConge(req_conge);
       window.electronAPI.updatePersonnel(req_personnel);
       window.electronAPI.congeAddedSuccess(() => { 
         setSuccess("congé ajouté avec succès");
-        setStatus(`Le satut de ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a été mis à jour !`);
+        setStatus(`Le satut de ${formatPersonnelName(sexe)} a été mis à jour !`);
       });
       setTimeout(() => {
         setSuccess("");
-      }, 3000)*/
+      }, 3000)
       setActived(true);
     } catch (error) {
       console.error("Erreur saving congé : " + error.message);
@@ -405,6 +442,28 @@ const Conges = () => {
     const month = date.getMonth();
     const year = date.getFullYear();
     return new Date(year, month, day);
+  }
+
+  
+  function formatPersonnelName(s) {
+    if (s === 'M')
+      return 'M. ' + name
+    else
+      return 'Mme ' + name
+  }
+
+  function formatDateDayForm(date) {
+    if (formatDate(date).getDate() < 10 ) 
+      return "0"+formatDate(date).getDate()
+    else 
+      return formatDate(date).getDate()
+  }
+
+  function formatDateMonthForm(date) {
+    if (parseInt(formatDate(date).getMonth()+1) > 10) 
+      return parseInt(formatDate(date).getMonth()+1)
+    else 
+      return "0"+parseInt(formatDate(date).getMonth()+1)
   }
 
   function nbDaysBetween(start, end) {
@@ -490,11 +549,11 @@ const Conges = () => {
           conge[x].attestation_conge = JSON.parse(conge[x].attestation_conge);
           conge[x].attestation_conge.repriseDate = conge[x].attestation_conge.repriseDate.split('/');
           conge[x].attestation_conge.repriseDate = new Date(conge[x].attestation_conge.repriseDate[2], conge[x].attestation_conge.repriseDate[1], conge[x].attestation_conge.repriseDate[0]);
-          console.log(`<--- conge ${x} --->`);
+          /*console.log(`<--- conge ${x} --->`);
           console.log(`current date : ${date}`);
           console.log(`date ddc : ${conge[x].date_debut_conge}`);
           console.log(`date dfc : ${conge[x].date_fin_conge}`);
-          console.log(`attesttaion : ${conge[x].attestation_conge.repriseDate}`);
+          console.log(`attesttaion : ${conge[x].attestation_conge.repriseDate}`);*/
           if (date >= conge[x].date_debut_conge && date <= conge[x].date_fin_conge) {
             const statut = "en congé";
             const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${conge[x].id_personnel};`;
@@ -664,8 +723,8 @@ const Conges = () => {
                           <tr key={index}>
                               <td>{c.matricule_personnel}</td>    
                               <td>{c.nom_prenom_personnel}</td> 
-                              <td>{c.date_debut_conge.getDate() + "/" + (parseInt(c.date_debut_conge.getMonth()+1) <= 9 ? "0"+parseInt(c.date_debut_conge.getMonth()+1) : parseInt(c.date_fin_conge.getMonth()+1)) + "/" + c.date_debut_conge.getFullYear() }</td>
-                              <td>{c.date_fin_conge.getDate() + "/" + (parseInt(c.date_fin_conge.getMonth()+1) <= 9 ? "0"+parseInt(c.date_fin_conge.getMonth()+1) : parseInt(c.date_fin_conge.getMonth()+1)) + "/" + c.date_fin_conge.getFullYear()}</td>
+                              <td>{c.date_debut_conge.getDate() + "/" + formatDateMonthForm(c.date_debut_conge) + "/" + c.date_debut_conge.getFullYear() }</td>
+                              <td>{c.date_fin_conge.getDate() + "/" + formatDateMonthForm(c.date_fin_conge) + "/" + c.date_fin_conge.getFullYear()}</td>
                               <td>{c.statut_conge === "programmé" ? c.attestation_conge.duration : c.statut_conge !== "terminé" ? curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? Math.ceil((c.date_fin_conge - curr_date) / (1000 * 3600 * 24)) : Math.ceil((c.date_fin_conge - c.date_debut_conge)/ (1000 * 3600 * 24)) : 0 }</td>
                               <td>{c.statut_conge === "en cours"
                                   ? <Badge color="success">
