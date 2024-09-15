@@ -24,6 +24,13 @@ import {
     Nav,
     UncontrolledTooltip,
     Button,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    CardBody,
+    Form,
+    FormGroup,
+    Label,
   } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import ReactPaginate from "react-paginate";
@@ -37,6 +44,7 @@ const Personnel = () => {
     const [excelFile, setExcelFile] = useState(null);
     const [typeError, setTypeError] = useState(null);
     const [excelData, setExcelData] = useState(null);
+    const [dette, setDette] = useState("");
     const [personnel, setPersonnel] = useState([]);
     const [pageNumber, setPageNumber] = useState(0);
     const [perPage] = useState(100);
@@ -45,6 +53,10 @@ const Personnel = () => {
     const [status, setStatus] = useState("");
     const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
+    const [modalData, setModalData] = useState(null); 
+    const [modal, setModal] = useState(false);
+    const [errorDette, setErrorDette] = useState("");
+    const [successDette, setSuccessDette] = useState("");
     const [selectedPerson, setSelectedPerson] = useState(null);
     const [loadingSpinner, setLoadingSpinner] = useState(true);
     const loadingText = "Aucune donnée dans la base de données";
@@ -89,6 +101,40 @@ const Personnel = () => {
         }
     } 
 
+    // Conge dette definition 
+    const toggleModal = () => {
+        setModal(!modal)
+    }
+
+    const handleRowClick = (person) => {
+        setModalData(person);
+        toggleModal();
+    };
+
+
+    const handleDetteChange = (e) => {
+        setDette(e.target.value);
+    };
+
+    const saveDettPersonnel = async (person) => {
+        if (dette === "") {
+            setErrorDette("Veuillez Entrez une valeur valide");
+            setTimeout(() => {
+              setErrorDette("");
+            }, 7000)
+            return;
+        }
+        const req = `UPDATE personnel SET dette_conge = ${dette} WHERE personnel.id_personnel = ${person.id_personnel}`;
+        console.log(`${req}`);
+        window.electronAPI.addPersonnelDette(req);
+        window.electronAPI.addPersonnelDetteSuccess((event, res) => {
+            setSuccessDette("Dette définie avec succès");
+            setTimeout(() => {
+                setSuccessDette("");
+            }, 7000)
+        })
+    }
+
     /** add personnel to the db */
     const addPersonnel = async () => {
         try {
@@ -97,6 +143,7 @@ const Personnel = () => {
                 const statut = "en poste";
                 const nb_jours_conges = ['A2','A1','B1','B2','C','D'].includes(excelData[i].CATEGORIE) ? 30 : 18;
                 //const nb_jours_conges = 0;
+                const dette_conge = 0;
                 const nb_jours_permission = 10;
                 const nb_jours_conges_maternite = 0;
                 const nb_jours_conges_mariage = 0;
@@ -109,13 +156,14 @@ const Personnel = () => {
                 const req = `
                     INSERT INTO personnel 
                     (ordre_personnel, matricule_personnel, nom_prenom_personnel, grade_personnel, poste_personnel, structure_personnel, cellule_personnel, sexe_personnel, date_recrutement_personnel, situation_matrimoniale_personnel,
-                    region_personnel, departement_personnel, date_naiss_personnel, telephone_personnel,id_type_personnel, categorie_personnel, arrondissement_personnel,nb_jours_permission,nb_jours_conges,nb_jours_conges_maladie,nb_jours_conges_maternite,nb_jours_conges_deces,nb_jours_conges_mariage,statut_personnel,next_month_permission,preposition_personnel)
+                    region_personnel, departement_personnel, date_naiss_personnel, telephone_personnel,id_type_personnel, categorie_personnel, arrondissement_personnel,nb_jours_permission,nb_jours_conges,nb_jours_conges_maladie,nb_jours_conges_maternite,nb_jours_conges_deces,nb_jours_conges_mariage,statut_personnel,next_month_permission,preposition_personnel,dette_conge)
                     VALUES 
                     (${excelData[i].ORDRE},"${excelData[i].MATRICULE}","${excelData[i].NOM_PRENOM}",
                     "${excelData[i].GRADE}","${excelData[i].POSTE}","${excelData[i].STRUCTURE}","${excelData[i].STRUCTURE_01}","${excelData[i].SEXE}",
                     "${excelData[i].DATE_RECRUTEMENT}","${excelData[i].SITUATION_MATRIMONIALE}","${excelData[i].REGION}",
                     "${excelData[i].DEPARTEMENT}","${excelData[i].DATE_NAISSANCE}","${excelData[i].TELEPHONE}","${type}",
-                    "${excelData[i].CATEGORIE}","${excelData[i].ARRONDISSEMENT}","${nb_jours_permission}","${nb_jours_conges}","${nb_jours_conges_maladie}","${nb_jours_conges_maternite}","${nb_jours_conges_deces}","${nb_jours_conges_mariage}","${statut}",'${JSON.stringify(next_month_permission)}',"${excelData[i].PREPOSITION}")
+                    "${excelData[i].CATEGORIE}","${excelData[i].ARRONDISSEMENT}","${nb_jours_permission}","${nb_jours_conges}","${nb_jours_conges_maladie}","${nb_jours_conges_maternite}","${nb_jours_conges_deces}","${nb_jours_conges_mariage}","${statut}",'${JSON.stringify(next_month_permission)}',"${excelData[i].PREPOSITION}"
+                    ,"${dette_conge})
                 ;`;
                 /*console.log(req);
                 WHERE NOT EXISTS (
@@ -256,6 +304,14 @@ const Personnel = () => {
         navigate("/admin/permission", {state: {selectedPerson: person}});
         setSelectedPerson(person);
     }
+
+    // format name : 
+    function formatPersonnelName(p) {
+        if (p.sexe_personnel === 'M')
+          return 'M. ' + p.nom_prenom_personnel;
+        else
+          return 'Mme ' + p.nom_prenom_personnel;
+      }
 
     return (
         <>
@@ -481,6 +537,77 @@ const Personnel = () => {
                                                                 disabled={(person.nb_jours_conges + person.nb_jours_permission === 28 && person.id_type_personnel === 1) || (person.nb_jours_conges + person.nb_jours_permission === 40 && person.id_type_personnel === 2) ? true : false}
                                                             >
                                                                 Nouvelle permission
+                                                            </DropdownItem>
+                                                            <DropdownItem
+                                                                onClick={() => handleRowClick(person)}
+                                                            >
+                                                                Définir la dette
+                                                                <Modal isOpen={modal} toggle={toggleModal} {...modalData}>
+                                                                    <ModalHeader toggle={toggleModal}>
+                                                                        <Row>
+                                                                            <Col>
+                                                                                <h3 className="mb-0">Définir la dette de congé de {formatPersonnelName(person)}</h3>
+                                                                            </Col>
+                                                                        </Row>
+                                                                    </ModalHeader>
+                                                                    <ModalBody>
+                                                                        <CardBody>
+                                                                            <Form>
+                                                                                <Row>
+                                                                                    <Col>  
+                                                                                        <FormGroup>
+                                                                                        <Label
+                                                                                            for="demande-file"
+                                                                                        >
+                                                                                            Entrez le nombre de jours de congé dû (-moins de 3ans)
+                                                                                        </Label>
+                                                                                        <Input
+                                                                                            id="demande-file"
+                                                                                            name="dette"
+                                                                                            type="number"
+                                                                                            onChange={(e) => handleDetteChange(e)}
+                                                                                        />
+                                                                                        </FormGroup>
+                                                                                    </Col>
+                                                                                </Row>
+                                                                                <Row>
+                                                                                    <Col md="6">
+                                                                                        <Button
+                                                                                            color="success"
+                                                                                            size="md"
+                                                                                            onClick={() => saveDettPersonnel(modalData)}
+                                                                                        >
+                                                                                            Définir
+                                                                                        </Button>
+                                                                                    </Col>
+                                                                                    <Col>
+                                                                                        <Button
+                                                                                            color="danger"
+                                                                                            size="md"
+                                                                                            onClick={() => toggleModal()}
+                                                                                        >
+                                                                                            Terminer
+                                                                                        </Button>
+                                                                                    </Col>
+                                                                                </Row>
+                                                                                <Row className="mt-3">
+                                                                                    <Col>
+                                                                                        { errorDette && (
+                                                                                            <Alert color="danger">
+                                                                                                {errorDette}
+                                                                                            </Alert>
+                                                                                        )}
+                                                                                        { successDette && (
+                                                                                            <Alert color="success">
+                                                                                                {successDette}
+                                                                                            </Alert>
+                                                                                        )}                                                                                    
+                                                                                    </Col>
+                                                                                </Row>
+                                                                            </Form>
+                                                                        </CardBody>
+                                                                    </ModalBody>
+                                                                </Modal>
                                                             </DropdownItem>
                                                             <DropdownItem
                                                                 onClick={() => handleDetailClick(person)}
