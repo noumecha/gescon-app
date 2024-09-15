@@ -116,6 +116,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     receivePersonnel: (callback) => ipcRenderer.on('all-personnel', callback), // get all personnel form the getPersonnel function
     updatePersonnelSuccess: (callback) => ipcRenderer.on('update-personnel-success', callback),
     updatePersonnel: (req) => ipcRenderer.send('update-personnel', req),
+    addPersonnelDette: (req) => ipcRenderer.send('add-personnel-dette',req), 
+    addPersonnelDetteSuccess: (callback) => ipcRenderer.on('add-personnel-dette-success', callback), 
     // for users : 
     userAddedSuccess: (callback) => ipcRenderer.on('user-added-success', callback),
     userDeletedSuccess: (callback) => ipcRenderer.on('user-deleted-success', callback),
