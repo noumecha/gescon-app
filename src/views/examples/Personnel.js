@@ -107,8 +107,17 @@ const Personnel = () => {
     }
 
     const handleRowClick = (person) => {
-        setModalData(person);
-        toggleModal();
+        
+        if(person.id_type_personnel === 1) {
+            setError("Impossible de définir une dette de congé pour un personnel administratif");
+            setTimeout(() => {
+              setError("");
+            }, 7000)
+            return;
+        } else {
+            setModalData(person);
+            toggleModal();
+        }
     };
 
 
@@ -124,7 +133,14 @@ const Personnel = () => {
             }, 7000)
             return;
         }
-        const req = `UPDATE personnel SET dette_conge = ${dette} WHERE personnel.id_personnel = ${person.id_personnel}`;
+        if (dette > 36) {
+            setErrorDette("La dette de congé ne peux pas dépasser 36jours");
+            setTimeout(() => {
+              setErrorDette("");
+            }, 7000)
+            return;
+        }
+        const req = `UPDATE personnel SET dette_conge = ${parseInt(dette)} WHERE personnel.id_personnel = ${person.id_personnel}`;
         console.log(`${req}`);
         window.electronAPI.addPersonnelDette(req);
         window.electronAPI.addPersonnelDetteSuccess((event, res) => {
@@ -163,7 +179,7 @@ const Personnel = () => {
                     "${excelData[i].DATE_RECRUTEMENT}","${excelData[i].SITUATION_MATRIMONIALE}","${excelData[i].REGION}",
                     "${excelData[i].DEPARTEMENT}","${excelData[i].DATE_NAISSANCE}","${excelData[i].TELEPHONE}","${type}",
                     "${excelData[i].CATEGORIE}","${excelData[i].ARRONDISSEMENT}","${nb_jours_permission}","${nb_jours_conges}","${nb_jours_conges_maladie}","${nb_jours_conges_maternite}","${nb_jours_conges_deces}","${nb_jours_conges_mariage}","${statut}",'${JSON.stringify(next_month_permission)}',"${excelData[i].PREPOSITION}"
-                    ,"${dette_conge})
+                    ,"${dette_conge}")
                 ;`;
                 /*console.log(req);
                 WHERE NOT EXISTS (
