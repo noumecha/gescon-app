@@ -270,6 +270,7 @@ const Permission = () => {
     const savePermission = async (e) => {
         e.preventDefault();
         try {
+            // test if no person is selected
             if (!selectedPerson) {
                 setError(`Veuillez d'abord selectionner un personnel`);
                 setTimeout(() => {
@@ -277,6 +278,7 @@ const Permission = () => {
                 },7000)
                 return;
             }
+            // block permission saving when duration is null or under 0
             if (duration <= 0) {
                 setError(`La durée de la permission ne peut pas etre négative ou égale à 0`);
                 setTimeout(() => {
@@ -284,6 +286,7 @@ const Permission = () => {
                 },7000)
                 return;
             }
+            // block permission if the personnel is not in post
             if (selectedPerson.statut_personnel !== "en poste") {
                 for (let index = 0; index < userConge.length; index++) {
                     if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) && (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
@@ -295,6 +298,7 @@ const Permission = () => {
                     }
                 }
             }
+            // block permission for not open day
             if (formatDate(startDate).getDay() === 0 || formatDate(startDate).getDay() === 6) {
               setError("Les permissions ne peuvent être configurer que pour les jours ouvrables");
               setTimeout(() => {
@@ -349,6 +353,7 @@ const Permission = () => {
                     }
                 }
             }
+            // checking last permissions
             if (lastPermission.length > 0) {
                 for (let i = 0; i < lastPermission.length; i++) {                   
                     let lprd = new Date(formatDate(lastPermission[i].date_fin_permission));
@@ -483,7 +488,7 @@ const Permission = () => {
                 },7000)
                 return;
             }
-            //
+            // test if the duration is not okay
             if (duration > 3) {
                 setError("On ne peut définir que 3 jours de permissions pour un personnel par mois");
                 setTimeout(() => {
@@ -491,7 +496,7 @@ const Permission = () => {
                 },7000)
                 return;
             }
-            //
+            // tests if the fiels are empty
             if (name === "" || startDate === "" || endDate === "" || duration === "" || repDate === "" || matricule === "" || type === "" || structure === "" || poste === "") {
                 setError('Veuillez remplir tous les champs');
                 setTimeout(() => {
@@ -499,6 +504,7 @@ const Permission = () => {
                 }, 7000)
                 return;
             } else {
+                // attestations permissions datas
                 const attestation = {
                     name: name,
                     matricule: matricule,
@@ -518,6 +524,7 @@ const Permission = () => {
                     month : nextMonthPermNb.month,
                     amout : nextMonthPermNb.amount,
                 }
+                // permission datas
                 const permission_data = {
                     startDate : startDate,
                     endDate : endDate,
@@ -535,9 +542,9 @@ const Permission = () => {
                   VALUES ("${permission_data.startDate}","${permission_data.endDate}",${duree},"${permission_data.curr_date}",'${JSON.stringify(attestation)}',${permission_data.id_personnel},"${permission_data.demande}","${permission_data.statut_permission}","${permission_data.statut_attestation_permission}");`;
                 const statut = curr_date >= permission_data.startDate && curr_date <= permission_data.endDate ? "en permission" : "en poste";
                 const req_pers = `UPDATE personnel SET next_month_permission = '${JSON.stringify(next_month_permission)}',statut_personnel = "${statut}",nb_jours_permission = (nb_jours_permission - ${duration}) WHERE id_personnel = ${permission_data.id_personnel};`;
-                //console.log(`permission query : ${req_permission}`);
-                //console.log(`personnel query : ${req_pers}`);
-                /*window.electronAPI.addPermission(req_permission);
+                console.log(`permission query : ${req_permission}`);
+                console.log(`personnel query : ${req_pers}`);
+                window.electronAPI.addPermission(req_permission);
                 setStatus(`Le satut de ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a été mis à jour !`);
                 window.electronAPI.permissionAddedSuccess(() => {
                     setSuccess("permission ajoutée avec succès");
@@ -548,30 +555,30 @@ const Permission = () => {
                 window.electronAPI.updatePersonnel(req_pers);
                 window.electronAPI.updatePersonnelSuccess(() => {
                     console.log("personnel updated");
-                });*/
+                });
                 if (selectedPerson.id_type_personnel === 2 && total_lasts_days + parseInt(duration) > 10 && selectedPerson.nb_jours_conges > 0) {
                     let diff = selectedPerson.nb_jours_permission + 1 === 10 ? (total_lasts_days + parseInt(duration)) - 10 : (total_lasts_days + parseInt(duration)) - selectedPerson.nb_jours_permission ;
                     const req_personnel = `UPDATE personnel SET nb_jours_permission = 10,nb_jours_conges = (nb_jours_conges - ${diff}) WHERE id_personnel = ${selectedPerson.id_personnel};`;
                     console.log(`${req_personnel}`)
-                    /*window.electronAPI.updatePersonnel(req_personnel);
+                    window.electronAPI.updatePersonnel(req_personnel);
                     window.electronAPI.updatePersonnelSuccess(() => {
                         setSuccess("personnel mis à jour avec succès");
                         setTimeout(() => {
                             setSuccess("");
                         }, 3000)
-                    })*/
+                    })
                 }
                 if (selectedPerson.id_type_personnel === 1 && total_lasts_days + parseInt(duration) > 10 && selectedPerson.nb_jours_conges > 0) {
                     let diff = selectedPerson.nb_jours_permission + 1 === 10 ? (total_lasts_days + parseInt(duration)) - 10 : (total_lasts_days + parseInt(duration)) - selectedPerson.nb_jours_permission ;
                     const req_personnel = `UPDATE personnel SET nb_jours_permission = 10,nb_jours_conges = (nb_jours_conges - ${diff}) WHERE id_personnel = ${selectedPerson.id_personnel};`;
                     console.log(`${req_personnel}`)
-                    /*window.electronAPI.updatePersonnel(req_personnel);
+                    window.electronAPI.updatePersonnel(req_personnel);
                     window.electronAPI.updatePersonnelSuccess(() => {
                         setSuccess("personnel mis à jour avec succès");
                         setTimeout(() => {
                             setSuccess("");
                         }, 3000)
-                    })*/
+                    })
                 }
                 handleRefresh();
                 setLoadingSpinner(true);
