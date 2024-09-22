@@ -44,8 +44,8 @@ const styles = StyleSheet.create({
     },
     containerTwo: {
       display: 'flex',
-      marginLeft: 30,
-      marginRight: 30,
+      marginLeft: 60,
+      marginRight: 60,
       justifyContent: 'space-evenly',
       flexDirection: 'column',
     },
@@ -53,8 +53,8 @@ const styles = StyleSheet.create({
       display: 'flex',
       alignItems: 'flex-start',
       marginTop: 30,
-      marginLeft: 30,
-      marginRight: 30,
+      marginLeft: 60,
+      marginRight: 60,
       justifyContent: 'space-evenly',
       flexDirection: 'column',
     },
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     topSectionTwo: {
         flex: 1,
         textAlign: 'center',
-        marginRight: -65,
+        marginRight: -60,
     },
     topSectionImage: {
         position: 'absolute',
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         marginLeft: 10,
         marginRight: 10,
-        marginTop: 40,
+        marginTop: 180,
     },
     sectionQr: {
       display: 'flex',
@@ -227,69 +227,69 @@ const RepriseCongeDoc = (props) => {
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIQUE DU CAMEROUN
                     </Text>
-                    <Text>********</Text>
+                    <Text>--------</Text>
                     <Text style={styles.h4Title}>
                         Paix-Travail-Patrie
                     </Text>
-                    <Text>********</Text>
+                    <Text>--------</Text>
                     <Text style={styles.h1Title}>
                         MINISTERE DES FINANCES
                     </Text>
-                    <Text>********</Text>
+                    <Text>--------</Text>
                     <Text style={styles.h1Title}>
                         SECRETARIAT GENERAL
                     </Text>
-                    <Text>********</Text>
+                    <Text>--------</Text>
                     <Text style={styles.h1Title}>
                         DIRECTION GENERALE DU BUDGET
                     </Text>
-                    <Text>********</Text>
+                    <Text>--------</Text>
                     <Text style={styles.h1Title}>
                         SOUS-DIRECTION DES AFFAIRES GENERALES
                     </Text>
-                    <Text>********</Text>
+                    <Text>--------</Text>
                     <Text style={styles.h1Title}>
                         SERVICE DU PERSONNEL
                     </Text>
-                    <Text>********</Text>
+                    <Text>--------</Text>
                     <Text style={styles.h4TitleNumber}>
                         N°__________/CRS/MINFI/SG/DGB/SDAG/AAN
                     </Text>
                 </View>
                 {/* image */}
-                <View style={styles.topSectionImage}>
+                {/*<View style={styles.topSectionImage}>
                     <Image style={styles.imageSceau} src={image}/> 
-                </View>
+                </View>*/}
                 {/* top right text */}
                 <View style={styles.topSectionTwo}>
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIC OF CAMEROON
                     </Text>
-                    <Text>********</Text>
+                    <Text>--------</Text>
                     <Text style={styles.h4Title}>
                         Peace work home
                     </Text>
-                    <Text>********</Text>
+                    <Text>--------</Text>
                     <Text style={styles.h1Title}>
                         MINISTRY OF FINANCE
                     </Text>
-                    <Text>********</Text>
+                    <Text>--------</Text>
                     <Text style={styles.h1Title}>
                         GENERAL SECRETARIAT
                     </Text>
-                    <Text>********</Text>
+                    <Text>--------</Text>
                     <Text style={styles.h1Title}>
                         GENERAL BUDGET DIRECTORATE
                     </Text>
-                    <Text>********</Text>
+                    <Text>--------</Text>
                     <Text style={styles.h1Title}>
                         SUB-DIRECTION OF GENERAL AFFAIRS
                     </Text>
-                    <Text>********</Text>
+                    <Text>--------</Text>
                     <Text style={styles.h1Title}>
                         PERSONNEL DEPARTEMENT
                     </Text>
-                    <Text>********</Text>
+                    <Text>--------</Text>
                     <Text style={styles.h4TitleDate}>
                         Yaoundé le ___________________
                     </Text>
