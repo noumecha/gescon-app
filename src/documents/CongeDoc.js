@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         position: 'relative',
         flexDirection: 'row',
-        marginTop: 80,
+        marginTop: 30,
     },
     containerTwo: {
         display: 'flex',
@@ -55,6 +55,14 @@ const styles = StyleSheet.create({
         justifyContent: 'space-evenly',
         flexDirection: 'column',
     },
+    containerDateNumber: {
+        display: 'flex',
+        flexDirection: 'row',
+        marginTop: 20,
+        marginLeft: 60,
+        marginRight: 60,
+        justifyContent: 'space-evenly',
+    },
     // footer left section
     sectionLeftBottom: {
       display: 'flex',
@@ -63,13 +71,17 @@ const styles = StyleSheet.create({
       display: 'flex',
     },
     topSectionOne: {
+        fontSize: 9,
         flex: 1,
         textAlign: 'center',
+        lineHeight: 1,
         marginLeft: -50,
     },
     topSectionTwo: {
         flex: 1,
+        fontSize: 9,
         textAlign: 'center',
+        lineHeight: 1,
         marginRight: -60,
     },
     /*topSectionImage: {
@@ -103,19 +115,19 @@ const styles = StyleSheet.create({
     },
     // top text title
     h1TitleFirst: {
-      fontSize: 10,
-      color: '#000000',
-      textAlign: 'center'
+        fontFamily: 'Times-Bold',
+        fontWeight: 'bold',
+        color: '#000000',
+        textAlign: 'center'
     },
     h1Title: {
-        fontSize: 10,
-        marginTop: -5,
         color: '#000000',
         textAlign: 'center'
     },
     h4Title: {
-        fontSize: 10,
-        marginTop: -5,
+        fontFamily: 'Times-Bold',
+        textTransform: 'italic',
+        fontWeight: 'bold',
         color: '#000000',
         textAlign: 'center'
     },
@@ -211,9 +223,8 @@ const CongeDoc = (props) => {
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIQUE DU CAMEROUN
                     </Text>
-                    <Text>--------</Text>
                     <Text style={styles.h4Title}>
-                        Paix-Travail-Patrie
+                        PAIX-TRAVAIL-PATRIE
                     </Text>
                     <Text>--------</Text>
                     <Text style={styles.h1Title}>
@@ -236,9 +247,6 @@ const CongeDoc = (props) => {
                         SERVICE DU PERSONNEL
                     </Text>
                     <Text>--------</Text>
-                    <Text style={styles.h4TitleNumber}>
-                        N°__________/MINFI/SG/DGB/SDAG/SP
-                    </Text>
                 </View>
                 {/* image */}
                 {/*<View style={styles.topSectionImage}>
@@ -249,9 +257,8 @@ const CongeDoc = (props) => {
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIC OF CAMEROON
                     </Text>
-                    <Text>--------</Text>
                     <Text style={styles.h4Title}>
-                        Peace work home
+                        PEACE-WORK-FATHERLAND
                     </Text>
                     <Text>--------</Text>
                     <Text style={styles.h1Title}>
@@ -274,10 +281,15 @@ const CongeDoc = (props) => {
                         PERSONNEL DEPARTEMENT
                     </Text>
                     <Text>--------</Text>
-                    <Text style={styles.h4TitleDate}>
-                        Yaoundé le ___________________
-                    </Text>
                 </View>
+            </View>
+            <View style={styles.containerDateNumber}>
+                <Text style={styles.h4TitleNumber}>
+                    N°{new Date().getFullYear() % 100}/__________/MINFI/SG/DGB/SDAG/SP
+                </Text>
+                <Text style={styles.h4TitleDate}>
+                    Yaoundé le 
+                </Text>
             </View>
             <View style={styles.containerTwo}>
                 <View style={styles.section}>
