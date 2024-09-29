@@ -1,14 +1,16 @@
 import React from 'react';
-import { Page, Text, View, Document,Image, StyleSheet, Font } from '@react-pdf/renderer';
-import image from './docs-images/sceau-img.PNG';
+import { Page, Text, View, Document, StyleSheet, Font } from '@react-pdf/renderer';//Image,
+//import image from './docs-images/sceau-img.PNG';
 import TimesNewRoman from './docs-fonts/times new roman.ttf';
 import TimesNewRomanBold from './docs-fonts/times new roman bold.ttf';
+import TimesNewRomanItalic from './docs-fonts/times new roman bold italic.ttf';
 
 // Create styles
 Font.register({ 
     family: 'Times-Roman', 
     fonts : [
         {src: TimesNewRoman},
+        {src: TimesNewRomanItalic},
         {src: TimesNewRomanBold, fontWeight: 700}
     ]
 });
@@ -21,6 +23,10 @@ const fontStyles = StyleSheet.create({
     bold: {
         fontFamily: 'Times-Bold',
         fontWeight: 'bold',
+    },
+    italic: {
+        fontFamily: 'Times-BoldItalic',
+        fontStyle: 'italic',
     }
 })
 const styles = StyleSheet.create({
@@ -37,12 +43,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         position: 'relative',
         flexDirection: 'row',
-        marginTop: 40,
+        marginTop: 30,
     },
     containerTwo: {
         display: 'flex',
-        marginLeft: 30,
-        marginRight: 30,
+        marginLeft: 60,
+        marginRight: 60,
         justifyContent: 'space-evenly',
         flexDirection: 'column',
     },
@@ -50,10 +56,32 @@ const styles = StyleSheet.create({
         display: 'flex',
         alignItems: 'flex-start',
         marginTop: 30,
-        marginLeft: 30,
-        marginRight: 30,
+        marginLeft: 60,
+        marginRight: 60,
         justifyContent: 'space-evenly',
         flexDirection: 'column',
+    },
+    // date year number and structure
+    containerDateNumber: {
+        display: 'flex',
+        flexDirection: 'row',
+        marginTop: 15,
+        marginLeft: 30,
+        marginRight: 30,
+        //justifyContent: 'space-between',
+    },
+    h4TitleNumber: {
+        fontSize: 10,
+        marginTop: 10,
+        color: '#000000',
+        textAlign: 'center'
+    },
+    h4TitleDate: {
+      fontSize: 10,
+      marginTop: 10,
+      marginLeft: 160,
+      color: '#000000',
+      textAlign: 'center'
     },
     // footer left section
     sectionLeftBottom: {
@@ -63,20 +91,24 @@ const styles = StyleSheet.create({
       display: 'flex',
     },
     topSectionOne: {
+        fontSize: 9,
         flex: 1,
         textAlign: 'center',
+        lineHeight: 1,
         marginLeft: -50,
     },
     topSectionTwo: {
         flex: 1,
+        fontSize: 9,
         textAlign: 'center',
-        marginRight: -65,
+        lineHeight: 1,
+        marginRight: -60,
     },
-    topSectionImage: {
+    /*topSectionImage: {
         position: 'absolute',
         marginTop: -20,
         left: "44%",
-    },
+    },*/
     // certif title
     h1CertifTitle: {
       fontSize: 14,
@@ -102,34 +134,38 @@ const styles = StyleSheet.create({
       textAlign: 'justify',
     },
     // top text title
+    // for the -------- 
+    line: {
+        textAlign: 'center',
+        marginTop: -2,
+        letterSpacing: 1,
+    },
+    //
     h1TitleFirst: {
-      fontSize: 10,
-      color: '#000000',
-      textAlign: 'center'
+        fontFamily: 'Times-Bold',
+        fontWeight: 'bold',
+        color: '#000000',
+        textAlign: 'center'
+    },
+    h1TitleBold: {
+        color: '#000000',
+        textAlign: 'center',
+        marginTop: 3,
+        fontFamily: 'Times-Bold',
+        fontWeight: 'bold',
     },
     h1Title: {
-        fontSize: 10,
-        marginTop: -5,
         color: '#000000',
-        textAlign: 'center'
+        textAlign: 'center',
+        marginTop: 3,
     },
     h4Title: {
-        fontSize: 10,
-        marginTop: -5,
+        marginTop: 2,
+        fontFamily: 'Times-BoldItalic',
+        fontStyle: 'italic',
+        fontWeight: 'bold',
         color: '#000000',
         textAlign: 'center'
-    },
-    h4TitleNumber: {
-        fontSize: 10,
-        marginTop: 10,
-        color: '#000000',
-        textAlign: 'center'
-    },
-    h4TitleDate: {
-      fontSize: 10,
-      marginTop: 10,
-      color: '#000000',
-      textAlign: 'center'
     },
     // on footer ampliations text
     amTitle: {
@@ -181,7 +217,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         marginLeft: 10,
         marginRight: 10,
-        marginTop: 40,
+        marginTop: 180,
     },
     sectionQr: {
       display: 'flex',
@@ -211,73 +247,73 @@ const CongeDoc = (props) => {
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIQUE DU CAMEROUN
                     </Text>
-                    <Text>********</Text>
                     <Text style={styles.h4Title}>
-                        Paix-Travail-Patrie
+                        PAIX - TRAVAIL - PATRIE
                     </Text>
-                    <Text>********</Text>
+                    <Text style={styles.line}>------------</Text>
                     <Text style={styles.h1Title}>
-                        MINISTERE DES FINANCES
+                        MINISTÈRE DES FINANCES
                     </Text>
-                    <Text>********</Text>
+                    <Text style={styles.line}>------------</Text>
                     <Text style={styles.h1Title}>
-                        SECRETARIAT GENERAL
+                        SECRETARIAT GÉNÉRAL
                     </Text>
-                    <Text>********</Text>
+                    <Text style={styles.line}>------------</Text>
+                    <Text style={styles.h1TitleBold}>
+                        DIRECTION GÉNÉRALE DU BUDGET
+                    </Text>
+                    <Text style={styles.line}>------------</Text>
                     <Text style={styles.h1Title}>
-                        DIRECTION GENERALE DU BUDGET
+                        SOUS-DIRECTION DES AFFAIRES GÉNÉRALES
                     </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h1Title}>
-                        SOUS-DIRECTION DES AFFAIRES GENERALES
-                    </Text>
-                    <Text>********</Text>
+                    <Text style={styles.line}>------------</Text>
                     <Text style={styles.h1Title}>
                         SERVICE DU PERSONNEL
                     </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h4TitleNumber}>
-                        N°__________/MINFI/SG/DGB/SDAG/SP
-                    </Text>
+                    <Text style={styles.line}>------------</Text>
                 </View>
                 {/* image */}
-                <View style={styles.topSectionImage}>
+                {/*<View style={styles.topSectionImage}>
                     <Image style={styles.imageSceau} src={image}/> 
-                </View>
+                </View>*/}
                 {/* top right text */}
                 <View style={styles.topSectionTwo}>
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIC OF CAMEROON
                     </Text>
-                    <Text>********</Text>
                     <Text style={styles.h4Title}>
-                        Peace work home
+                        PEACE - WORK - FATHERLAND
                     </Text>
-                    <Text>********</Text>
+                    <Text style={styles.line}>------------</Text>
                     <Text style={styles.h1Title}>
                         MINISTRY OF FINANCE
                     </Text>
-                    <Text>********</Text>
+                    <Text style={styles.line}>------------</Text>
                     <Text style={styles.h1Title}>
-                        GENERAL SECRETARIAT
+                        SECRETARIAT GENERAL
                     </Text>
-                    <Text>********</Text>
+                    <Text style={styles.line}>------------</Text>
+                    <Text style={styles.h1TitleBold}>
+                        DIRECTORATE GENERAL OF BUDGET 
+                    </Text>
+                    <Text style={styles.line}>------------</Text>
                     <Text style={styles.h1Title}>
-                        GENERAL BUDGET DIRECTORATE
+                        SUB-DEPARTMENT FOR GENERAL AFFAIRS
                     </Text>
-                    <Text>********</Text>
+                    <Text style={styles.line}>------------</Text>
                     <Text style={styles.h1Title}>
-                        SUB-DIRECTION OF GENERAL AFFAIRS
+                        PERSONNEL SERVICE
                     </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h1Title}>
-                        PERSONNEL DEPARTEMENT
-                    </Text>
-                    <Text>********</Text>
-                    <Text style={styles.h4TitleDate}>
-                        Yaoundé le ___________________
-                    </Text>
+                    <Text style={styles.line}>------------</Text>
                 </View>
+            </View>
+            <View style={styles.containerDateNumber}>
+                <Text style={styles.h4TitleNumber}>
+                    N°{new Date().getFullYear() % 100}/__________/MINFI/SG/DGB/SDAG/SP
+                </Text>
+                <Text style={styles.h4TitleDate}>
+                    Yaoundé, le 
+                </Text>
             </View>
             <View style={styles.containerTwo}>
                 <View style={styles.section}>
