@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         marginLeft: 10,
         marginRight: 10,
-        marginTop: 180,
+        marginTop: 240,
     },
     sectionQr: {
       display: 'flex',

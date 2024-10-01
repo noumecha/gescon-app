@@ -4,13 +4,14 @@ const mysql = require('mysql2');
 //const isDev = import('electron-is-dev');
 
 let mainWindow;
-
 function createWindow() {
     // configure the main window
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
         webPreferences: {
+            backgroundThrottling: false, // Avoid background throttling
+            enableBlinkFeatures: 'CSSVariables, FontCache',
             sandbox: false,
             nodeIntegration: true,
             enableRemoteModule: true,
@@ -467,6 +468,11 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
+    app.commandLine.appendSwitch('disable-gpu-rasterization');
+    app.commandLine.appendSwitch('disable-zero-copy');
+    app.commandLine.appendSwitch('enable-low-end-device-mode');
+    app.commandLine.appendSwitch('max-tiles-for-interest-area', '512');
+    app.disableHardwareAcceleration();
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
     }

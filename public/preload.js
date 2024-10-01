@@ -1,6 +1,6 @@
 const { contextBridge, ipcRenderer } = require("electron");
 const dev = "Spaker the TMC";
-ipcRenderer.setMaxListeners(2500);
+ipcRenderer.setMaxListeners(5000);
 
 window.addEventListener('DOMContentLoaded', () => {
     console.log('Preload script loaded successfully!');
