@@ -460,7 +460,7 @@ const Conges = () => {
   }
 
   function formatDateMonthForm(date) {
-    if (parseInt(formatDate(date).getMonth()+1) > 10) 
+    if (parseInt(formatDate(date).getMonth()+1) >= 10) 
       return parseInt(formatDate(date).getMonth()+1)
     else 
       return "0"+parseInt(formatDate(date).getMonth()+1)
@@ -500,18 +500,22 @@ const Conges = () => {
               weekdaysToAdd--;
             }
           }
-          //console.log('end date : ' + st);
-          let next_day = new Date();
-          let rep = new Date();
-          next_day.setDate(st.getDate() + 1);
+          console.log('end date calculate : ' + st);
+          let next_day = new Date(st);
+          let rep = new Date(st);
+          console.log('before', next_day.getDay());
+          next_day.setDate(next_day.getDate() + parseInt(1));
+          console.log('after', next_day.getDay());
+          console.log(next_day);
           if (next_day.getDay() === 0 || next_day.getDay() === 6) {
-            rep.setDate(st.getDate() + 3);
-            //console.log("rep date : " + rep);
+            rep.setDate(st.getDate() + parseInt(3));
+            console.log("rep date : " + rep);
           } else {
-            rep.setDate(st.getDate() + 1);
-            //console.log("rep date : " + rep);
+            rep.setDate(st.getDate() + parseInt(1));
+            console.log("rep date : " + rep);
           }
           setEndDate(st.toISOString().split("T")[0]);
+          console.log("rep date formated " + rep.toISOString().split("T")[0]);
           setRepriseDate(rep.toISOString().split("T")[0]);
         } else {
           const start = new Date(startDate);
