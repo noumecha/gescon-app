@@ -467,6 +467,16 @@ app.on('window-all-closed', () => {
     app.quit();
 })
 
+app.on('ready', () => {
+    app.commandLine.appendSwitch('disable-gpu-rasterization');
+    app.commandLine.appendSwitch('disable-zero-copy');
+    app.commandLine.appendSwitch('enable-low-end-device-mode');
+    app.commandLine.appendSwitch('max-tiles-for-interest-area', '512');
+    if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+    }
+});
+
 app.on('activate', () => {
     app.commandLine.appendSwitch('disable-gpu-rasterization');
     app.commandLine.appendSwitch('disable-zero-copy');
