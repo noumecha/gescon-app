@@ -44,7 +44,7 @@ const Personnel = () => {
     const [excelFile, setExcelFile] = useState(null);
     const [typeError, setTypeError] = useState(null);
     const [excelData, setExcelData] = useState(null);
-    const [dette, setDette] = useState("");
+    const [dette, setDette] = useState('');
     const [personnel, setPersonnel] = useState([]);
     const [pageNumber, setPageNumber] = useState(0);
     const [perPage] = useState(100);
@@ -107,7 +107,7 @@ const Personnel = () => {
     }
 
     const handleRowClick = useCallback((person) => {
-        
+        setSelectedPerson(person);
         if(person.id_type_personnel === 1) {
             setError("Impossible de définir une dette de congé pour un personnel administratif");
             setTimeout(() => {
@@ -149,7 +149,7 @@ const Personnel = () => {
                 setSuccessDette("");
             }, 7000)
         })
-    }, []);
+    }, [dette]);
 
     /** add personnel to the db */
     const addPersonnel = async () => {
@@ -322,11 +322,11 @@ const Personnel = () => {
     }
 
     // format name : 
-    function formatPersonnelName(p) {
-        if (p.sexe_personnel === 'M')
-          return 'M. ' + p.nom_prenom_personnel;
+    function formatPersonnelName(person) {
+        if (person.sexe_personnel === 'M')
+          return 'M. ' + person.nom_prenom_personnel;
         else
-          return 'Mme ' + p.nom_prenom_personnel;
+          return 'Mme ' + person.nom_prenom_personnel;
       }
 
     return (
@@ -558,74 +558,6 @@ const Personnel = () => {
                                                                 onClick={() => handleRowClick(person)}
                                                             >
                                                                 Définir la dette
-                                                                { modal && 
-                                                                    <Modal isOpen={modal} toggle={toggleModal} {...modalData}>
-                                                                        <ModalHeader toggle={toggleModal}>
-                                                                            <Row>
-                                                                                <Col>
-                                                                                    <h3 className="mb-0">Définir la dette de congé de {formatPersonnelName(person)}</h3>
-                                                                                </Col>
-                                                                            </Row>
-                                                                        </ModalHeader>
-                                                                        <ModalBody>
-                                                                            <CardBody>
-                                                                                <Form>
-                                                                                    <Row>
-                                                                                        <Col>  
-                                                                                            <FormGroup>
-                                                                                            <Label
-                                                                                                for="demande-file"
-                                                                                            >
-                                                                                                Entrez le nombre de jours de congé dû (-moins de 3ans)
-                                                                                            </Label>
-                                                                                            <Input
-                                                                                                id="demande-file"
-                                                                                                name="dette"
-                                                                                                type="number"
-                                                                                                onChange={(e) => handleDetteChange(e)}
-                                                                                            />
-                                                                                            </FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                    <Row>
-                                                                                        <Col md="6">
-                                                                                            <Button
-                                                                                                color="success"
-                                                                                                size="md"
-                                                                                                onClick={() => saveDettPersonnel(modalData)}
-                                                                                            >
-                                                                                                Définir
-                                                                                            </Button>
-                                                                                        </Col>
-                                                                                        <Col>
-                                                                                            <Button
-                                                                                                color="danger"
-                                                                                                size="md"
-                                                                                                onClick={() => toggleModal()}
-                                                                                            >
-                                                                                                Terminer
-                                                                                            </Button>
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                    <Row className="mt-3">
-                                                                                        <Col>
-                                                                                            { errorDette && (
-                                                                                                <Alert color="danger">
-                                                                                                    {errorDette}
-                                                                                                </Alert>
-                                                                                            )}
-                                                                                            { successDette && (
-                                                                                                <Alert color="success">
-                                                                                                    {successDette}
-                                                                                                </Alert>
-                                                                                            )}                                                                                    
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                </Form>
-                                                                            </CardBody>
-                                                                        </ModalBody>
-                                                                    </Modal>
-                                                                }
                                                             </DropdownItem>
                                                             <DropdownItem
                                                                 onClick={() => handleDetailClick(person)}
@@ -646,6 +578,76 @@ const Personnel = () => {
                                         )}
                                     </tbody>
                                 </Table>
+                                {/** modal implementation */}
+                                
+                                { modal && 
+                                <Modal isOpen={modal} toggle={toggleModal} {...modalData}>
+                                    <ModalHeader toggle={toggleModal}>
+                                        <Row>
+                                            <Col>
+                                                <h3 className="mb-0">Définir la dette de congé de {selectedPerson ? formatPersonnelName(selectedPerson) : ''}</h3>
+                                            </Col>
+                                        </Row>
+                                    </ModalHeader>
+                                    <ModalBody>
+                                        <CardBody>
+                                            <Form>
+                                                <Row>
+                                                    <Col>  
+                                                        <FormGroup>
+                                                        <Label
+                                                            for="dette"
+                                                        >
+                                                            Entrez le nombre de jours de congé dû (-moins de 3ans)
+                                                        </Label>
+                                                        <Input
+                                                            id="dette"
+                                                            name="dette"
+                                                            type="number"
+                                                            value={dette}
+                                                            onChange={handleDetteChange}
+                                                        />
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col md="6">
+                                                        <Button
+                                                            color="success"
+                                                            size="md"
+                                                            onClick={() => saveDettPersonnel(modalData)}
+                                                        >
+                                                            Définir
+                                                        </Button>
+                                                    </Col>
+                                                    <Col>
+                                                        <Button
+                                                            color="danger"
+                                                            size="md"
+                                                            onClick={() => toggleModal()}
+                                                        >
+                                                            Terminer
+                                                        </Button>
+                                                    </Col>
+                                                </Row>
+                                                <Row className="mt-3">
+                                                    <Col>
+                                                        { errorDette && (
+                                                            <Alert color="danger">
+                                                                {errorDette}
+                                                            </Alert>
+                                                        )}
+                                                        { successDette && (
+                                                            <Alert color="success">
+                                                                {successDette}
+                                                            </Alert>
+                                                        )}                                                                                    
+                                                    </Col>
+                                                </Row>
+                                            </Form>
+                                        </CardBody>
+                                    </ModalBody>
+                                </Modal>}
                             </Card>
                         </div>
                 </div>

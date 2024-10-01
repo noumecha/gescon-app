@@ -24,8 +24,8 @@ function createWindow() {
     mainWindow.setMenuBarVisibility(false);
 
     mainWindow.loadURL(
-        //`http://localhost:3000`
-        `file://${path.join(__dirname, '../build/index.html')}`
+        `http://localhost:3000`
+        //`file://${path.join(__dirname, '../build/index.html')}`
         //isDev ? `http://localhost:3000` : `file://${path.join(__dirname, '/../build/index.html')}`
     );
 
@@ -467,12 +467,12 @@ app.on('window-all-closed', () => {
     app.quit();
 })
 
+app.disableHardwareAcceleration();
 app.on('activate', () => {
     app.commandLine.appendSwitch('disable-gpu-rasterization');
     app.commandLine.appendSwitch('disable-zero-copy');
     app.commandLine.appendSwitch('enable-low-end-device-mode');
     app.commandLine.appendSwitch('max-tiles-for-interest-area', '512');
-    app.disableHardwareAcceleration();
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
     }
