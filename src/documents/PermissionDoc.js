@@ -324,7 +324,7 @@ const PermissionDoc = (props) => {
                         ABSENCE PERMISSION CERTIFICATE
                     </Text>
                     <Text style={styles.pCertifText}>
-                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M." : "Mme"} <Text style={fontStyles.bold}>{props.name}</Text>, 
+                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "Monsieur" : "Madame"} <Text style={fontStyles.bold}>{props.name}</Text>, 
                          {props.grade}, Mle <Text style={fontStyles.bold}>{props.matricule}</Text>, {props.poste} {props.preposition} {props.structure} est bénéficiaire
                         d'une permission d'absence de (<Text style={fontStyles.bold}>{props.duration}</Text>) jours.
                     </Text>
