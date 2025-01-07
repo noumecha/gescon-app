@@ -324,7 +324,7 @@ const ReprisePermissionDoc = (props) => {
                         RETURN OF SERVICE CERTIFICATE
                     </Text>
                     <Text style={styles.pCertifText}>
-                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "M." : "Mme"} <Text style={fontStyles.bold}>{props.name}</Text>, 
+                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "Monsieur" : "Madame"} <Text style={fontStyles.bold}>{props.name}</Text>, 
                          {props.grade}, Matricule <Text style={fontStyles.bold}>{props.matricule}</Text>, {props.poste} {props.preposition} {props.structure}, bénéficiaire
                         d'une permission d'absence de (<Text style={fontStyles.bold}>{props.duration}</Text>) {props.duration > 1 ? "jours ouvrables" : "jour ouvrable" } allant du <Text style={fontStyles.bold}>{props.startDate}</Text> au <Text style={fontStyles.bold}>{props.endDate}</Text> a effectivement
                         repris le service le <Text style={fontStyles.bold}>{props.repriseDate} à 7 heures 30 précises.</Text>

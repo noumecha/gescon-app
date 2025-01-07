@@ -12,21 +12,14 @@ import {
   Container,
   Row,
   Alert,
-  Table,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-  Badge,
-  CardFooter,
-  Pagination,
-  PaginationItem,
-  PaginationLink
 } from "reactstrap";
+// custom compontents : 
+import CongesTable from "views/customs-components/CongesTable";
 // core components
 import Header from "components/Headers/Header.js";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import CongesForm from "views/customs-components/CongesForm";
 
 const Conges = () => {
   const location = useLocation();
@@ -329,6 +322,7 @@ const Conges = () => {
         decision: selectedDec, 
         duration: duration,
         structure: struc.replace("'", "`"),
+        nbJoursConge : nb_jours_conges,
         startDate: formatDateDayForm(startDate) + "/" + formatDateMonthForm(startDate) +"/"+formatDate(startDate).getFullYear(),
         endDate: formatDateDayForm(endDate) + "/" + formatDateMonthForm(endDate) + "/"+formatDate(endDate).getFullYear(),
         repriseDate: formatDateDayForm(repriseDate) + "/" + formatDateMonthForm(repriseDate) + "/" + formatDate(repriseDate).getFullYear(),
@@ -641,500 +635,62 @@ const Conges = () => {
   return (
     <>
       <Header />
-      {/* Page content */}
       <Container className="mt--7" fluid>
-        {/* Tableaux de Conges */}
-        <Row>
-          <Col lg="12">
-            <Card>
-              <CardHeader>
-                <Row>
-                  <Col lg="6">
-                    <Input
-                      type="select"
-                      className="form-control mt-2"
-                      onChange={handleStatutFilter}
-                      value={statutFilter}
-                    >
-                      <option value="">Tous les statuts</option>
-                      <option value="programmé">programmé</option>
-                      <option value="en cours">en cours</option>
-                      <option value="terminé">terminé</option>
-                    </Input>
-                  </Col>
-                  <Col lg="6">
-                    <Input
-                      type="text"
-                      className="form-control mt-2"
-                      placeholder="Rechercher par nom ou matricule"
-                      onChange={handleSearch}
-                      value={search}
-                    />
-                  </Col>
-                </Row>
-              </CardHeader>
-            </Card>
-          </Col>
-          <Col lg="12">
-            <Card className="shadow">
-              <Row>
-                <Col md="12" className="text-center">
-                  {/* generateError && 
-                    <Alert color="danger">
-                      {generateError}
-                    </Alert>
-                  */}
-                  { generateSuccess && 
-                    <Alert color="success">
-                      {generateSuccess}
-                    </Alert>
-                  }
-                </Col>
-              </Row>
-              <CardHeader className="bg-white border-2 d-flex justify-content-center">
-                <h3 className="mb-0 text-center">Listes des Congés</h3>
-                <Button
-                  size="sm"
-                  className="ml-3"
-                  onClick={() => handleRefresh()}
-                >
-                  Actualiser
-                </Button>
-              </CardHeader>
-              <Table className="align-items-center table-flush" responsive>
-                  <thead className="thead-light">
-                      <tr>
-                          <th>Matricule</th>
-                          <th>Nom</th>
-                          <th>Date de debut</th>
-                          <th>Date de fin</th>
-                          <th>Nombre de jours restant</th>
-                          <th>Statut</th>
-                          <th>Actions</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                    {loadingSpinner && (
-                      <tr>
-                        <td colSpan="7" className="text-center">
-                          <div className="spinner-border" role="status">
-                            <span className="sr-only">Loading...</span>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                      {filterConge && filterConge.length > 0 ? !loadingSpinner && (filterConge.slice(offset, offset + perPage).map((c, index) => (
-                          <tr key={index}>
-                              <td>{c.matricule_personnel}</td>    
-                              <td>{c.nom_prenom_personnel}</td> 
-                              <td>{c.date_debut_conge.getDate() + "/" + formatDateMonthForm(c.date_debut_conge) + "/" + c.date_debut_conge.getFullYear() }</td>
-                              <td>{c.date_fin_conge.getDate() + "/" + formatDateMonthForm(c.date_fin_conge) + "/" + c.date_fin_conge.getFullYear()}</td>
-                              <td>{c.statut_conge === "programmé" ? c.attestation_conge.duration : c.statut_conge !== "terminé" ? curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? Math.ceil((c.date_fin_conge - curr_date) / (1000 * 3600 * 24)) : Math.ceil((c.date_fin_conge - c.date_debut_conge)/ (1000 * 3600 * 24)) : 0 }</td>
-                              <td>{c.statut_conge === "en cours"
-                                  ? <Badge color="success">
-                                      {c.statut_conge}
-                                    </Badge>
-                                  : 
-                                  c.statut_conge === "terminé"
-                                  ?
-                                    <Badge color="primary">
-                                      {c.statut_conge}
-                                    </Badge>
-                                  :
-                                    <Badge color="warning">
-                                      {c.statut_conge}
-                                    </Badge>
-                                  }
-                              </td>
-                              <td className="text-right">
-                                  <UncontrolledDropdown>
-                                      <DropdownToggle
-                                      className="btn-icon-only text-light"
-                                      role="button"
-                                      size="sm"
-                                      color=""
-                                      onClick={(e) => e.preventDefault()}
-                                      >
-                                          <i className="fas fa-ellipsis-v" />
-                                      </DropdownToggle>
-                                      <DropdownMenu className="dropdown-menu-arrow" right>
-                                          <DropdownItem
-                                            onClick={() => saveAttestationRepConge(c)}
-                                            disabled={c.statut_conge === "terminé" ? false : true}
-                                          >
-                                            Générer l'attestation de reprise
-                                          </DropdownItem>
-                                      </DropdownMenu>
-                                  </UncontrolledDropdown>
-                              </td>
-                          </tr>
-                      )))
-                      :
-                        !loadingSpinner && (
-                          <tr>
-                            <td colSpan="7" className="text-center">
-                              {loadingText}
-                            </td>
-                          </tr>
-                        )
-                      }
-                  </tbody>
-              </Table>
-              <Row className="m-0 justify-content-center">
-                  <CardFooter className="py-3 d-flex" >
-                      <nav className="ligna-items-center" aria-label="...">
-                          <Pagination
-                            className="pagination justify-content-center"
-                            listClassName="justify-content-center"
-                          >
-                            <PaginationItem>
-                              <PaginationLink
-                                onClick={() => handlePagePrev()}
-                                tabIndex="-1"
-                              >
-                                <i className="fas fa-angle-left" />
-                                <span className="sr-only">Previous</span>
-                              </PaginationLink>
-                            </PaginationItem>
-                              {Array.from({length: pageCount}, (_, i) => (
-                                  <PaginationItem key={i} active={i === pageNumber}>
-                                      <PaginationLink onClick={() => handlePageChange({selected: i})}>
-                                          {i}
-                                      </PaginationLink>
-                                  </PaginationItem>
-                              ))}
-                            <PaginationItem>
-                              <PaginationLink
-                                onClick={() => handlePageNext()}
-                              >
-                                <i className="fas fa-angle-right" />
-                                <span className="sr-only">Next</span>
-                              </PaginationLink>
-                            </PaginationItem>
-                          </Pagination>
-                      </nav>
-                  </CardFooter>
-              </Row>
-            </Card>
-          </Col>
-        </Row>
-        {/** Formulaire de Creation de Congé */}
-        <Row className="mt-5">
-          <Col className="order-xl-1" md="12" lg="12">
-            <Card className="bg-secondary shadow">
-              <CardHeader className="bg-white border-0">
-                <Row className="align-items-center">
-                  <Col xs="8">
-                    <h3 className="mb-0">Définir un nouveau congé</h3>
-                  </Col>
-                </Row>
-                <Row className="mt-2">
-                  <Col md="12">
-                    { status && 
-                      <Alert color="dark" isOpen={visible} toggle={onDismiss}>
-                        {status}
-                      </Alert>
-                    }
-                  </Col>
-                </Row>
-              </CardHeader>
-              <CardBody>
-                <Form>
-                  <h6 className="heading-small text-muted mb-4">
-                    Information du personnel
-                  </h6>
-                  <div className="pl-lg-4">
-                    <Row>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-username"
-                          >
-                            Nom 
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-username"
-                            value={name}
-                            onChange={handleInputChange(setName)}
-                            placeholder="Nom "
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-phone"
-                          >
-                            Telephone
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-phone"
-                            onChange={handleInputChange(setTelphone)}
-                            value={telephone}
-                            placeholder=""
-                            type="phone"
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-matricule"
-                          >
-                            Matricule
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-matricule"
-                            value={matricule}
-                            onChange={handleInputChange(setMatricule)}
-                            placeholder="Matricule"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-poste"
-                          >
-                            Poste
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            value={poste}
-                            onChange={handleInputChange(setPoste)}
-                            id="input-poste"
-                            placeholder="poste"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-type"
-                          >
-                            Type
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            value={type}
-                            id="input-type"
-                            onChange={handleInputChange(setType)}
-                            placeholder="type personnel"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-structure"
-                          >
-                            Structure
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            value={struc}
-                            id="input-structure"
-                            onChange={handleInputChange(setStruc)}
-                            placeholder="structure de travail"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                  </div>
-                  <hr className="my-4" />
-                  {/* Congés */}
-                  <h6 className="heading-small text-muted mb-4">
-                    Information sur le congés
-                  </h6>
-                  <div className="pl-lg-4">
-                  <Row>
-                      <Col md="6">
-                        <FormGroup>  
-                          <Label for="type-conge">
-                            Type de congé
-                          </Label>              
-                          <Input
-                            className="mb-3"
-                            type="select"
-                            id="type-conge"
-                            value={selectedType}
-                            onChange={handleInputChange(setSelectedType)}
-                          >
-                            {typeConge && typeConge.length > 0 
-                              ? typeConge.map((t, i) => (
-                                <option key={i}>{t.libelle_type_conge}</option>
-                              ))
-                              : (<option>Selectionner le type de congé</option>)
-                            }
-                          </Input>
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col>  
-                        <FormGroup>
-                          <Label
-                            for="demande-file"
-                          >
-                            Demande de Congé Timbré
-                          </Label>
-                          <Input
-                            id="demande-file"
-                            name="file"
-                            type="file"
-                            accept=".jpeg, .png, .jpg"
-                            onChange={handleFileChange(setDemande)}
-                          />
-                          <FormText>
-                            selectionner la demande (fichier accepté .jpeg, .png, .jpg)
-                          </FormText>
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    {selectedType === "congé maladie" || selectedType === "congé maternité" ? (
-                      <Row>
-                        <Col>
-                          <FormGroup>
-                            <Label
-                              for="exampleFile"
-                            >
-                              Document
-                            </Label>
-                            <Input
-                              id="exampleFile"
-                              name="file"
-                              type="file"
-                              accept=".jpeg, .png, .jpg"
-                              onChange={handleFileChange(setDocument)}
-                            />
-                            <FormText>
-                              Pièces à fournir comme justificatif en fonction du type de congé (fichier accepté .jpeg, .png, .jpg)
-                            </FormText>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                    ) : (
-                      ""
-                    )}
-                    <Row>
-                      <Col md="6">
-                        <FormGroup>
-                          <Label for="date-depart">
-                            Date de départ
-                          </Label>
-                          <Input
-                            id="date-depart"
-                            name="date"
-                            onChange={handleInputChange(setStartDate)}
-                            value={startDate}
-                            placeholder="date"
-                            type="date"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col md="6">
-                        <FormGroup>
-                          <Label for="duree">
-                            {"Durée (en jours)"}
-                          </Label>
-                          <Input
-                            id="duree"
-                            value={duration}
-                            onChange={handleInputChange(setDuration)}
-                            name="datetitme"
-                            placeholder="duree en jours"
-                            type="number"
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col md="6">
-                        <FormGroup>
-                          <Label for="date-fin">
-                            Date de fin
-                          </Label>
-                            <Input
-                              id="date-fin"
-                              name="date"
-                              value={endDate}
-                              placeholder="date"
-                              type="date"
-                              readOnly
-                            />
-                        </FormGroup>
-                      </Col>
-                      <Col md="6">
-                        <FormGroup>  
-                          <Label for="num-decision">
-                            Numero de Décision
-                          </Label>              
-                          <Input
-                            className="mb-3"
-                            type="text"
-                            id="num-decision"
-                            value={selectedDec}
-                            readOnly
-                          >
-                            {/*decision && decision.length > 0 
-                              ? decision.map((d, i) => (
-                                <option key={i}>{d.numero_decision}</option>
-                              ))
-                              : (<option>Selectionner le numero de décision</option>)
-                            */}
-                          </Input>
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col md="12">
-                        { error && 
-                          <Alert color="danger">
-                            {error}
-                          </Alert>
-                        }
-                        { success && 
-                          <Alert color="success">
-                            {success}
-                          </Alert>
-                        }
-                      </Col>
-                    </Row>
-                    <Row className="mt-3">
-                      <Col md="6">
-                        <Button
-                          color="primary"
-                          onClick={(e) => saveConge(e)}
-                          disabled={actived}
-                        >
-                          Générer l'attestation
-                        </Button>
-                      </Col>
-                    </Row>
-                  </div>
-                </Form>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
+          <CongesTable 
+            loadingText={loadingText}
+            saveAttestationRepConge={saveAttestationRepConge}
+            loadingSpinner={loadingSpinner}
+            pageCount={pageCount}
+            handlePagePrev={handlePagePrev}
+            handlePageChange={handlePageChange}
+            handlePageNext={handlePageNext}
+            pageNumber={pageNumber}
+            handleStatutFilter={handleStatutFilter}
+            statutFilter={statutFilter}
+            handleSearch={handleSearch}
+            search={search}
+            generateSuccess={generateSuccess}
+            handleRefresh={handleRefresh}
+            filterConge={filterConge}
+            offset={offset}
+            perPage={perPage}
+            formatDateMonthForm={formatDateMonthForm}
+            curr_date={curr_date}
+          />
+          <CongesForm
+            name={name}
+            status={status}
+            visible={visible}
+            onDismiss={onDismiss}
+            setName={setName}
+            setTelphone={setTelphone}
+            telephone={telephone}
+            matricule={matricule}
+            setMatricule={setMatricule}
+            poste={poste}
+            setPoste={setPoste}
+            type={type}
+            setType={setType}
+            struc={struc}
+            setStruc={setStruc}
+            selectedType={selectedType}
+            setSelectedType={setSelectedType}
+            typeConge={typeConge}
+            handleFileChange={handleFileChange}
+            setDemande={setDemande}
+            setDocument={setDocument}
+            handleInputChange={handleInputChange}
+            setStartDate={setStartDate}
+            startDate={startDate}
+            duration={duration}
+            setDuration={setDuration}
+            endDate={endDate}
+            selectedDec={selectedDec}
+            error={error}
+            success={success}
+            saveConge={saveConge}
+            actived={actived}
+          />
       </Container>
     </>
   );
