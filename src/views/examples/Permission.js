@@ -1,27 +1,5 @@
 import {
-    Card,
-    Button,
-    CardHeader,
-    CardBody,
-    FormGroup,
-    FormText,
-    Form,
-    Input,
-    Label,
-    Col,
-    Container,
-    Row,
-    Alert,
-    Table,
-    UncontrolledDropdown,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem,
-    Badge,
-    CardFooter,
-    Pagination,
-    PaginationItem,
-    PaginationLink
+    Container
   } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import PersmissonsForm from "views/customs-components/PermissionsForm";
@@ -708,6 +686,29 @@ const Permission = () => {
             />
             {/** Fomulaire de création de permission */}
             <PermissionsForm 
+                status={status}
+                visible={visible}
+                onDismiss={onDismiss}
+                name={name}
+                setName={setName}
+                setTelephone={setTelephone}
+                telephone={telephone}
+                matricule={matricule}
+                setMatricule={setMatricule}
+                poste={poste}
+                setPoste={setPoste}
+                type={type}
+                setType={setType}
+                handleFileChange={handleFileChange}
+                setDemande={setDemande}
+                handleInputChange={handleInputChange}
+                setStartDate={setStartDate}
+                startDate={startDate}
+                duration={duration}
+                setDuration={setDuration}
+                endDate={endDate}
+                error={error}
+                actived={actived}
             />
         </Container>
       </>

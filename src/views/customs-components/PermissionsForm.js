@@ -15,7 +15,29 @@ import {
 } from "reactstrap";
 
 const PersmissonsForm = ({
-
+    status,
+    visible,
+    onDismiss,
+    name,
+    setName,
+    setTelephone,
+    telephone,
+    matricule,
+    setMatricule,
+    poste,
+    setPoste, 
+    type,
+    setType,
+    handleFileChange,
+    setDemande,
+    handleInputChange,
+    setStartDate, 
+    startDate,
+    duration,
+    setDuration,
+    endDate,
+    error,
+    actived,
 }) => {
     return (
         <Row className="mt-5">
