@@ -1,0 +1,272 @@
+import {
+  Card,
+  Button,
+  CardHeader,
+  CardBody,
+  FormGroup,
+  FormText,
+  Form,
+  Input,
+  Label,
+  Col,
+  Container,
+  Row,
+  Alert,
+} from "reactstrap";
+// custom components : 
+import CongesTable from "views/customs-components/CongesTable";
+// core components
+import Header from "components/Headers/Header.js";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import CongesForm from "views/customs-components/CongesForm";
+import { fetchDatas, saveConge, saveAttestationRepConge, handleInputChange, handleFileChange, handlePageChange, handlePagePrev, handlePageNext, handleSearch, handleStatutFilter, onDismiss, handleRefresh, formatDate, formatPersonnelName, formatDateDayForm, formatDateMonthForm, nbDaysBetween } from "./congesUtils";
+
+const Conges = () => {
+  const location = useLocation();
+  const { selectedPerson } = location.state || {};
+  const [userConge, setUserConge] = useState([]);
+  const [lastPermission, setLastPermission] = useState([]);
+  const [typeConge, setTypeConge] = useState([]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [repriseDate, setRepriseDate] = useState("");
+  const [selectedType, setSelectedType] = useState(typeConge.length > 0 ? typeConge[0].libelle_type_conge : "congé administratif partiel");
+  const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom_personnel : "TCHUENTE");
+  const preposition = selectedPerson ? selectedPerson.preposition_personnel : "au";
+  const grade = selectedPerson ? selectedPerson.grade_personnel : "GRADE";
+  const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule_personnel : "XD3 566");
+  const [type, setType] = useState(selectedPerson ? selectedPerson.id_type_personnel === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
+  const [selectedDec, setSelectedDec] = useState("");
+  const [struc, setStruc] = useState(selectedPerson ? selectedPerson.structure_personnel : "Service Général");
+  const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste_personnel : "Contrôleur");
+  const sexe = !selectedPerson ? "M" : selectedPerson.sexe_personnel ;
+  const nb_jours_conges = selectedPerson ? selectedPerson.nb_jours_conges + selectedPerson.dette_conge : 18;
+  const [telephone, setTelphone] = useState(selectedPerson ? selectedPerson.telephone_personnel : 696879475);
+  const [demande, setDemande] = useState(null);
+  const [document, setDocument] = useState(null);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [generateSuccess, setGenerateSuccess] = useState("");
+  const [status, setStatus] = useState(`${formatPersonnelName(sexe)} a ${nb_jours_conges} ${nb_jours_conges > 1 ? "jours" : "jour"} de congés disponibles`);
+  const [visible, setVisible] = useState(true);
+  const [conge, setConge] = useState([]);
+  const [search, setSearch] = useState("");
+  const [statutFilter, setStatutFilter] = useState("");
+  const [pageNumber, setPageNumber] = useState(0);
+  const [perPage] = useState(100);
+  const [loadingSpinner, setLoadingSpinner] = useState(true);
+  const id_personnel = selectedPerson ? selectedPerson.id_personnel : "1";
+  const loadingText = "Aucune donnée dans la base de données";
+  const [actived, setActived] = useState(selectedPerson === undefined ? true : false);
+  const curr_date = new Date();
+  const [duration, setDuration] = useState(selectedPerson ? selectedPerson.nb_jours_conges + selectedPerson.dette_conge : "");
+  let nbDaysConges = 0;
+
+  const filterConge = search !== "" || statutFilter !== ""
+    ? conge.filter(conge => conge.statut_conge.includes(statutFilter) && (
+      conge.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
+      || conge.matricule_personnel.toLowerCase().includes(search.toLowerCase())
+    ))
+    : conge
+  
+  const pageCount = Math.ceil(conge.length/perPage);
+  const offset = pageNumber * perPage;
+
+  useEffect(() => {
+    const changeDuration = () => {
+      if (selectedPerson && selectedType === "congé maternité" && selectedPerson.sexe_personnel !== "M") {
+        setDuration("98");
+      }
+      if (selectedPerson && selectedType === "congé paternité" && selectedPerson.sexe_personnel === "M") {
+        setDuration("3");
+      }
+      if (selectedPerson && selectedType === "congé mariage") {
+        setDuration("5");
+      }
+      if (selectedPerson && selectedType === "congé maladie") {
+        setDuration("90");
+      }
+      if (selectedPerson && selectedType === "congé décès") {
+        setDuration("3");
+      }
+    };
+    const calculateEndDate = () => {
+      if (startDate && duration) {
+        if (selectedPerson.id_type_personnel === 2 && (selectedType === "congé administratif total" || selectedType === "congé administratif partiel")) {
+          let st = new Date(startDate);
+          let weekdaysToAdd = duration - 1;
+          while (weekdaysToAdd > 0) {
+            st.setDate(st.getDate() + parseInt(1));
+            if (st.getDay() !== 0 && st.getDay() !== 6) {
+              weekdaysToAdd--;
+            }
+          }
+          let next_day = new Date(st);
+          let rep = new Date(st);
+          next_day.setDate(next_day.getDate() + parseInt(1));
+          if (next_day.getDay() === 0 || next_day.getDay() === 6) {
+            rep.setDate(st.getDate() + parseInt(3));
+          } else {
+            rep.setDate(st.getDate() + parseInt(1));
+          }
+          setEndDate(st.toISOString().split("T")[0]);
+          setRepriseDate(rep.toISOString().split("T")[0]);
+        } else {
+          const start = new Date(startDate);
+          const end = new Date(start);
+          end.setDate(end.getDate() + parseInt(duration - 1));
+          setEndDate(end.toISOString().split("T")[0]);
+          const repDate = new Date(end);
+          repDate.setDate(end.getDate() + parseInt(1));
+          setRepriseDate(repDate.toISOString().split("T")[0]);
+        }
+      }
+    };
+    const changeLibelle = () => {
+        if (typeConge.length > 0) {
+          for (let i = 0; i < typeConge.length; i++) {
+            if (typeConge[i].libelle_type_conge === "congé maternité" && selectedPerson && selectedPerson.sexe_personnel === "M") {
+              typeConge[i].libelle_type_conge = "congé paternité";
+            }
+          }
+        }
+    };
+    changeLibelle();
+    calculateEndDate();
+    changeDuration();
+  }, [startDate, duration,typeConge,selectedType, selectedPerson]);
+
+  useEffect(() => {
+    const updatePersonnelState = async () => {
+      try {
+      if (conge.length > 0) {
+        let date = new Date();
+        for (let x = 0; x < conge.length; x++) {
+          conge[x].attestation_conge = JSON.parse(conge[x].attestation_conge);
+          conge[x].attestation_conge.repriseDate = conge[x].attestation_conge.repriseDate.split('/');
+          conge[x].attestation_conge.repriseDate = new Date(conge[x].attestation_conge.repriseDate[2], conge[x].attestation_conge.repriseDate[1], conge[x].attestation_conge.repriseDate[0]);
+          if (date >= conge[x].date_debut_conge && date <= conge[x].date_fin_conge) {
+            const statut = "en congé";
+            const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${conge[x].id_personnel};`;
+            window.electronAPI.updatePersonnel(req_personnel);
+          }
+          if ((date.getDate() === conge[x].date_fin_conge.getDate() && date.getMonth() === conge[x].date_fin_conge.getMonth() && date.getFullYear() === conge[x].date_fin_conge.getFullYear())) {
+            const statut_conge = "terminé";
+            const req_conge = `UPDATE conge SET statut_conge = "${statut_conge}" WHERE id_conge = ${conge[x].id_conge}`;
+            window.electronAPI.addConge(req_conge);
+            setTimeout(() => {
+              setSuccess("");
+            }, 3000)
+          }
+          if (date.getMonth() > conge[x].date_fin_conge.getMonth() && date.getFullYear() === conge[x].date_fin_conge.getFullYear()) {
+            const statut_conge = "terminé";
+            const req_conge = `UPDATE conge SET statut_conge = "${statut_conge}" WHERE id_conge = ${conge[x].id_conge}`;
+            window.electronAPI.addConge(req_conge);
+            setTimeout(() => {
+              setSuccess("");
+            }, 3000)
+          }
+          if (date.getDate() === conge[x].attestation_conge.repriseDate.getDate() && date.getMonth() === conge[x].attestation_conge.repriseDate.getMonth() && date.getFullYear() === conge[x].attestation_conge.repriseDate.getFullYear()) {
+            const statut = "en poste";
+            const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${conge[x].id_personnel};`;
+            window.electronAPI.updatePersonnel(req_personnel);
+          }
+          if (date.getMonth() > conge[x].attestation_conge.repriseDate.getMonth() && date.getFullYear() === conge[x].attestation_conge.repriseDate.getFullYear()) {
+            const statut = "en poste";
+            const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${conge[x].id_personnel};`;
+            window.electronAPI.updatePersonnel(req_personnel);
+          }
+        }
+      }
+      } catch (err) {
+        console.error("Erreur : " + err.message);
+      }
+    }
+    updatePersonnelState()
+  }, [conge]);
+
+  useEffect(() => {
+    const getSpecificConge = async () => {
+      try {
+          const test_conge_req = `SELECT * FROM conge WHERE id_personnel = ${id_personnel}`;
+          window.electronAPI.getSpecificConge(test_conge_req);
+          await window.electronAPI.retrieveSpecificConge((event, res) => {
+            for (let index = 0; index < res.length; index++) {
+              res[index].attestation_conge = JSON.parse(res[index].attestation_conge)                                                
+            }
+            setUserConge(res);
+          })
+      } catch (error) {
+          console.error("Erreur : " + error.message);
+      }
+    }
+    getSpecificConge();
+    fetchDatas(setConge, setLoadingSpinner, setSelectedDec, setTypeConge, setLastPermission, selectedPerson, id_personnel);
+  },[]);
+
+  return (
+    <>
+      <Header />
+      <Container className="mt--7" fluid>
+          <CongesTable 
+            loadingText={loadingText}
+            saveAttestationRepConge={saveAttestationRepConge}
+            loadingSpinner={loadingSpinner}
+            pageCount={pageCount}
+            handlePagePrev={handlePagePrev}
+            handlePageChange={handlePageChange}
+            handlePageNext={handlePageNext}
+            pageNumber={pageNumber}
+            handleStatutFilter={handleStatutFilter}
+            statutFilter={statutFilter}
+            handleSearch={handleSearch}
+            search={search}
+            generateSuccess={generateSuccess}
+            handleRefresh={handleRefresh}
+            filterConge={filterConge}
+            offset={offset}
+            perPage={perPage}
+            formatDateMonthForm={formatDateMonthForm}
+            curr_date={curr_date}
+          />
+          <CongesForm
+            name={name}
+            status={status}
+            visible={visible}
+            onDismiss={onDismiss}
+            setName={setName}
+            setTelphone={setTelphone}
+            telephone={telephone}
+            matricule={matricule}
+            setMatricule={setMatricule}
+            poste={poste}
+            setPoste={setPoste}
+            type={type}
+            setType={setType}
+            struc={struc}
+            setStruc={setStruc}
+            selectedType={selectedType}
+            setSelectedType={setSelectedType}
+            typeConge={typeConge}
+            handleFileChange={handleFileChange}
+            setDemande={setDemande}
+            setDocument={setDocument}
+            handleInputChange={handleInputChange}
+            setStartDate={setStartDate}
+            startDate={startDate}
+            duration={duration}
+            setDuration={setDuration}
+            endDate={endDate}
+            selectedDec={selectedDec}
+            error={error}
+            success={success}
+            saveConge={saveConge}
+            actived={actived}
+          />
+      </Container>
+    </>
+  );
+};
+
+export default Conges;

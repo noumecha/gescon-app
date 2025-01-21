@@ -1,18 +1,4 @@
-import {
-  Card,
-  Button,
-  CardHeader,
-  CardBody,
-  FormGroup,
-  FormText,
-  Form,
-  Input,
-  Label,
-  Col,
-  Container,
-  Row,
-  Alert,
-} from "reactstrap";
+import { Container } from "reactstrap";
 // custom compontents : 
 import CongesTable from "views/customs-components/CongesTable";
 // core components
@@ -20,6 +6,9 @@ import Header from "components/Headers/Header.js";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import CongesForm from "views/customs-components/CongesForm";
+// useful functions 
+import { fetchDatas } from "utils/fetchDatas";
+//import { saveConge } from "utils/saveConge";
 
 const Conges = () => {
   const location = useLocation();
@@ -106,47 +95,21 @@ const Conges = () => {
     reader.readAsDataURL(file);
   }
 
-  const fetchDatas = async () => {
-    try {
-      window.electronAPI.getConge();
-      await window.electronAPI.retrieveConge((event, res) => {
-        setConge(res);
-        setTimeout(() => 
-        setLoadingSpinner(false)
-        , 3000);
-      })
-      window.electronAPI.getSpecificDec(selectedPerson ? selectedPerson.id_type_personnel : 1);
-      await window.electronAPI.retrieveSpecificDec((event, res) => {
-        const specific_dec = res;
-        setSelectedDec(specific_dec[0].numero_decision);
-      })
-      window.electronAPI.getCongeType();
-      await window.electronAPI.retrieveCongeType((event, res) => {
-        setTypeConge(res);
-      })
-      const last_permission_req = `SELECT * FROM permission WHERE id_personnel = ${id_personnel}`;
-      window.electronAPI.getLastPermission(last_permission_req);
-      await window.electronAPI.retrieveLastPermission((event, res) => {        
-          for (let index = 0; index < res.length; index++) {
-              res[index].attestation_permission = JSON.parse(res[index].attestation_permission)                                                
-          }
-          setLastPermission(res);
-      })
-    } catch (error) {
-        console.error("Erreur : " + error.message);
+  const validateDuration = () => {
+    if (duration <= 0) {
+      setError(`La durée du congé ne peut pas etre négative ou égale à 0`);
+      setTimeout(() => {
+        setError("");
+      },7000)
+      return false;
     }
-  }
+    return true;
+  };
 
   const saveConge = async (e) => {
     e.preventDefault();
     try {
-      if (duration <= 0) {
-        setError(`La durée du congé ne peut pas etre négative ou égale à 0`);
-        setTimeout(() => {
-          setError("");
-        },7000)
-        return;
-      }
+      if (!validateDuration()) return;
       // testing for contractual personnel
       if (selectedPerson.id_type_personnel === 2) {
         if ((duration > selectedPerson.nb_jours_conges + selectedPerson.dette_conge) && (formatDate(startDate).getFullYear() === curr_date.getFullYear()) && (selectedType === "congé administratif partiel" || selectedType === "congé administratif total")) {
@@ -375,8 +338,8 @@ const Conges = () => {
         req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges - ${parseInt(selectedPerson.nb_jours_conges)}), dette_conge = (dette_conge - ${parseInt(diff_dette_conge)} ) WHERE id_personnel = ${conge_data.id_personnel};`;
       }
       // saving leaves
-      /*console.log(req_personnel);
-      console.log(req_conge);*/
+      //console.log(req_personnel);
+      //console.log(req_conge);
       setSuccess("congé ajouté avec succès");
       window.electronAPI.addConge(req_conge);
       window.electronAPI.updatePersonnel(req_personnel);
@@ -616,7 +579,7 @@ const Conges = () => {
       }
     }
     getSpecificConge();
-    fetchDatas();
+    fetchDatas(setConge, setLoadingSpinner, setSelectedDec, setTypeConge, setLastPermission, selectedPerson, id_personnel);
   },[]);
 
   const handleRefresh = () => {
@@ -625,7 +588,7 @@ const Conges = () => {
       setTimeout(() => 
       setLoadingSpinner(false)
       , 3000);
-      fetchDatas();
+      fetchDatas(setConge, setLoadingSpinner, setSelectedDec, setTypeConge, setLastPermission, selectedPerson, id_personnel);
       console.log("datas refreshed successfully");
     } catch (err) {
       console.error("error on refresh : " + err.message);
