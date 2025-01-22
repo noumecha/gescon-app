@@ -1,36 +1,11 @@
 /* eslint-disable no-unused-vars */
 import {
-    Badge,
     Card,
-    CardHeader,
-    CardFooter,
-    DropdownMenu,
-    DropdownItem,
-    UncontrolledDropdown,
-    DropdownToggle,
-    Media,
-    NavItem,
-    NavLink,
     Input,
-    Pagination,
-    PaginationItem,
-    PaginationLink,
-    Progress,
-    Table,
     Container,
     Row,
     Col,
     Alert,
-    Nav,
-    UncontrolledTooltip,
-    Button,
-    Modal,
-    ModalHeader,
-    ModalBody,
-    CardBody,
-    Form,
-    FormGroup,
-    Label,
   } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import ReactPaginate from "react-paginate";
@@ -38,6 +13,8 @@ import { useState, useEffect, useCallback } from "react";
 import * as XLSX from "xlsx";
 import { useNavigate } from "react-router-dom";
 import PersonnelDetails from "./PersonnelDetails";
+import PersonnelsTable from "views/customs-components/PersonnelsTable";
+import MyPagination from "views/customs-components/MyPagination";
 
 const Personnel = () => {
 
@@ -332,8 +309,8 @@ const Personnel = () => {
     return (
         <>
         <Header />
-        {/* Page content */}
-        <Container className="mt--7" fluid>  
+        <Container className="mt--7" fluid> 
+            {/** alert for messages */} 
             <Row>
                 <Col lg="12">
                     { success && 
@@ -349,7 +326,7 @@ const Personnel = () => {
                     }
                 </Col>
             </Row>
-            {/* Table */}
+            {/** button and defaults options */}
             <Row>
                 <Col lg="12">
                     <form className="form-group custom-form" onSubmit={handleFileSubmit}>
@@ -394,6 +371,7 @@ const Personnel = () => {
                     )}
                 </Col>
             </Row>
+            {/** categories filters */}
             <Row>
                 <Col lg="6">
                     <Input
@@ -437,6 +415,7 @@ const Personnel = () => {
                     </Input>
                 </Col>
             </Row>
+            {/** search bar */}
             <Row>
                 <Col lg="12">
                     <div className="form-group custom-form">
@@ -450,243 +429,37 @@ const Personnel = () => {
                     </div>
                 </Col>
             </Row>
-            <Row>
-                <div className="col p-0">
-                        <div className="col">
-                            <Card className="shadow">
-                                <CardHeader className="bg-white border-2 d-flex justify-content-center">
-                                    <h3 className="mb-0 text-center">Listes du personnel </h3>
-                                    <Button
-                                        size="sm"
-                                        className="ml-3"
-                                        onClick={() => handleRefresh()}
-                                        >
-                                        Actualiser
-                                    </Button>
-                                </CardHeader>
-                                <Table className="align-items-center table-flush" responsive>
-                                    <thead className="thead-light">
-                                        <tr>
-                                            <th>Matricule</th>
-                                            <th>Nom & Prenom</th>
-                                            {/*<th>Grade</th>*/}
-                                            <th>Poste</th>
-                                            {/*<th>Structure</th>*/}
-                                            {/*<th>Sexe</th>*/}
-                                            {/*<th>Date recrutement</th>*/}
-                                            {/*<th>Situation Matrimoniale</th>*/}
-                                            {/*<th>Region</th>*/}
-                                            {/*<th>Departement</th>*/}
-                                            {/*<th>Date de naissance</th>*/}
-                                            {/*<th>Telephone</th>*/}
-                                            <th>Categorie</th>
-                                            {/*<th>Arrondissement</th>*/}
-                                            <th>Statut</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {loadingSpinner && (
-                                            <tr>
-                                                <td colSpan="7" className="text-center">
-                                                    <div className="spinner-border" role="status">
-                                                        <span className="sr-only">Loading...</span>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )}
-                                        {filterPersonnel && filterPersonnel.length > 0 ? !loadingSpinner && (filterPersonnel.slice(offset, offset + perPage).map((person, index) => (
-                                            <tr key={index}>
-                                                <td>{person.matricule_personnel}</td>    
-                                                <td>{person.nom_prenom_personnel}</td>    
-                                                {/*<td>{person.grade_personnel}</td>*/}    
-                                                <td>{person.poste_personnel}</td>    
-                                                {/*<td>{person.structure_personnel}</td>*/}    
-                                                {/*<td>{person.sexe_personnel}</td>*/}
-                                                {/*<td>{person.date_recrutement_personnel}</td>*/}    
-                                                {/*<td>{person.situration_matrimoniale_personnel}</td>*/}    
-                                                {/*<td>{person.region_personnel}</td>*/}    
-                                                {/*<td>{person.departement_personnel}</td>*/}    
-                                                {/*<td>{person.date_naiss_personnel}</td>*/}    
-                                                {/*<td>{person.telephone_personnel}</td>*/}    
-                                                <td>{person.categorie_personnel}</td>    
-                                                {/*<td>{person._personnel}</td>*/} 
-                                                <td>
-                                                    {person.statut_personnel === "en congé" ?  
-                                                        <Badge color="danger">
-                                                            {person.statut_personnel}
-                                                        </Badge> 
-                                                        : person.statut_personnel === "en poste" ? 
-                                                        <Badge color="success">
-                                                            {person.statut_personnel}
-                                                        </Badge> 
-                                                        : person.statut_personnel === "en permission" ?
-                                                        <Badge color="primary">
-                                                            {person.statut_personnel}
-                                                        </Badge>
-                                                        : 
-                                                        <Badge color="danger">
-                                                            {person.statut_personnel}
-                                                        </Badge>
-                                                    }
-                                                </td> 
-                                                <td className="text-right">
-                                                    <UncontrolledDropdown>
-                                                        <DropdownToggle
-                                                        className="btn-icon-only text-light"
-                                                        role="button"
-                                                        size="sm"
-                                                        color=""
-                                                        onClick={(e) => e.preventDefault()}
-                                                        >
-                                                            <i className="fas fa-ellipsis-v" />
-                                                        </DropdownToggle>
-                                                        <DropdownMenu className="dropdown-menu-arrow" right>
-                                                            <DropdownItem
-                                                                onClick={() => handleCongeClick(person)}
-                                                                disabled={(person.nb_jours_conges + person.nb_jours_permission === 28 && person.id_type_personnel === 1) || (person.nb_jours_conges + person.nb_jours_permission === 40 && person.id_type_personnel === 2) ? true : false}
-                                                            >
-                                                                Nouveau congé
-                                                            </DropdownItem>
-                                                            <DropdownItem
-                                                                onClick={() => handlePermissionClick(person)}
-                                                                disabled={(person.nb_jours_conges + person.nb_jours_permission === 28 && person.id_type_personnel === 1) || (person.nb_jours_conges + person.nb_jours_permission === 40 && person.id_type_personnel === 2) ? true : false}
-                                                            >
-                                                                Nouvelle permission
-                                                            </DropdownItem>
-                                                            <DropdownItem
-                                                                onClick={() => handleRowClick(person)}
-                                                            >
-                                                                Définir la dette
-                                                            </DropdownItem>
-                                                            <DropdownItem
-                                                                onClick={() => handleDetailClick(person)}
-                                                            >
-                                                                Détails
-                                                            </DropdownItem>
-                                                        </DropdownMenu>
-                                                    </UncontrolledDropdown>
-                                                </td>
-                                            </tr>
-                                        ))) :              
-                                            !loadingSpinner && (
-                                                <tr>
-                                                    <td colSpan="7" className="text-center">
-                                                        {loadingText}
-                                                    </td>
-                                                </tr>
-                                        )}
-                                    </tbody>
-                                </Table>
-                                {/** modal implementation */}
-                                
-                                { modal && 
-                                <Modal isOpen={modal} toggle={toggleModal} {...modalData}>
-                                    <ModalHeader toggle={toggleModal}>
-                                        <Row>
-                                            <Col>
-                                                <h3 className="mb-0">Définir la dette de congé de {selectedPerson ? formatPersonnelName(selectedPerson) : ''}</h3>
-                                            </Col>
-                                        </Row>
-                                    </ModalHeader>
-                                    <ModalBody>
-                                        <CardBody>
-                                            <Form>
-                                                <Row>
-                                                    <Col>  
-                                                        <FormGroup>
-                                                        <Label
-                                                            for="dette"
-                                                        >
-                                                            Entrez le nombre de jours de congé dû (-moins de 3ans)
-                                                        </Label>
-                                                        <Input
-                                                            id="dette"
-                                                            name="dette"
-                                                            type="number"
-                                                            value={dette}
-                                                            onChange={handleDetteChange}
-                                                        />
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                                <Row>
-                                                    <Col md="6">
-                                                        <Button
-                                                            color="success"
-                                                            size="md"
-                                                            onClick={() => saveDettPersonnel(modalData)}
-                                                        >
-                                                            Définir
-                                                        </Button>
-                                                    </Col>
-                                                    <Col>
-                                                        <Button
-                                                            color="danger"
-                                                            size="md"
-                                                            onClick={() => toggleModal()}
-                                                        >
-                                                            Terminer
-                                                        </Button>
-                                                    </Col>
-                                                </Row>
-                                                <Row className="mt-3">
-                                                    <Col>
-                                                        { errorDette && (
-                                                            <Alert color="danger">
-                                                                {errorDette}
-                                                            </Alert>
-                                                        )}
-                                                        { successDette && (
-                                                            <Alert color="success">
-                                                                {successDette}
-                                                            </Alert>
-                                                        )}                                                                                    
-                                                    </Col>
-                                                </Row>
-                                            </Form>
-                                        </CardBody>
-                                    </ModalBody>
-                                </Modal>}
-                            </Card>
-                        </div>
-                </div>
-            </Row>
-            <Row className="m-0 justify-content-center">
-                <CardFooter className="py-3 d-flex" >
-                    <nav className="ligna-items-center" aria-label="...">
-                        <Pagination
-                          className="pagination justify-content-center"
-                          listClassName="justify-content-center"
-                        >
-                          <PaginationItem>
-                            <PaginationLink
-                              onClick={() => handlePagePrev()}
-                              tabIndex="-1"
-                            >
-                              <i className="fas fa-angle-left" />
-                              <span className="sr-only">Previous</span>
-                            </PaginationLink>
-                          </PaginationItem>
-                            {Array.from({length: pageCount}, (_, i) => (
-                                <PaginationItem key={i} active={i === pageNumber}>
-                                    <PaginationLink onClick={() => handlePageChange({selected: i})}>
-                                        {i}
-                                    </PaginationLink>
-                                </PaginationItem>
-                            ))}
-                          <PaginationItem>
-                            <PaginationLink
-                              onClick={() => handlePageNext()}
-                            >
-                              <i className="fas fa-angle-right" />
-                              <span className="sr-only">Next</span>
-                            </PaginationLink>
-                          </PaginationItem>
-                        </Pagination>
-                    </nav>
-                </CardFooter>
-            </Row>
+            {/** personnels table */}
+            <PersonnelsTable 
+                loadingSpinner={loadingSpinner}
+                filterPersonnel={filterPersonnel}
+                loadingText={loadingText}
+                modal={modal}
+                toggleModal={toggleModal}
+                selectedPerson={selectedPerson}
+                formatPersonnelName={formatPersonnelName}
+                dette={dette}
+                handleDetteChange={handleDetteChange}
+                errorDette={errorDette}
+                successDette={successDette}
+                handleRefresh={ handleRefresh}
+                handleCongeClick={handleCongeClick}
+                handlePermissionClick={handlePermissionClick}
+                handleRowClick={handleRowClick}
+                handleDetailClick={handleDetailClick}
+                saveDettPersonnel={saveDettPersonnel}
+                perPage={perPage}
+                offset={offset}
+                modalData={modalData}
+            />
+            {/** paginations */}
+            <MyPagination
+                pageCount={pageCount}
+                pageNumber={pageNumber}
+                handlePageChange={handlePageChange}
+                handlePagePrev={handlePagePrev}
+                handlePageNext={handlePageNext}
+            />
             <Row>
                 <div className="col p-0">
                     <button type="submit" disabled className="mt-3 btn btn-secondary btn-md">Exporter le fichier</button>

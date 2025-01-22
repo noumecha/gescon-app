@@ -14,6 +14,7 @@ const Conges = () => {
   const location = useLocation();
   /** recuperation des attributs d'un personnel depuis personnel.js */
   const { selectedPerson } = location.state || {};
+  /** variables et leurs stateHook */
   //const [decision, setDecision] = useState([]);
   const [userConge, setUserConge] = useState([]);
   const [lastPermission, setLastPermission] = useState([]);
@@ -51,6 +52,8 @@ const Conges = () => {
   const [actived, setActived] = useState(selectedPerson === undefined ? true : false);
   const curr_date = new Date();
   const [duration, setDuration] = useState(selectedPerson ? selectedPerson.nb_jours_conges + selectedPerson.dette_conge : "");
+
+  // completion varaibles for functions
   let nbDaysConges = 0;
 
   const filterConge = search !== "" || statutFilter !== ""
