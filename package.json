@@ -36,7 +36,8 @@
     "postinstall": "electron-builder install-app-deps",
     "rebuild": "electron-rebuild --verbose",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "make:mac": "electron-forge make --platform darwin"
   },
   "eslintConfig": {
     "extends": "react-app"

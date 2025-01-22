@@ -14,7 +14,10 @@ import {
     Alert,
 } from "reactstrap";
 
-const PersmissonsForm = ({
+const PermissionsForm = ({
+    structure,
+    setStructure,
+    savePermission,
     status,
     visible,
     onDismiss,
@@ -25,13 +28,13 @@ const PersmissonsForm = ({
     matricule,
     setMatricule,
     poste,
-    setPoste, 
+    setPoste,
     type,
     setType,
     handleFileChange,
     setDemande,
     handleInputChange,
-    setStartDate, 
+    setStartDate,
     startDate,
     duration,
     setDuration,
@@ -286,4 +289,4 @@ const PersmissonsForm = ({
     );
 }
 
-export default PersmissonsForm;
+export default PermissionsForm;

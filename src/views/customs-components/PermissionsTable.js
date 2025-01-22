@@ -7,6 +7,7 @@ import {
     Col,
     Row,
     Alert,
+    Badge,
     Table,
     UncontrolledDropdown, 
     DropdownToggle, 
@@ -18,7 +19,26 @@ import {
     PaginationLink,
 } from "reactstrap";
 
-const PersmissionsTable = ({}) => {
+const PersmissionsTable = ({
+    handleStatutFilter,
+    statutFilter,
+    handleSearch,
+    search,
+    success,
+    handleRefresh,
+    loadingSpinner,
+    filterPermission,
+    offset,
+    perPage,
+    curr_date,
+    saveAttestationRepPermission,
+    loadingText,
+    handlePagePrev,
+    pageCount,
+    pageNumber,
+    handlePageChange,
+    handlePageNext
+}) => {
     return (
         <Row>
             <Col lg="12">
