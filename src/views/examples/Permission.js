@@ -2,7 +2,7 @@ import {
     Container
   } from "reactstrap";
 import Header from "components/Headers/Header.js";
-import PersmissonsForm from "views/customs-components/PermissionsForm";
+import PermissionsForm from "views/customs-components/PermissionsForm";
 import { useState,useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import PersmissionsTable from "views/customs-components/PermissionsTable";
@@ -683,9 +683,30 @@ const Permission = () => {
         <Container className="mt--7" fluid>
             {/* Tableaux de Conges */}
             <PersmissionsTable 
+              handleStatutFilter={handleStatutFilter}
+              statutFilter={statutFilter}
+              handleSearch ={handleSearch }
+              search   ={search   }
+              success={success}
+              handleRefresh={handleRefresh}
+              loadingSpinner={loadingSpinner}
+              filterPermission={filterPermission}
+              offset={offset}
+              perPage={perPage}
+              curr_date={curr_date}
+              saveAttestationRepPermission={saveAttestationRepPermission}
+              loadingText={loadingText}
+              handlePagePrev={handlePagePrev}
+              pageCount ={pageCount }
+              pageNumber={pageNumber}
+              handlePageChange={handlePageChange}
+              handlePageNext={handlePageNext}
             />
             {/** Fomulaire de création de permission */}
-            <PermissionsForm 
+            <PermissionsForm
+                structure={structure}
+                setStructure={setStructure}
+                savePermission={savePermission}
                 status={status}
                 visible={visible}
                 onDismiss={onDismiss}

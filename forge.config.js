@@ -14,6 +14,10 @@ module.exports = {
     {
       name: '@electron-forge/maker-zip',
       platforms: ['darwin'],
+      config: {
+        description: "Desktop application for leaves",
+        author: "noumel",
+      },
     },
     {
       name: '@electron-forge/maker-deb',
