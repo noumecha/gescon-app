@@ -325,8 +325,8 @@ const CongeDoc = (props) => {
                     </Text>
                     <Text style={styles.pCertifText}>
                         Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "Monsieur" : "Madame"} <Text style={fontStyles.bold}>{props.name}</Text>, {props.grade},
-                        <Text style={fontStyles.bold}> Mle {props.matricule}</Text>, {props.poste} {props.preposition} {props.structure}. L'intéressé bénéficie
-                        d'un {props.typeConge} de (<Text style={fontStyles.bold}>{props.nbJoursConge}</Text>) {props.duration > 1 ? "jours" : "jour"}, accordé par décision <Text style={fontStyles.bold}>N°{props.decision}</Text> du Ministre des finances.
+                        <Text style={fontStyles.bold}> Mle {props.matricule}</Text>, {props.poste} {props.preposition} {props.structure},est bénéficiaire
+                        d'un {props.typeConge} de (<Text style={fontStyles.bold}>{props.duration}</Text>) {props.duration > 1 ? "jours" : "jour"}, accordé par décision <Text style={fontStyles.bold}>N°{props.decision}</Text> du Ministre des finances.
                     </Text>
                     <Text style={styles.pCertifText}>
                         L'intéressé{props.sexe === "M" ? "" : "e"} jouira dudit congé pendant la période allant du <Text style={fontStyles.bold}>{props.startDate}</Text> au <Text style={fontStyles.bold}>{props.endDate}</Text> et 
