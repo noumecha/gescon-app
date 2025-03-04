@@ -12,9 +12,9 @@ import { fetchDatas } from "utils/fetchDatas";
 
 const Conges = () => {
   const location = useLocation();
-  /** recuperation des attributs d'un personnel depuis personnel.js */
+  // recuperation des attributs d'un personnel depuis personnel.js
   const { selectedPerson } = location.state || {};
-  /** variables et leurs stateHook */
+  // variables et leurs stateHook
   //const [decision, setDecision] = useState([]);
   const [userConge, setUserConge] = useState([]);
   const [lastPermission, setLastPermission] = useState([]);
@@ -22,7 +22,7 @@ const Conges = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [repriseDate, setRepriseDate] = useState("");
-  const [selectedType, setSelectedType] = useState(typeConge.length > 0 ? typeConge[0].libelle_type_conge : "congé administratif partiel");
+  const [selectedType, setSelectedType] = useState(typeConge.length > 0 ? typeConge[0].libelle_type_conge : "congé administratif");
   const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom_personnel : "TCHUENTE");
   const preposition = selectedPerson ? selectedPerson.preposition_personnel : "au";
   const grade = selectedPerson ? selectedPerson.grade_personnel : "GRADE";
@@ -115,14 +115,14 @@ const Conges = () => {
       if (!validateDuration()) return;
       // testing for contractual personnel
       if (selectedPerson.id_type_personnel === 2) {
-        if ((duration > selectedPerson.nb_jours_conges + selectedPerson.dette_conge) && (formatDate(startDate).getFullYear() === curr_date.getFullYear()) && (selectedType === "congé administratif partiel" || selectedType === "congé administratif total")) {
+        if ((duration > selectedPerson.nb_jours_conges + selectedPerson.dette_conge) && (formatDate(startDate).getFullYear() === curr_date.getFullYear()) && (selectedType === "congé administratif")) {
           setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponibles pour cette année");
           setTimeout(() => {
             setError("");
           },7000)
           return;
         }
-        if ((duration > selectedPerson.nb_jours_conges + selectedPerson.dette_conge) && (selectedType === "congé administratif partiel" || selectedType === "congé administratif total")) {
+        if ((duration > selectedPerson.nb_jours_conges + selectedPerson.dette_conge) && (selectedType === "congé administratif")) {
           setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponibles");
           setTimeout(() => {
             setError("");
@@ -139,7 +139,7 @@ const Conges = () => {
         }
       }
         // --> my last code for this section : (selectedType !== "congé maladie" || selectedType !== "congé maternité")
-      if ((selectedPerson.id_type_personnel === 2 && ((selectedPerson.nb_jours_conges + selectedPerson.dette_conge) === 0)) && (selectedType === "congé administratif partiel" || selectedType === "congé administratif total")) {
+      if ((selectedPerson.id_type_personnel === 2 && ((selectedPerson.nb_jours_conges + selectedPerson.dette_conge) === 0)) && (selectedType === "congé administratif")) {
         setError(`${formatPersonnelName(sexe)} a déja epuisé tout ces congés pour l'année`);
         setTimeout(() => {
           setError("");
@@ -184,7 +184,7 @@ const Conges = () => {
       }
       // tests for administratif personnel
       if (selectedPerson.id_type_personnel === 1) {
-        if (duration > selectedPerson.nb_jours_conges && (selectedType === "congé administratif partiel" || selectedType === "congé administratif total")) {
+        if (duration > selectedPerson.nb_jours_conges && (selectedType === "congé administratif")) {
           setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
           setTimeout(() => {
             setError("");
@@ -193,7 +193,7 @@ const Conges = () => {
         }
       }
         // -> last code for this section : (selectedType !== "congé maladie" || selectedType !== "congé maternité")
-      if ((selectedPerson.id_type_personnel === 1 && selectedPerson.nb_jours_conges === 0) && (selectedType === "congé administratif partiel" || selectedType === "congé administratif total")) {
+      if ((selectedPerson.id_type_personnel === 1 && selectedPerson.nb_jours_conges === 0) && (selectedType === "congé administratif")) {
         setError(`${formatPersonnelName(sexe)} a déja epuisé tout ces congés pour l'année`);
         setTimeout(() => {
           setError("");
@@ -306,7 +306,7 @@ const Conges = () => {
         curr_date : new Date().toISOString().slice(0,19).replace('T',' '),
         demande : demande,
         document : document,
-        id_type_conge : selectedType === "congé administratif partiel" ? 1 : selectedType === "congé administratif total" ? 2 : selectedType === "congé maternité" || selectedType === "congé paternité" ? 3 : selectedType === "congé maladie" ? 4 : selectedType === "congé mariage" ? 7 : selectedType === "congé décès" ? 8 : 0,
+        id_type_conge : selectedType === "congé administratif" ? 1 : selectedType === "congé administratif" ? 2 : selectedType === "congé maternité" || selectedType === "congé paternité" ? 3 : selectedType === "congé maladie" ? 4 : selectedType === "congé mariage" ? 7 : selectedType === "congé décès" ? 8 : 0,
         statut_attestation_conge : "non archivé",
         statut_conge : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en cours" : curr_date.toISOString().slice(0,19).replace('T',' ') >= endDate ? "terminé" : "programmé",
         statut_personnel : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en congé" : "en poste",
@@ -451,7 +451,7 @@ const Conges = () => {
     };
     const calculateEndDate = () => {
       if (startDate && duration) {
-        if (selectedPerson.id_type_personnel === 2 && (selectedType === "congé administratif total" || selectedType === "congé administratif partiel")) {
+        if (selectedPerson.id_type_personnel === 2 && (selectedType === "congé administratif" || selectedType === "congé administratif")) {
           let st = new Date(startDate);
           let weekdaysToAdd = duration - 1;
           while (weekdaysToAdd > 0) {
