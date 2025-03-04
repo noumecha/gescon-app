@@ -280,7 +280,7 @@ const Conges = () => {
       }
       // leave attestation datas
       const attestation = {
-        name: name,
+        name: name.replace("'", "`"),
         matricule: matricule,
         sexe: sexe,
         poste: poste.replace("'", "`"), 
