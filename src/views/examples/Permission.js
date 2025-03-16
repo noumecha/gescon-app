@@ -3,44 +3,25 @@ import {
   } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import PermissionsForm from "views/customs-components/PermissionsForm";
-import { useState,useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import PersmissionsTable from "views/customs-components/PermissionsTable";
+import filterPersonnel from "utils/filterPersonnel";
+import usePermissionState from "hooks/usePermissionState";
+import usePagination from "hooks/usePagination";
+import {dateInRange, formatDate, lastDateOfMonth, firstDateOfMonth, monthToText, nbDaysBetween} from "utils/dates-utils";
 
 const Permission = () => {
-    const location = useLocation();
-    const { selectedPerson } = location.state || {};
-    const [endDate, setEndDate] = useState("");
-    const [repDate, setRepDate] = useState("");
-    const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom_personnel : "TCHUENTE");
-    const [telephone, setTelephone] = useState(selectedPerson ? selectedPerson.telephone_personnel : "653465348");
-    const [startDate, setStartDate] = useState("");
-    const [matricule, setMatricule] = useState(selectedPerson ? selectedPerson.matricule_personnel : "XD3 566");
-    const [type, setType] = useState(selectedPerson ? selectedPerson.id_type_personnel === 1 ? "Fonctionnaire" : "Contractuelle" : "Fonctionnaire");
-    const [structure, setStructure] = useState(selectedPerson ? selectedPerson.structure_personnel : "Service Général");
-    const [duration, setDuration] = useState("");
-    const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste_personnel : "Contrôleur");
-    const [demande, setDemande] = useState(null);
-    const sexe = selectedPerson ? selectedPerson.sexe_personnel : "M"; 
-    const preposition = selectedPerson ? selectedPerson.preposition_personnel : "au";
-    const grade = selectedPerson ? selectedPerson.grade_personnel : "au";
-    const id_personnel = selectedPerson ? selectedPerson.id_personnel : "1";
-    const [permission, setPermission] = useState([]);
-    const [lastPermission, setLastPermission] = useState([]);
+
+    const {
+        endDate, setEndDate, repDate, setRepDate, name, setName, telephone, setTelephone,
+        startDate, setStartDate, matricule, setMatricule, type, setType, structure, setStructure,
+        duration, setDuration, poste, setPoste, demande, setDemande, sexe, preposition, grade, id_personnel,
+        permission, setPermission, lastPermission, setLastPermission, error, setError, success, setSuccess,
+        visible, setVisible, search, setSearch, statutFilter, setStatutFilter,/* pageNumber, setPageNumber,*/
+        perPage, userConge, setUserConge, loadingSpinner, setLoadingSpinner, actived, setActived, status, setStatus, selectedPerson
+    } = usePermissionState();
     const curr_date = new Date();
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
-    const nb_jours_permission = selectedPerson ? selectedPerson.nb_jours_permission : 0;
-    const [status, setStatus] = useState(nb_jours_permission === 0 ? `les nouvelles permissions de ${sexe === 'M' ? 'M.' : 'Mme'} ${name} seront déduites de ses jours de congés` : `${sexe === 'M' ? 'M.' : 'Mme'} ${name} a ${nb_jours_permission} ${nb_jours_permission > 1 ? "jours" : "jour"} de ${nb_jours_permission > 1 ? "permissions" : "permission"} ${nb_jours_permission > 1 ? "disponibles" : "disponible"}`);
-    const [visible, setVisible] = useState(true);
-    const [search, setSearch] = useState("");
-    const [statutFilter, setStatutFilter] = useState("");
-    const [pageNumber, setPageNumber] = useState(0);
-    const [perPage] = useState(100);
-    const [userConge, setUserConge] = useState([]);
-    const [loadingSpinner, setLoadingSpinner] = useState(true);
     const loadingText = "Aucune donnée dans la base de données";
-    const [actived, setActived] = useState(selectedPerson === undefined ? true : false);
     let total_lasts_days = 0;
     let nbDaysConges = 0;
     let nbDayPermCurrMonth = {
@@ -53,26 +34,14 @@ const Permission = () => {
     };
     let nb = 0; // total days of permission for specifc month (particularly the month of the start date)
 
-    // usefull function   
-    const filterPermission = search !== "" || status !== ""
-    ? permission.filter(permission => permission.statut_permission.includes(statutFilter) && (
-        permission.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
-        || permission.matricule_personnel.toLowerCase().includes(search.toLowerCase())
-      ))
-      : permission
-    
-    const pageCount = Math.ceil(permission.length/perPage);
+    // filtering permission
+    const filterPermission = filterPersonnel(permission, search, status, "permission")
+
+    const { pageNumber, pageCount, currentPageData, handlePageChange, handlePagePrev, handlePageNext } = usePagination(filterPermission, perPage);
+
+    //const pageCount = Math.ceil(permission.length/perPage);
     const offset = pageNumber * perPage;
 
-    const handlePageChange = ({selected}) => {
-      setPageNumber(selected);
-    }
-    const handlePagePrev = () => {
-      setPageNumber(pageCount <= 1 || pageNumber === 0 ? pageNumber : pageNumber - 1);
-    }
-    const handlePageNext = () => {
-      setPageNumber(pageCount <= 1 || pageCount === pageNumber + 1 ? pageNumber : pageNumber + 1);
-    }
     const handleSearch = (e) => {
       setSearch(e.target.value);
     }
@@ -86,113 +55,45 @@ const Permission = () => {
     const handleInputChange = (setStateFunction) => (e) => {
         setStateFunction(e.target.value);
     };
-
-    function firstDateOfMonth(d){
-		var date = new Date(d);
-        var y = date.getFullYear();
-        var m = date.getMonth();
-		var firstDay = new Date(y, m, 1);
-		return firstDay;
-	}
-
-    function lastDateOfMonth(d){
-		var date = new Date(d);
-        var y = date.getFullYear();
-        var m = date.getMonth();
-		var lastDay = new Date(y, m + 1, 0);
-		return lastDay;
-
-    }
-
-    function dateInRange(d, start, end) {
-        if (d >= start && d <= end) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    function formatDate(d) {
-        const date = new Date(d);
-        const day = date.getDate();
-        const month = date.getMonth();
-        const year = date.getFullYear();
-        return new Date(year, month, day);
-    }
-
-    function nbDaysBetween(start, end) {
-        return parseInt(Math.round((end.getTime() - start.getTime()) / (1000 * 3600 * 24)));
-    }
-
-    const monthToText = (n) => {
-        switch (n) {
-            case 0:
-                return 'Janvier';
-            case 1:
-                return 'Fevrier';
-            case 2:
-                return "Mars";
-            case 3:
-                return "Avril";
-            case 4:
-                return "Mai";
-            case 5:
-                return "Juin";
-            case 6:
-                return "Juillet";
-            case 7:
-                return "Août";
-            case 8:
-                return "Septembre";
-            case 9:
-                return "Octobre";
-            case 10:
-                return "Novembre";
-            case 11:
-                return "Decembre";
-            default:
-                break;
-        }
-    }
     
-  const saveAttestationRepPermission = async (p) => {
-    try {
-      p.attestation_permission = JSON.stringify(p.attestation_permission);
-      p.attestation_permission = JSON.parse(p.attestation_permission);
-      console.log(`we are goin to generate an attestation of reprise for conge ${JSON.stringify(p.attestation_permission)}`);
-      const attestation_reprise = {
-        name: p.attestation_permission.name,
-        matricule: p.attestation_permission.matricule,
-        sexe: p.attestation_permission.sexe,
-        poste: p.attestation_permission.poste, 
-        type: p.attestation_permission.type,
-        decision: p.attestation_permission.decision, 
-        duration: p.attestation_permission.duration,
-        structure: p.attestation_permission.structure,
-        startDate: p.attestation_permission.startDate,
-        endDate: p.attestation_permission.endDate,
-        repriseDate: p.attestation_permission.repriseDate,
-        typeConge: p.attestation_permission.typeConge,
-        preposition: p.attestation_permission.preposition,
-        grade : p.attestation_permission.grade,
-        created_at : new Date().toISOString().slice(0,19).replace('T',' ')
-      }
-      const created_at_att_rep_permission = new Date().toISOString().slice(0,19).replace('T',' ');
-      const req = `UPDATE permission SET created_at_reprise_permission = "${created_at_att_rep_permission}",attestation_reprise_permission='${JSON.stringify(attestation_reprise)}',statut_att_reprise_permission="non archivé" WHERE ${p.id_permission}=permission.id_permission`; 
-      window.electronAPI.addArchiveAttestationRepPermission(req);
-      await window.electronAPI.addArchiveAttPermissionRepSuccess((event, res) => {
-        console.log("Attestation de reprise générer avec succès");
-      });
-      setSuccess("Attestation de reprise générer avec succès");
-      setStatus(`Le satut de ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a été mis à jour !`);
-      setTimeout(() => {
-        setSuccess("");
-      }, 3000)
-      setActived(true);
-    } catch (error) {
-      console.error("Erreur saving congé : " + error.message);
+    const saveAttestationRepPermission = async (p) => {
+        try {
+            p.attestation_permission = JSON.stringify(p.attestation_permission);
+            p.attestation_permission = JSON.parse(p.attestation_permission);
+            console.log(`we are goin to generate an attestation of reprise for conge ${JSON.stringify(p.attestation_permission)}`);
+            const attestation_reprise = {
+                name: p.attestation_permission.name,
+                matricule: p.attestation_permission.matricule,
+                sexe: p.attestation_permission.sexe,
+                poste: p.attestation_permission.poste, 
+                type: p.attestation_permission.type,
+                decision: p.attestation_permission.decision, 
+                duration: p.attestation_permission.duration,
+                structure: p.attestation_permission.structure,
+                startDate: p.attestation_permission.startDate,
+                endDate: p.attestation_permission.endDate,
+                repriseDate: p.attestation_permission.repriseDate,
+                typeConge: p.attestation_permission.typeConge,
+                preposition: p.attestation_permission.preposition,
+                grade : p.attestation_permission.grade,
+                created_at : new Date().toISOString().slice(0,19).replace('T',' ')
+            }
+            const created_at_att_rep_permission = new Date().toISOString().slice(0,19).replace('T',' ');
+            const req = `UPDATE permission SET created_at_reprise_permission = "${created_at_att_rep_permission}",attestation_reprise_permission='${JSON.stringify(attestation_reprise)}',statut_att_reprise_permission="non archivé" WHERE ${p.id_permission}=permission.id_permission`; 
+            window.electronAPI.addArchiveAttestationRepPermission(req);
+            await window.electronAPI.addArchiveAttPermissionRepSuccess((event, res) => {
+                console.log("Attestation de reprise générer avec succès");
+            });
+            setSuccess("Attestation de reprise générer avec succès");
+            setStatus(`Le satut de ${sexe === 'M' ? 'M.' : 'Mme'} ${name} a été mis à jour !`);
+            setTimeout(() => {
+                setSuccess("");
+            }, 3000)
+            setActived(true);
+        } catch (error) {
+            console.error("Erreur saving congé : " + error.message);
+        }
     }
-  }
 
     // calculate the end date from startdate and duration
     useEffect(() => {
