@@ -352,7 +352,7 @@ const CongesForm = ({
                       <Col md="6">
                         <Button
                           color="primary"
-                          onClick={(e) => saveConge(e)}
+                          onClick={saveConge}
                           disabled={actived}
                         >
                           Générer l'attestation
