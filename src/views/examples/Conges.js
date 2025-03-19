@@ -227,7 +227,7 @@ const Conges = () => {
     updatePersonnelState()
   }, [conge]);
 
-  // useEffect for getting data
+  // useEffect for getting conge for a specific user
   useEffect(() => {
     const getSpecificConge = async () => {
       try {
@@ -237,7 +237,7 @@ const Conges = () => {
             for (let index = 0; index < res.length; index++) {
               res[index].attestation_conge = JSON.parse(res[index].attestation_conge)                                                
             }
-            setUserConge(res);
+            console.log(res);
           })
       } catch (error) {
           console.error("Erreur : " + error.message);
@@ -247,6 +247,7 @@ const Conges = () => {
     fetchDatas(setConge, setLoadingSpinner, setSelectedDec, setTypeConge, setLastPermission, selectedPerson, id_personnel);
   },[id_personnel, selectedPerson]);
 
+  // refresh the conges table 
   const handleRefresh = () => {
     try {
       setLoadingSpinner(true);
