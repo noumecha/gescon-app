@@ -37,7 +37,6 @@ const CongesTable = ({
     formatDateMonthForm,
     curr_date,
 }) => {
-    console.log("conges : " + filterConge);
     return (
         <Row className='mt-3'>
             <Col lg="12">
