@@ -35,7 +35,6 @@ const useCongeState = () => {
     const [search, setSearch] = useState("");
     const [statutFilter, setStatutFilter] = useState("");
     const [pageNumber, setPageNumber] = useState(0);
-    const [perPage] = useState(100);
     const [loadingSpinner, setLoadingSpinner] = useState(true);
     const id_personnel = selectedPerson ? selectedPerson.id_personnel : "1";
     const loadingText = "Aucune donnée dans la base de données";
@@ -48,7 +47,7 @@ const useCongeState = () => {
         duration, setDuration, poste, setPoste, demande, setDemande, sexe, preposition, grade, id_personnel,
         conge, setConge, lastPermission, setLastPermission, error, setError, success, setSuccess,loadingText,
         visible, setVisible, search, setSearch, statutFilter, setStatutFilter, pageNumber, setPageNumber,
-        perPage, userConge, setUserConge, loadingSpinner, setLoadingSpinner, actived, setActived, status, setStatus, selectedPerson,
+        userConge, setUserConge, loadingSpinner, setLoadingSpinner, actived, setActived, status, setStatus, selectedPerson,
         repriseDate, setRepriseDate, selectedType, setSelectedType, selectedDec, setSelectedDec, struc, setStruc, document, setDocument,
         generateSuccess, setGenerateSuccess
     };

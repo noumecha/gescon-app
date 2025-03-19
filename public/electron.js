@@ -119,7 +119,7 @@ function deleteDecision(event, req) {
     })
 }
 
-// functions for conge : 
+// functions for getting all conges : 
 function getConge(event, req) {
     pool.query('SELECT * FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel;', (err, res) => {
         if (err) throw err;

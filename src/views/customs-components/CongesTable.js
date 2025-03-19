@@ -1,4 +1,4 @@
-import { useEffect, React } from 'react';
+import { useState, React } from 'react';
 import { 
     UncontrolledDropdown, 
     DropdownToggle, 
@@ -15,28 +15,31 @@ import {
     Button,
 } from 'reactstrap';
 import MyPagination from './MyPagination';
+import filterPersonnel from 'utils/filterPersonnel';
+import usePagination from 'hooks/usePagination';
+import { formatDateMonthForm } from 'utils/dates-utils';
 
 const CongesTable = ({
     loadingText, 
     saveAttestationRepConge, 
-    loadingSpinner, 
-    pageCount, 
-    handlePagePrev, 
-    handlePageChange, 
-    handlePageNext, 
-    pageNumber,
+    loadingSpinner,
     handleStatutFilter,
     statutFilter,
     handleSearch,
     search,
     generateSuccess,
     handleRefresh,
-    filterConge,
-    offset,
-    perPage,
-    formatDateMonthForm,
-    curr_date,
+    conge,
 }) => {
+
+    const [perPage] = useState(100);
+    
+    const curr_date = new Date();
+
+    const filterConge = filterPersonnel(conge, search, statutFilter, "conge");
+
+    const { pageNumber, pageCount, handlePageChange, currentPageData, offset, handlePagePrev, handlePageNext } = usePagination(filterConge, perPage);
+
     return (
         <Row className='mt-3'>
             <Col lg="12">
@@ -73,15 +76,10 @@ const CongesTable = ({
                 <Card className="shadow">
                     <Row>
                         <Col md="12" className="text-center">
-                            {/* generateError && 
-                            <Alert color="danger">
-                                {generateError}
-                            </Alert>
-                            */}
                             { generateSuccess && 
-                            <Alert color="success">
-                                {generateSuccess}
-                            </Alert>
+                                <Alert color="success">
+                                    {generateSuccess}
+                                </Alert>
                             }
                         </Col>
                     </Row>
@@ -108,69 +106,69 @@ const CongesTable = ({
                             </tr>
                         </thead>
                         <tbody>
-                        {loadingSpinner && (
-                            <tr>
-                            <td colSpan="7" className="text-center">
-                                <div className="spinner-border" role="status">
-                                <span className="sr-only">Loading....</span>
-                                </div>
-                            </td>
-                            </tr>
-                        )}
-                            {filterConge && filterConge.length > 0 ? !loadingSpinner && (filterConge.slice(offset, offset + perPage).map((c, index) => (
-                                <tr key={index}>
-                                    <td>{c.matricule_personnel}</td>    
-                                    <td>{c.nom_prenom_personnel}</td> 
-                                    <td>{c.date_debut_conge.getDate() + "/" + formatDateMonthForm(c.date_debut_conge) + "/" + c.date_debut_conge.getFullYear() }</td>
-                                    <td>{c.date_fin_conge.getDate() + "/" + formatDateMonthForm(c.date_fin_conge) + "/" + c.date_fin_conge.getFullYear()}</td>
-                                    <td>{c.statut_conge === "programmé" ? c.attestation_conge.duration : c.statut_conge !== "terminé" ? curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? Math.ceil((c.date_fin_conge - curr_date) / (1000 * 3600 * 24)) : Math.ceil((c.date_fin_conge - c.date_debut_conge)/ (1000 * 3600 * 24)) : 0 }</td>
-                                    <td>{c.statut_conge === "en cours"
-                                        ? <Badge color="success">
-                                            {c.statut_conge}
-                                        </Badge>
-                                        : 
-                                        c.statut_conge === "terminé"
-                                        ?
-                                        <Badge color="primary">
-                                            {c.statut_conge}
-                                        </Badge>
-                                        :
-                                        <Badge color="warning">
-                                            {c.statut_conge}
-                                        </Badge>
-                                        }
-                                    </td>
-                                    <td className="text-right">
-                                        <UncontrolledDropdown>
-                                            <DropdownToggle
-                                            className="btn-icon-only text-light"
-                                            role="button"
-                                            size="sm"
-                                            color=""
-                                            onClick={(e) => e.preventDefault()}
-                                            >
-                                                <i className="fas fa-ellipsis-v" />
-                                            </DropdownToggle>
-                                            <DropdownMenu className="dropdown-menu-arrow" right>
-                                                <DropdownItem
-                                                onClick={() => saveAttestationRepConge(c)}
-                                                disabled={c.statut_conge === "terminé" ? false : true}
-                                                >
-                                                Générer l'attestation de reprise
-                                                </DropdownItem>
-                                            </DropdownMenu>
-                                        </UncontrolledDropdown>
-                                    </td>
-                                </tr>
-                            )))
-                            :
-                            !loadingSpinner && (
+                            {loadingSpinner && (
                                 <tr>
                                 <td colSpan="7" className="text-center">
-                                    {loadingText}
+                                    <div className="spinner-border" role="status">
+                                    <span className="sr-only">Loading....</span>
+                                    </div>
                                 </td>
                                 </tr>
-                            )
+                            )}
+                            {   filterConge && filterConge.length > 0 ? !loadingSpinner && currentPageData.map((c, index) => (
+                                    <tr key={index}>
+                                        <td>{c.matricule_personnel}</td>    
+                                        <td>{c.nom_prenom_personnel}</td> 
+                                        <td>{c.date_debut_conge.getDate() + "/" + formatDateMonthForm(c.date_debut_conge) + "/" + c.date_debut_conge.getFullYear() }</td>
+                                        <td>{c.date_fin_conge.getDate() + "/" + formatDateMonthForm(c.date_fin_conge) + "/" + c.date_fin_conge.getFullYear()}</td>
+                                        <td>{c.statut_conge === "programmé" ? c.attestation_conge.duration : c.statut_conge !== "terminé" ? curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? Math.ceil((c.date_fin_conge - curr_date) / (1000 * 3600 * 24)) : Math.ceil((c.date_fin_conge - c.date_debut_conge)/ (1000 * 3600 * 24)) : 0 }</td>
+                                        <td>{c.statut_conge === "en cours"
+                                            ? <Badge color="success">
+                                                {c.statut_conge}
+                                            </Badge>
+                                            : 
+                                            c.statut_conge === "terminé"
+                                            ?
+                                            <Badge color="primary">
+                                                {c.statut_conge}
+                                            </Badge>
+                                            :
+                                            <Badge color="warning">
+                                                {c.statut_conge}
+                                            </Badge>
+                                            }
+                                        </td>
+                                        <td className="text-right">
+                                            <UncontrolledDropdown>
+                                                <DropdownToggle
+                                                className="btn-icon-only text-light"
+                                                role="button"
+                                                size="sm"
+                                                color=""
+                                                onClick={(e) => e.preventDefault()}
+                                                >
+                                                    <i className="fas fa-ellipsis-v" />
+                                                </DropdownToggle>
+                                                <DropdownMenu className="dropdown-menu-arrow" right>
+                                                    <DropdownItem
+                                                    onClick={() => saveAttestationRepConge(c)}
+                                                    disabled={c.statut_conge === "terminé" ? false : true}
+                                                    >
+                                                    Générer l'attestation de reprise
+                                                    </DropdownItem>
+                                                </DropdownMenu>
+                                            </UncontrolledDropdown>
+                                        </td>
+                                    </tr>
+                                ))
+                                :
+                                !loadingSpinner && (
+                                    <tr>
+                                    <td colSpan="7" className="text-center">
+                                        {loadingText}
+                                    </td>
+                                    </tr>
+                                )
                             }
                         </tbody>
                     </Table>

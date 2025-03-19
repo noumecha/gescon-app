@@ -7,10 +7,7 @@ import { useEffect } from "react";
 import CongesForm from "views/customs-components/CongesForm";
 // useful functions 
 import { fetchDatas } from "utils/fetchDatas";
-import filterPersonnel from "utils/filterPersonnel";
-import usePagination from "hooks/usePagination";
 import useCongeState from "hooks/useCongeState";
-import { formatDateMonthForm } from "utils/dates-utils";
 // CRUDs functions 
 import { saveConge } from "utils/saveConge";
 
@@ -21,17 +18,14 @@ const Conges = () => {
     startDate, setStartDate, matricule, setMatricule, type, setType,nb_jours_conges,
     duration, setDuration, poste, setPoste, demande, setDemande, sexe, preposition, grade, id_personnel,
     conge, setConge, lastPermission, setLastPermission, error, setError, success, setSuccess,loadingText,
-    visible, setVisible, search, setSearch, statutFilter, setStatutFilter, /*pageNumber, setPageNumber,*/
-    perPage, userConge, setUserConge, loadingSpinner, setLoadingSpinner, actived, setActived, status, setStatus, selectedPerson,
-    repriseDate, setRepriseDate, selectedType, setSelectedType, selectedDec, setSelectedDec, struc, setStruc, document, setDocument,
-    generateSuccess, setGenerateSuccess
+    visible, setVisible, search, setSearch, statutFilter, setStatutFilter, userConge, setUserConge,loadingSpinner,
+    setLoadingSpinner, actived, setActived, status, setStatus, selectedPerson, repriseDate, setRepriseDate, selectedType, 
+    setSelectedType, selectedDec, setSelectedDec, struc, setStruc, document, setDocument, generateSuccess, setGenerateSuccess
   } = useCongeState();
-  const curr_date = new Date();
 
   // completion varaibles for functions
   let nbDaysConges = 0;
-  // filtering Conge
-  const filterConge = filterPersonnel(conge, search, status, "conge")
+
   // saving conge
   const handleSaveConge = () => {
     saveConge(
@@ -40,9 +34,6 @@ const Conges = () => {
       setSuccess,setActived,grade,demande,preposition,nbDaysConges,setStatus,document
     )
   }
-  const { pageNumber, pageCount, handlePageChange, handlePagePrev, handlePageNext } = usePagination(filterConge, perPage);
-
-  const offset = pageNumber * perPage;
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
@@ -101,6 +92,20 @@ const Conges = () => {
       setActived(true);
     } catch (error) {
       console.error("Erreur saving congé : " + error.message);
+    }
+  }
+
+  // refresh the conges table 
+  const handleRefresh = () => {
+    try {
+      setLoadingSpinner(true);
+      setTimeout(() => 
+      setLoadingSpinner(false)
+      , 3000);
+      fetchDatas(setConge, setLoadingSpinner, setSelectedDec, setTypeConge, setLastPermission, selectedPerson, id_personnel);
+      console.log("datas refreshed successfully");
+    } catch (err) {
+      console.error("error on refresh : " + err.message);
     }
   }
 
@@ -178,7 +183,7 @@ const Conges = () => {
   useEffect(() => {
     const updatePersonnelState = async () => {
       try {
-      //const statut = curr_date >= conge_data.startDate && curr_date <= conge_data.endDate ? "en congé" : "en poste";
+      //const statut = currrent date >= conge_data.startDate && currrent date <= conge_data.endDate ? "en congé" : "en poste";
       if (conge.length > 0) {
         let date = new Date();
         for (let x = 0; x < conge.length; x++) {
@@ -232,12 +237,12 @@ const Conges = () => {
     const getSpecificConge = async () => {
       try {
           const test_conge_req = `SELECT * FROM conge WHERE id_personnel = ${id_personnel}`;
+          console.log(test_conge_req);
           window.electronAPI.getSpecificConge(test_conge_req);
           await window.electronAPI.retrieveSpecificConge((event, res) => {
             for (let index = 0; index < res.length; index++) {
               res[index].attestation_conge = JSON.parse(res[index].attestation_conge)                                                
             }
-            console.log(res);
           })
       } catch (error) {
           console.error("Erreur : " + error.message);
@@ -246,20 +251,6 @@ const Conges = () => {
     getSpecificConge();
     fetchDatas(setConge, setLoadingSpinner, setSelectedDec, setTypeConge, setLastPermission, selectedPerson, id_personnel);
   },[id_personnel, selectedPerson]);
-
-  // refresh the conges table 
-  const handleRefresh = () => {
-    try {
-      setLoadingSpinner(true);
-      setTimeout(() => 
-      setLoadingSpinner(false)
-      , 3000);
-      fetchDatas(setConge, setLoadingSpinner, setSelectedDec, setTypeConge, setLastPermission, selectedPerson, id_personnel);
-      console.log("datas refreshed successfully");
-    } catch (err) {
-      console.error("error on refresh : " + err.message);
-    }
-  }
 
   return (
     <>
@@ -302,23 +293,14 @@ const Conges = () => {
           <CongesTable 
             loadingText={loadingText}
             saveAttestationRepConge={saveAttestationRepConge}
-            loadingSpinner={loadingSpinner}
-            pageCount={pageCount}
-            handlePagePrev={handlePagePrev}
-            handlePageChange={handlePageChange}
-            handlePageNext={handlePageNext}
-            pageNumber={pageNumber}
             handleStatutFilter={handleStatutFilter}
             statutFilter={statutFilter}
             handleSearch={handleSearch}
             search={search}
             generateSuccess={generateSuccess}
             handleRefresh={handleRefresh}
-            filterConge={filterConge}
-            offset={offset}
-            perPage={perPage}
-            formatDateMonthForm={formatDateMonthForm}
-            curr_date={curr_date}
+            loadingSpinner={loadingSpinner}
+            conge={conge}
           />
       </Container>
     </>
