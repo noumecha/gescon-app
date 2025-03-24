@@ -326,11 +326,14 @@ const CongeDoc = (props) => {
                     <Text style={styles.pCertifText}>
                         Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "Monsieur" : "Madame"} <Text style={fontStyles.bold}>{props.name}</Text>, {props.grade},
                         <Text style={fontStyles.bold}> Matricule {props.matricule}</Text>, {props.poste} {props.preposition} {props.structure}, est bénéficiaire
-                        d'un {props.typeConge} de (<Text style={fontStyles.bold}>{props.duration}</Text>) {props.duration > 1 ? "jours" : "jour"}{props.type === "Contractuelle" ? " ouvrable" : ""}{(props.type === "Contractuelle" && props.duration > 1) ? "s" : ""},
+                        d'un {props.typeConge} de (<Text style={fontStyles.bold}>{props.type === "Contractuelle" ? 18 : 30}</Text>)
+                        {props.duration > 1 ? " jours" : " jour"}{props.type === "Contractuelle" ? " ouvrable" : ""}{(props.type === "Contractuelle" && props.duration > 1) ? "s" : ""},
                         accordé par décision <Text style={fontStyles.bold}>N°{props.decision}</Text> du Ministre des finances.
                     </Text>
                     <Text style={styles.pCertifText}>
-                        L'intéressé{props.sexe === "M" ? "" : "e"} jouira dudit congé pendant la période allant du <Text style={fontStyles.bold}>{props.startDate}</Text> au <Text style={fontStyles.bold}>{props.endDate}</Text> et 
+                        L'intéressé{props.sexe === "M" ? "" : "e"} jouira 
+                        {props.numero_conge_admin !== 0 ? props.numero_conge_admin === 1 ? " de la " + props.numero_conge_admin + "ère partie " : " de la " + props.numero_conge_admin + "ème partie " : " " } 
+                        dudit congé pendant la période allant du <Text style={fontStyles.bold}>{props.startDate}</Text> au <Text style={fontStyles.bold}>{props.endDate}</Text> et 
                         reprendra le service le <Text style={fontStyles.bold}>{props.repriseDate} à 7 heures 30 précises.</Text>
                     </Text>
                     <Text style={styles.pCertifText}>

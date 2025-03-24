@@ -125,8 +125,7 @@ const AttestationConge = () => {
             window.electronAPI.getAttestationConge();
             await window.electronAPI.retrieveAttestationConge((event, res) => {
                 for (let index = 0; index < res.length; index++) {
-                    res[index].attestation_conge = JSON.parse(res[index].attestation_conge)   
-                    //console.log(res[index].attestation_conge.created_at);                                        
+                    res[index].attestation_conge = JSON.parse(res[index].attestation_conge)                                
                 }
                 setAttestationConge(res);
                 setTimeout(() => 
@@ -243,6 +242,8 @@ const AttestationConge = () => {
                                                         typeConge={att_con.attestation_conge.typeConge}
                                                         preposition={att_con.attestation_conge.preposition}
                                                         grade={att_con.attestation_conge.grade}
+                                                        nb_jour_conges_restant={att_con.attestation_conge.nb_jour_conges_restant}
+                                                        numero_conge_admin={att_con.attestation_conge.numero_conge_admin}
                                                     />} fileName={`attestation_conge_${att_con.nom_prenom_personnel}_du_${att_con.attestation_conge.startDate}_au_${att_con.attestation_conge.endDate}.pdf`}>
                                                     {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 
                                                         <Button

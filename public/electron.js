@@ -161,7 +161,7 @@ function getArchiveAttRepConge(event) {
         event.sender.send('all-archive-att-rep-conge', res);
     });
 }
-    // congés -> getting specific conge by req
+// congés -> getting specific conge by req
 function getSpecificConge(event, req) {
     pool.query(req, (err, res) => {
         if (err) throw err;

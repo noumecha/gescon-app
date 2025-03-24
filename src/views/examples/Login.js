@@ -36,7 +36,7 @@ const Login = ({ onLogin }) => {
   }
 
   function handleLogin() {
-    /*if (!password || !username) {
+    if (!password || !username) {
       setError('Renseigner vos informations de connexion!');
       setTimeout(() => {
         setError("");
@@ -48,14 +48,13 @@ const Login = ({ onLogin }) => {
     );
     if (matchedUser) {
       login(matchedUser);
-      // console.log("match");
     } else {
       setError("nom d'utilisateur ou mot de passe incorrect");
       setTimeout(() => {
         setError("");
       },4000);
-    }*/
-    login(users[0]);
+    }
+    //login(users[0]);
   }
 
   const fetchUsers = async () => {

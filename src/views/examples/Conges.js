@@ -29,7 +29,7 @@ const Conges = () => {
   // saving conge
   const handleSaveConge = () => {
     saveConge(
-      selectedPerson,selectedType,typeConge,name,startDate,endDate,duration,
+      selectedPerson,selectedType,typeConge,name,startDate,endDate,duration,setDuration,
       repriseDate,matricule,type,selectedDec,struc,poste,userConge,lastPermission,setError,sexe,nb_jours_conges,
       setSuccess,setActived,grade,demande,preposition,nbDaysConges,setStatus,document
     )
@@ -236,16 +236,16 @@ const Conges = () => {
   useEffect(() => {
     const getSpecificConge = async () => {
       try {
-          const test_conge_req = `SELECT * FROM conge WHERE id_personnel = ${id_personnel}`;
-          console.log(test_conge_req);
-          window.electronAPI.getSpecificConge(test_conge_req);
-          await window.electronAPI.retrieveSpecificConge((event, res) => {
-            for (let index = 0; index < res.length; index++) {
-              res[index].attestation_conge = JSON.parse(res[index].attestation_conge)                                                
-            }
-          })
+        const specific_conge_query = `SELECT * FROM conge WHERE id_personnel = ${id_personnel}`;
+        window.electronAPI.getSpecificConge(specific_conge_query);
+        await window.electronAPI.retrieveSpecificConge((event, res) => {
+          for (let index = 0; index < res.length; index++) {
+            res[index].attestation_conge = JSON.parse(res[index].attestation_conge)                                                
+          }
+          setUserConge(res);
+        })
       } catch (error) {
-          console.error("Erreur : " + error.message);
+        console.error("Erreur : " + error.message);
       }
     }
     getSpecificConge();
