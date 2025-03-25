@@ -324,7 +324,7 @@ const CongeDoc = (props) => {
                         CERTIFICAT OF DEPARTURE ON LEAVE
                     </Text>
                     <Text style={styles.pCertifText}>
-                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "Monsieur" : "Madame"} <Text style={fontStyles.bold}>{props.name}</Text>, {props.grade},
+                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "Monsieur" : "Madame"} <Text style={fontStyles.bold}>{props.name+","}</Text> {props.grade},
                         <Text style={fontStyles.bold}> Matricule {props.matricule}</Text>, {props.poste} {props.preposition} {props.structure}, est bénéficiaire
                         d'un {props.typeConge} de (<Text style={fontStyles.bold}>{props.type === "Contractuelle" ? 18 : 30}</Text>)
                         {props.duration > 1 ? " jours" : " jour"}{props.type === "Contractuelle" ? " ouvrable" : ""}{(props.type === "Contractuelle" && props.duration > 1) ? "s" : ""},
