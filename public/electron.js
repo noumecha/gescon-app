@@ -119,7 +119,7 @@ function deleteDecision(event, req) {
     })
 }
 
-// functions for conge : 
+// functions for getting all conges : 
 function getConge(event, req) {
     pool.query('SELECT * FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel;', (err, res) => {
         if (err) throw err;
@@ -161,7 +161,7 @@ function getArchiveAttRepConge(event) {
         event.sender.send('all-archive-att-rep-conge', res);
     });
 }
-    // congés -> getting specific conge by req
+// congés -> getting specific conge by req
 function getSpecificConge(event, req) {
     pool.query(req, (err, res) => {
         if (err) throw err;

@@ -48,7 +48,6 @@ const Login = ({ onLogin }) => {
     );
     if (matchedUser) {
       login(matchedUser);
-      // console.log("match");
     } else {
       setError("nom d'utilisateur ou mot de passe incorrect");
       setTimeout(() => {

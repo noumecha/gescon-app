@@ -377,7 +377,7 @@ const Decision = () => {
                                             className="mb-3"
                                             type="select"
                                             id="type-conge"
-                                            defaultValue="choisir le type de congé"
+                                            defaultValue="choisir le type de décision"
                                             onChange={handleInputChange(setDecisionType)}
                                         >
                                           <option>{decisionType === "Decision Fonctionnaire" ? decisionType : "Decision Contractuel"}</option>
@@ -388,7 +388,7 @@ const Decision = () => {
                                         className="mb-3"
                                         type="select"
                                         id="type-conge"
-                                        defaultValue="choisir le type de congé"
+                                        defaultValue="choisir le type de décision"
                                         onChange={handleInputChange(setDecisionType)}
                                         >
                                             <option>Decision Contractuel</option>
