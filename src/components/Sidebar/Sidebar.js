@@ -45,29 +45,15 @@ const Sidebar = (props) => {
   };
   // creates the links that appear in the left menu / Sidebar
   const createLinks = (routes) => {
-    const excludesRoutes = [
-      '/fiches-de-suivies','/attestation-conge','/attestation-permission','/attestation_rep_permissions',
-      '/attestation_rep_conges','/personnel-details','/login','/register','/archive','/archive_permissions',
-      '/archive_att_rep_permissions','/archive_att_rep_conges'
-    ]
-    const includesRoutes = [
-      "/index",
-      "/permission",
-      "/conges",
-      "/personnel",
-      "/personnel-details",
-      "/structures",
-      "/decision",
-      "/user-profile",
-    ]
+    const includesRoutes = ['/index','/conges','/permission','/personnel','/personnel-details','/structures','/decision','/user-profile']
     return routes.map((prop, key) => {
       if (includesRoutes.includes(prop.path)) {
         return (
           <NavItem key={key}>
             <NavLink
-              to={{pathname: prop.layout + prop.path}}
+              to={prop.layout + prop.path}
               tag={NavLinkRRD}
-              onClick={() => closeCollapse()}
+              onClick={closeCollapse}
             >
               <i className={prop.icon} />
               {prop.name}
