@@ -1,18 +1,5 @@
 import React from 'react';
-import {
-    Row,
-    Col,
-    Card,
-    CardHeader,
-    Alert,
-    Form,
-    Input,
-    FormGroup,
-    Label,
-    FormText,
-    Button,
-    CardBody
-} from 'reactstrap';
+import { Row,Col,Card,CardHeader,Alert,Form,Input,FormGroup,Label,FormText,Button,CardBody } from 'reactstrap';
 
 const CongesForm = ({
     status,

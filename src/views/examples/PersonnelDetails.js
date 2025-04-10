@@ -266,17 +266,15 @@ const PersonnelDetails = () => {
                 </Col>
               </Row>
                 {<Row>
-                    <Col className="order-xl-1" xl="8">
-                        <PDFViewer>
-                            <PersonnelDoc
-                                name={selectedPerson.nom_prenom_personnel}
-                                statistics={statistics}
-                                statisticsPermission={statisticsPermission}
-                                conges={selectedPerson.nb_jours_conges}
-                                permissions={selectedPerson.nb_jours_permission}
-                            />
-                        </PDFViewer>
-                    </Col>
+                    <PDFViewer className="w-100">
+                        <PersonnelDoc
+                            name={selectedPerson.nom_prenom_personnel}
+                            statistics={statistics}
+                            statisticsPermission={statisticsPermission}
+                            conges={selectedPerson.nb_jours_conges}
+                            permissions={selectedPerson.nb_jours_permission}
+                        />
+                    </PDFViewer>
                 </Row>}
                 <Row>
                     <Col className="order-xl-1" xl="8">
