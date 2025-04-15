@@ -22,7 +22,7 @@ const useCongeState = () => {
     const [struc, setStruc] = useState(selectedPerson ? selectedPerson.structure_personnel : "Service Général");
     const [poste, setPoste] = useState(selectedPerson ? selectedPerson.poste_personnel : "Contrôleur");
     const sexe = !selectedPerson ? "M" : selectedPerson.sexe_personnel ;
-    const nb_jours_conges = selectedPerson ? selectedPerson.nb_jours_conges + selectedPerson.dette_conge : 18;
+    const nb_jours_conges = selectedPerson ? selectedPerson.id_type_personnel === 1 ? selectedPerson.nb_jours_conges : selectedPerson.nb_jours_conges + selectedPerson.dette_conge : 18;
     const [telephone, setTelphone] = useState(selectedPerson ? selectedPerson.telephone_personnel : 696879475);
     const [demande, setDemande] = useState(null);
     const [document, setDocument] = useState(null);
@@ -39,7 +39,7 @@ const useCongeState = () => {
     const id_personnel = selectedPerson ? selectedPerson.id_personnel : "1";
     const loadingText = "Aucune donnée dans la base de données";
     const [actived, setActived] = useState(selectedPerson === undefined ? true : false);
-    const [duration, setDuration] = useState(selectedPerson ? selectedPerson.nb_jours_conges + selectedPerson.dette_conge : "");
+    const [duration, setDuration] = useState(selectedPerson ? selectedPerson.id_type_personnel === 1 ? selectedPerson.nb_jours_conges : selectedPerson.nb_jours_conges + selectedPerson.dette_conge : "");
 
     return {
         endDate, setEndDate, name, setName, telephone, setTelphone, typeConge, setTypeConge,
