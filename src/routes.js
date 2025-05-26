@@ -17,6 +17,7 @@ import AttestationRepConge from "views/examples/AttestationRepConge";
 import ArchiveAttestationRepPermission from "views/examples/ArchiveAttestationRepPermission";
 import ArchiveAttestationRepConge from "views/examples/ArchiveAttestationRepConge";
 import FicheSuivie from "views/examples/FicheSuivie";
+import FicheStatsGlobal from "views/examples/FicheStatsGlobal";
 
 var routes = [
   {
@@ -172,6 +173,13 @@ var routes = [
     icon: "ni ni-single-copy-04 text-blue",
     component: <FicheSuivie />,
     layout: "/admin"
-  }
+  },
+  {
+    path: "/fiches-statistiques",
+    name: "fiches statistiques",
+    icon: "ni ni-single-copy-04 text-blue",
+    component: <FicheStatsGlobal />,
+    layout: "/admin"
+  },
 ];
 export default routes;

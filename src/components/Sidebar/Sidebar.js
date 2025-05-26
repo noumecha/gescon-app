@@ -105,7 +105,7 @@ const Sidebar = (props) => {
     });
   };
   const createFichesLinks = (routes) => {
-    const includesRoutes = ['/fiches-de-suivies']
+    const includesRoutes = ['/fiches-de-suivies', '/fiches-statistiques',]
     return routes.map((prop, key) => {
       if(includesRoutes.includes(prop.path)) {
         return(

@@ -132,6 +132,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     // for strucutres : 
     getStructuresNames: () => ipcRenderer.send('get-structures-names'),
     retrieveStructuresNames: (callback) => ipcRenderer.on('all-structures-names', callback),
+    getCongeYears: () => ipcRenderer.send('get-conges-years'),
+    retrieveCongesYears: (callback) => ipcRenderer.on('all-conges-years', callback),
     getStructuresNamePersonnel: (req) => ipcRenderer.send('get-structures-name-personnel', req),
     getStructuresNamePersonnelSuccess: (callback) => ipcRenderer.on('get-structures-name-personnel-success', callback),
     getStructuresConges: (req) => ipcRenderer.send('get-structures-conges', req),

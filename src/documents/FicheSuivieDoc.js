@@ -111,18 +111,25 @@ const styles = StyleSheet.create({
     },*/
     // certif title
     h1CertifTitle: {
-      fontSize: 14,
-      marginTop: 25,
-      display: 'flex',
-      color: '#000000',
-      textAlign: 'center',
-      textDecoration: 'underline',
+        fontSize: 14,
+        marginTop: 25,
+        display: 'flex',
+        color: '#000000',
+        textAlign: 'center',
+        textDecoration: 'underline',
     },
     h2CertifSubtitle: {
-      fontSize: 12,
-      marginTop: 3,
-      color: '#000000',
-      textAlign: 'center',
+        fontSize: 12,
+        marginTop: 3,
+        color: '#000000',
+        textAlign: 'center',
+    },
+    h1CirculationTitle : {
+        fontSize: 14,
+        marginTop: 25,
+        display: 'flex',
+        color: '#000000',
+        textAlign: 'center',
     },
     // paragraphStyle:
     pCertifText: {
@@ -229,6 +236,51 @@ const styles = StyleSheet.create({
         marginTop: 3,
         marginLeft: 5,
         textTransform: 'uppercase',
+    },
+    // table with css 
+    containerTableFirstRow1st : {
+        display: 'flex',
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 5,
+        marginLeft: 60,
+        marginRight: 60,
+    },
+    containerTableFirstRow : {
+        display: 'flex',
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginLeft: 60,
+        marginRight: 60,
+    },
+    containerTableFirstRowTd : {
+        border: '1px solid black',
+        textTransform: 'uppercase',
+        textAlign: 'center',
+        width: 200,
+        padding: 15,
+        fontSize: 10,
+    },
+    // object section 
+    sectionObject : {
+        display : 'flex',
+        marginTop : 5,
+        alignItems : 'center',
+        flexDirection : 'row',
+    },
+    sectionObjectTitle : {
+        fontSize: 12,
+        textTransform : 'capitalize',
+        textDecoration : 'underline',
+    },
+    sectionObjectText : {
+        fontSize: 12,
+    },
+    sectionObjectName : {
+        fontSize: 12,
+        fontWeight : 'bold',
     }
 });
 
@@ -301,24 +353,200 @@ const FicheSuivieDoc = (props) => {
                         <Text style={styles.line}>------------</Text>
                     </View>
                 </View>
-                <View style={styles.containerDateNumber}>
-                    <Text style={styles.h4TitleNumber}>
-                        N°{new Date().getFullYear() % 100}/__________/MINFI/SG/DGB/SDAG/SP
-                    </Text>
-                    <Text style={styles.h4TitleDate}>
-                        Yaoundé, le 
-                    </Text>
+                <View style={styles.containerTwo}>
+                    <View style={styles.section}>
+                        <Text style={styles.h1CirculationTitle}>
+                            FICHE DE CIRCULATION DES DOSSIERS
+                        </Text>
+                        <Text style={styles.h2CertifSubtitle}>
+                            ***********************
+                        </Text>
+                    </View>
                 </View>
-              <View style={styles.containerTwo}>
-                  <View style={styles.section}>
-                      <Text style={styles.h1CertifTitle}>
-                        FICHE DE SUIVIE
-                      </Text>
-                      <Text style={styles.h2CertifSubtitle}>
-                        
-                      </Text>
-                  </View>
-              </View>
+                <View style={styles.containerTwo}>
+                    <View style={styles.sectionObject}>
+                        <Text style={styles.sectionObjectTitle}>
+                            Objet : 
+                        </Text>
+                        <Text style={styles.sectionObjectText}>
+                            Certificat de départ en congé de {" "}
+                        </Text>
+                        <Text style={styles.sectionObjectName}>
+                            [M/Mme] [Nom et Prénom]
+                        </Text>
+                    </View>
+                </View>
+                <View style={styles.containerTable}>
+                    {/** first table */}
+                    <View style={styles.containerTableFirstRow1st}>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            responsable
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            Entrée
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            sortie
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            visa
+                        </Text>
+                    </View>
+                    <View style={styles.containerTableFirstRow}>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            secretaire générale
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                    </View>
+                    <View style={styles.containerTableFirstRow}>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            responsable
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                    </View>
+                    <View style={styles.containerTableFirstRow}>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            inspecteur générale
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                    </View>
+                    <View style={styles.containerTableFirstRow}>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            directeur général
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                    </View>
+                    <View style={styles.containerTableFirstRow}>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            conseiller technique
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                    </View>
+                    <View style={styles.containerTableFirstRow}>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            directeur
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                    </View>
+                    <View style={styles.containerTableFirstRow}>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            sous-directeur
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                    </View>
+                    <View style={styles.containerTableFirstRow}>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            chef de service
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                    </View>
+                    <View style={styles.containerTableFirstRow}>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            chef de bureau
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                    </View>
+                    <View style={styles.containerTableFirstRow}>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            cadre
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                    </View>
+                    <View style={styles.containerTableFirstRow}>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            courier
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                        <Text style={styles.containerTableFirstRowTd}>
+                            
+                        </Text>
+                    </View>
+                </View>
               <View style={styles.containerQr}>
                   <View style={styles.sectionQr}>
                       <Text style={styles.qrText}>

@@ -390,7 +390,8 @@ const Permission = () => {
                     repriseDate: (formatDate(repDate).getDate() < 10 ? "0"+formatDate(repDate).getDate() : formatDate(repDate).getDate()) + "/" + (parseInt(formatDate(repDate).getMonth()+1) < 10 ? "0"+parseInt(formatDate(repDate).getMonth()+1) : parseInt(formatDate(repDate).getMonth()+1)) +"/"+formatDate(repDate).getFullYear(),
                     preposition: preposition,
                     grade : grade.replace("'", "`"),
-                    created_at : new Date().toISOString().slice(0,19).replace('T',' ')
+                    created_at : new Date().toISOString().slice(0,19).replace('T',' '),
+                    // adding qr_code
                 }
                 const next_month_permission = {
                     month : nextMonthPermNb.month,

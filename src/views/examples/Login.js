@@ -36,7 +36,7 @@ const Login = ({ onLogin }) => {
   }
 
   function handleLogin() {
-    if (!password || !username) {
+    /*if (!password || !username) {
       setError('Renseigner vos informations de connexion!');
       setTimeout(() => {
         setError("");
@@ -53,8 +53,8 @@ const Login = ({ onLogin }) => {
       setTimeout(() => {
         setError("");
       },4000);
-    }
-    //login(users[0]);
+    }*/
+    login(users[0]);
   }
 
   const fetchUsers = async () => {
@@ -64,7 +64,10 @@ const Login = ({ onLogin }) => {
         setUsers(res);
       })
     } catch (error) {
-        console.error("Erreur : " + error.message);
+      setError("Erreur : " + error.message);
+      setTimeout(() => {
+        setError("");
+      }, 10000);
     }
   }
 

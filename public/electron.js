@@ -24,8 +24,8 @@ function createWindow() {
     mainWindow.setMenuBarVisibility(false);
 
     mainWindow.loadURL(
-        //`http://localhost:3000`
-        `file://${path.join(__dirname, '../build/index.html')}`
+        `http://localhost:3000`
+        //`file://${path.join(__dirname, '../build/index.html')}`
     );
 
 };
@@ -366,6 +366,14 @@ function getStructuresNames(event, req) {
     });
 }
 
+// conges years 
+function getCongeYears(event, req) {
+    pool.query('SELECT DISTINCT YEAR(date_fin_conge) AS annee FROM conge;', (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-conges-years', res);
+    });
+}
+
 function getStructuresNamePersonnel(event, req) {
     pool.query(req, (err, res) => {
         if (err) throw err;
@@ -456,6 +464,8 @@ app.whenReady().then(() => {
     ipcMain.on('get-structures-names', getStructuresNames);
     ipcMain.on('get-structures-name-personnel', getStructuresNamePersonnel);
     ipcMain.on('get-structures-conges', getStructuresConges);
+    // provisory year management 
+    ipcMain.on('get-conges-years', getCongeYears);
     // set the App title
     ipcMain.on('set-title', handleSetTitle);
     ipcMain.on('user-login', userLogin);

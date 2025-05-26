@@ -192,7 +192,8 @@ const saveConge = async (
         typeConge: selectedType,
         preposition: preposition,
         grade : grade.replace(/'/g, "''"),
-        created_at : new Date().toISOString().slice(0,19).replace('T',' ')
+        created_at : new Date().toISOString().slice(0,19).replace('T',' '),
+        // need to adding qr_code
       }
       // datas for the leave
       const conge_data = {
