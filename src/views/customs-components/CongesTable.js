@@ -30,6 +30,7 @@ const CongesTable = ({
     generateSuccess,
     handleRefresh,
     conge,
+    editConge,
 }) => {
 
     const [perPage] = useState(100);
@@ -183,10 +184,15 @@ const CongesTable = ({
                                                 </DropdownToggle>
                                                 <DropdownMenu className="dropdown-menu-arrow" right>
                                                     <DropdownItem
-                                                    onClick={() => saveAttestationRepConge(c)}
-                                                    disabled={c.statut_conge === "terminé" ? false : true}
+                                                        onClick={() => saveAttestationRepConge(c)}
+                                                        disabled={c.statut_conge === "terminé" ? false : true}
                                                     >
-                                                    Générer l'attestation de reprise
+                                                        Générer l'attestation de reprise
+                                                    </DropdownItem>
+                                                    <DropdownItem
+                                                        onClick={() => editConge(c)}
+                                                    >
+                                                        Modifier
                                                     </DropdownItem>
                                                 </DropdownMenu>
                                             </UncontrolledDropdown>

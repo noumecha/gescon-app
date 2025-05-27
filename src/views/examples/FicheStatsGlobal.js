@@ -61,8 +61,8 @@ const FicheStatsGlobal = () => {
 
             const hasFilter = !!filter?.value;
             const hasYear = !!yearFilter?.value;
-            const isAnnuel = typeFilter?.value === "annuel";
-            const isPeriodique = typeFilter?.value === "périodique";
+            const isAnnuel = typeFilter === "annuel";
+            const isPeriodique = typeFilter === "périodique";
 
             let conditions = [];
             let permissionConditions = [];
@@ -200,7 +200,7 @@ const FicheStatsGlobal = () => {
                                             options={yearOptions}
                                             isSearchable={true}
                                             placeholder="Selectionnez une année"
-                                            isDisabled = {typeFilter?.value === "périodique" ? true : false}
+                                            isDisabled = {typeFilter === "périodique" ? true : false}
                                         />
                                     </FormGroup>
                                 </Col>
@@ -227,7 +227,7 @@ const FicheStatsGlobal = () => {
                                             value={startDate}
                                             placeholder="date"
                                             type="date"
-                                            disabled={typeFilter?.value === "annuel" ? true : false}
+                                            disabled={typeFilter === "annuel" ? true : false}
                                         />
                                     </FormGroup>
                                 </Col>
@@ -243,7 +243,7 @@ const FicheStatsGlobal = () => {
                                             onChange={handleInputChange(setEndDate)}
                                             placeholder="date"
                                             type="date"
-                                            disabled={typeFilter?.value === "annuel" ? true : false}
+                                            disabled={typeFilter === "annuel" ? true : false}
                                         />
                                     </FormGroup>
                                 </Col>

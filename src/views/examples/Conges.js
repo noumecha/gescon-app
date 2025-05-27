@@ -109,6 +109,32 @@ const Conges = () => {
     }
   }
 
+  // edit specific conge : 
+  const handleEditConge = (congeToEdit) => {
+    // Récupère les données du congé et pré-remplit les champs
+    setName(congeToEdit.nom);
+    setMatricule(congeToEdit.matricule);
+    setStartDate(congeToEdit.date_debut_conge);
+    setEndDate(congeToEdit.date_fin_conge);
+    setDuration(congeToEdit.duree_conge);
+    setSelectedType(congeToEdit.libelle_type_conge);
+    setRepriseDate(congeToEdit.date_reprise_service);
+    setPoste(congeToEdit.poste);
+    setType(congeToEdit.type); // administratif, etc.
+    setSelectedDec(congeToEdit.decision);
+    setStruc(congeToEdit.structure);
+    setTypeConge([ 
+      { libelle_type_conge: congeToEdit.libelle_type_conge }
+    ]);
+    // Enregistre l'objet à modifier dans le state pour le réutiliser au moment de sauvegarder
+    setActived(true); 
+    setUserConge(congeToEdit); 
+  };
+
+  const editConge = () => {
+    console.log("edit congé");
+  }
+
   // useEffect change duration 
   useEffect(() =>  {
     const changeDuration = () => {
@@ -301,6 +327,7 @@ const Conges = () => {
             handleRefresh={handleRefresh}
             loadingSpinner={loadingSpinner}
             conge={conge}
+            editConge={editConge}
           />
       </Container>
     </>
