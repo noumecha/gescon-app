@@ -30,6 +30,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
     congeAddedSuccess: (callback) => ipcRenderer.on('conge-added-success', callback),    
     getConge: () => ipcRenderer.send('get-conge'),
     retrieveConge: (callback) => ipcRenderer.on('all-conge', callback),
+    // specific data : 
+    getData: (req) => ipcRenderer.send('get-specific-data' , req),
+    retrieveSpecificData: (callback) => ipcRenderer.on('all-specific-data', callback),
       // attestation congé
     getAttestationConge: () => ipcRenderer.send('get-attestation-conge'),
     retrieveAttestationConge: (callback) => ipcRenderer.on('all-attestation-conge', callback),

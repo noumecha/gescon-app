@@ -24,8 +24,8 @@ function createWindow() {
     mainWindow.setMenuBarVisibility(false);
 
     mainWindow.loadURL(
-        `http://localhost:3000`
-        //`file://${path.join(__dirname, '../build/index.html')}`
+        //`http://localhost:3000`
+        `file://${path.join(__dirname, '../build/index.html')}`
     );
 
 };
@@ -127,6 +127,8 @@ function getConge(event, req) {
     });
 }
 
+// function for getting specific data
+
 function getAttestationConge(even, req) {
     pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_conge,statut_attestation_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel  AND attestation_conge != "null" AND attestation_conge != "";', (err, res) => {
         if (err) throw err;
@@ -159,6 +161,13 @@ function getArchiveAttRepConge(event) {
     pool.query('SELECT archive_att_reprise_conge.id_conge,id_archive_att_reprise_conge,nom_prenom_personnel,matricule_personnel,created_at_archive_att_reprise_conge,fichier_archive_att_reprise_conge FROM conge,personnel,archive_att_reprise_conge WHERE conge.id_personnel = personnel.id_personnel AND conge.id_conge = archive_att_reprise_conge.id_conge;', (err, res) => {
         if (err) throw err;
         event.sender.send('all-archive-att-rep-conge', res);
+    });
+}
+// data -> getting generic data : 
+function getData(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-specific-data', res);
     });
 }
 // congés -> getting specific conge by req
@@ -424,6 +433,7 @@ app.whenReady().then(() => {
     ipcMain.on('get-specific-conge-type', getSpecificCongeType);
     // conge  
     ipcMain.on('get-specific-conge', getSpecificConge);
+    ipcMain.on('get-specific-data', getData);
     ipcMain.on('get-conge', getConge);
     ipcMain.on('add-archive-attestation-conge', addArchiveAttestationConge)
     ipcMain.on('update-conge', updateConge);

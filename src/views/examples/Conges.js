@@ -3,13 +3,14 @@ import { Container } from "reactstrap";
 import CongesTable from "views/customs-components/CongesTable";
 // core components
 import Header from "components/Headers/Header.js";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import CongesForm from "views/customs-components/CongesForm";
 // useful functions 
 import { fetchDatas } from "utils/fetchDatas";
 import useCongeState from "hooks/useCongeState";
 // CRUDs functions 
 import { saveConge } from "utils/saveConge";
+import { updateConge } from "utils/updateConge";
 
 const Conges = () => {
   
@@ -23,6 +24,9 @@ const Conges = () => {
     setSelectedType, selectedDec, setSelectedDec, struc, setStruc, document, setDocument, generateSuccess, setGenerateSuccess
   } = useCongeState();
 
+  const [action, setAction] = useState("create");
+  const [personnel, setPersonnel] = useState([]);
+
   // completion varaibles for functions
   let nbDaysConges = 0;
 
@@ -33,6 +37,12 @@ const Conges = () => {
       repriseDate,matricule,type,selectedDec,struc,poste,userConge,lastPermission,setError,sexe,nb_jours_conges,
       setSuccess,setActived,grade,demande,preposition,nbDaysConges,setStatus,document
     )
+  }
+
+  const handleUpdateConge = () => {
+    updateConge(
+      duration, setError, startDate, typeConge, personnel, setSuccess
+    );
   }
 
   const handleSearch = (e) => {
@@ -111,29 +121,27 @@ const Conges = () => {
 
   // edit specific conge : 
   const handleEditConge = (congeToEdit) => {
+    // console.log(congeToEdit);
     // Récupère les données du congé et pré-remplit les champs
-    setName(congeToEdit.nom);
-    setMatricule(congeToEdit.matricule);
-    setStartDate(congeToEdit.date_debut_conge);
-    setEndDate(congeToEdit.date_fin_conge);
+    setName(congeToEdit.nom_prenom_personnel);
+    setMatricule(congeToEdit.matricule_personnel);
+    const start_date = new Date(congeToEdit.date_debut_conge);
+    start_date.setDate(start_date.getDate() + parseInt(1));
+    setStartDate(start_date.toISOString().split("T")[0]);
     setDuration(congeToEdit.duree_conge);
     setSelectedType(congeToEdit.libelle_type_conge);
-    setRepriseDate(congeToEdit.date_reprise_service);
-    setPoste(congeToEdit.poste);
-    setType(congeToEdit.type); // administratif, etc.
-    setSelectedDec(congeToEdit.decision);
-    setStruc(congeToEdit.structure);
+    setPoste(congeToEdit.poste_personnel);
+    setType(congeToEdit.attestation_conge.type);
+    setStruc(congeToEdit.structure_personnel);
     setTypeConge([ 
-      { libelle_type_conge: congeToEdit.libelle_type_conge }
+      { libelle_type_conge: congeToEdit.attestation_conge.typeConge }
     ]);
     // Enregistre l'objet à modifier dans le state pour le réutiliser au moment de sauvegarder
     setActived(true); 
-    setUserConge(congeToEdit); 
+    setAction("update");
+    getSpecificPersonnel(congeToEdit.id_personnel);
+    setStatus("Mofification du "+ congeToEdit.attestation_conge.typeConge + " de " + congeToEdit.nom_prenom_personnel);
   };
-
-  const editConge = () => {
-    console.log("edit congé");
-  }
 
   // useEffect change duration 
   useEffect(() =>  {
@@ -172,7 +180,7 @@ const Conges = () => {
   useEffect(() => {
     const calculateEndDate = () => {
       if (startDate && duration) {
-        if (selectedPerson.id_type_personnel === 2 && (selectedType === "congé administratif" || selectedType === "congé administratif")) {
+        if (selectedPerson && selectedPerson.id_type_personnel === 2 && (selectedType === "congé administratif")) {
           let st = new Date(startDate);
           let weekdaysToAdd = duration - 1;
           while (weekdaysToAdd > 0) {
@@ -278,6 +286,19 @@ const Conges = () => {
     fetchDatas(setConge, setLoadingSpinner, setSelectedDec, setTypeConge, setLastPermission, selectedPerson, id_personnel);
   },[id_personnel, selectedPerson]);
 
+  // useEffect for getting specific personnel data
+  const getSpecificPersonnel = (personnelId) => {
+    try {
+      const personnel_query = `SELECT * FROM personnel WHERE id_personnel = ${personnelId}`;
+      window.electronAPI.getData(personnel_query);
+      window.electronAPI.retrieveSpecificData((event, res) => {
+        setPersonnel(res);
+      });
+    } catch (error) {
+      console.error("Erreur : " + error.message);
+    }
+  }
+
   return (
     <>
       <Header />
@@ -313,7 +334,9 @@ const Conges = () => {
             selectedDec={selectedDec}
             error={error}
             success={success}
-            saveConge={handleSaveConge}
+            buttonClass={action && action === "update" ? "success" : "primary"}
+            buttonText={action && action === "update" ? "Mettre à jour l'attestation" : "Générer l'attestion"}
+            saveConge={action && action === "update" ? handleUpdateConge : handleSaveConge}
             actived={actived}
           />
           <CongesTable 
@@ -327,7 +350,7 @@ const Conges = () => {
             handleRefresh={handleRefresh}
             loadingSpinner={loadingSpinner}
             conge={conge}
-            editConge={editConge}
+            handleEditConge={handleEditConge}
           />
       </Container>
     </>

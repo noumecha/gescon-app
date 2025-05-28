@@ -31,6 +31,8 @@ const CongesForm = ({
     endDate,
     selectedDec,
     error,
+    buttonText,
+    buttonClass,
     success,
     saveConge,
     actived,
@@ -338,11 +340,11 @@ const CongesForm = ({
                     <Row className="mt-3">
                       <Col md="6">
                         <Button
-                          color="primary"
+                          color={buttonClass}
                           onClick={saveConge}
                           //disabled={actived}
                         >
-                          Générer l'attestation
+                          {buttonText}
                         </Button>
                       </Col>
                     </Row>
