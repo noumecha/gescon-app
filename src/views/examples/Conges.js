@@ -26,22 +26,20 @@ const Conges = () => {
 
   const [action, setAction] = useState("create");
   const [personnel, setPersonnel] = useState([]);
-
-  // completion varaibles for functions
-  let nbDaysConges = 0;
+  const [congeToEdit, setCongeToEdit] = useState(null);
 
   // saving conge
   const handleSaveConge = () => {
     saveConge(
       selectedPerson,selectedType,typeConge,name,startDate,endDate,duration,setDuration,
       repriseDate,matricule,type,selectedDec,struc,poste,userConge,lastPermission,setError,sexe,nb_jours_conges,
-      setSuccess,setActived,grade,demande,preposition,nbDaysConges,setStatus,document
+      setSuccess,setActived,grade,demande,preposition,setStatus,document
     )
   }
 
   const handleUpdateConge = () => {
     updateConge(
-      duration, setError, startDate, typeConge, personnel, setSuccess
+      congeToEdit, duration, setError, startDate, typeConge, personnel, setSuccess, endDate, repriseDate, setStatus, demande, document, setDuration
     );
   }
 
@@ -139,6 +137,7 @@ const Conges = () => {
     // Enregistre l'objet à modifier dans le state pour le réutiliser au moment de sauvegarder
     setActived(true); 
     setAction("update");
+    setCongeToEdit(congeToEdit);
     getSpecificPersonnel(congeToEdit.id_personnel);
     setStatus("Mofification du "+ congeToEdit.attestation_conge.typeConge + " de " + congeToEdit.nom_prenom_personnel);
   };

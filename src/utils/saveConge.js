@@ -6,10 +6,11 @@ import { validateDuration } from "./validateDuration";
 const saveConge = async (
   selectedPerson,selectedType,typeConge,name,startDate,endDate,duration,setDuration,
   repriseDate,matricule,type,selectedDec,struc,poste,userConge,lastPermission,setError,sexe,nb_jours_conges,
-  setSuccess,setActived,grade,demande,preposition,nbDaysConges,setStatus,document
+  setSuccess,setActived,grade,demande,preposition,setStatus,document
 ) => {
     try {
       let total_conge_admin = 0;
+      let nbDaysConges = 0;
       const curr_date = new Date();
       if (!validateDuration(duration, setError)) return;
       if (selectedPerson.id_type_personnel === 2) {
