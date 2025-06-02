@@ -18,6 +18,7 @@ import MyPagination from './MyPagination';
 import filterPersonnel from 'utils/filterPersonnel';
 import usePagination from 'hooks/usePagination';
 import { formatDateMonthForm } from 'utils/dates-utils';
+import { deleteConge } from 'utils/deleteConge';
 
 const CongesTable = ({
     loadingText, 
@@ -71,6 +72,10 @@ const CongesTable = ({
             }
         }
         return leftDays
+    }
+
+    const handleDeleteConge = (c) => {
+        deleteConge(c);
     }
 
     return (
@@ -193,6 +198,11 @@ const CongesTable = ({
                                                         onClick={() => handleEditConge(c)}
                                                     >
                                                         Modifier
+                                                    </DropdownItem>
+                                                    <DropdownItem
+                                                        onClick={() => handleDeleteConge(c)}
+                                                    >
+                                                        Supprimer/annuler
                                                     </DropdownItem>
                                                 </DropdownMenu>
                                             </UncontrolledDropdown>

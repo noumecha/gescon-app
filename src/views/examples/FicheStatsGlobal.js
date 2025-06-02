@@ -9,14 +9,14 @@ import { useState, useEffect } from "react";
 const FicheStatsGlobal = () => {
     const date = new Date().getDate() + '_' + parseInt(new Date().getMonth() + 1 )+ '_' + new Date().getFullYear()
     const [conges, setConges] = useState([]);
-    const [permissions, setPermissions] = useState([]);
+    //const [permissions, setPermissions] = useState([]);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
-    const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
-    const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
-    const [filter, setFilter] = useState(null);
+    //const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+    //const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
+    const [filter, setFilter] = useState(null); // structure filter
     const [yearFilter, setYearFilter] = useState(null);
-    const [typeFilter, setTypeFilter] = useState(null);
+    //const [typeFilter, setTypeFilter] = useState(null); // periodique | annuel
     const [structureNames, setStructureNames] = useState([]);
     const [years, setYears] = useState([]);
 
@@ -24,7 +24,7 @@ const FicheStatsGlobal = () => {
         setStateFunction(e.target.value);
     };
 
-    const types = [
+    /*const types = [
         { libelle_type_stat: "annuel" },
         { libelle_type_stat: "périodique" },
     ];
@@ -32,7 +32,7 @@ const FicheStatsGlobal = () => {
     const typesOptions = types.map((t, i) => ({
         value: t.libelle_type_stat,
         label: t.libelle_type_stat,
-    }));
+    }));*/
 
     const yearOptions = years.map((y, i) => ({
         value: y.annee,
@@ -50,49 +50,47 @@ const FicheStatsGlobal = () => {
 
     const generateStats = async () => {
         try {
+            if(filter === null || yearFilter === null) {
+                setError("Selectionner au moins une structure et une année pour générer les statistiques.");
+                setTimeout(() => {
+                    setError("");
+                }, 7000);
+                return ;
+            }
+            const structures = Object.entries(filter).map(([key, value]) => ({
+                names : value.value
+            }));
+            const strucArray = structures.map(s => `'${s.names.replace(/'/g, "''")}'`).join(", ");;
+            console.log(strucArray)
             let query = `
                 SELECT * FROM conge 
-                INNER JOIN personnel ON personnel.id_personnel = conge.id_personnel
+                INNER JOIN personnel ON personnel.id_personnel = conge.id_personnel AND personnel.structure_personnel IN (${strucArray})
             `;
-            let permissionQuery = `
-                SELECT * FROM permission 
-                INNER JOIN personnel ON personnel.id_personnel = permission.id_personnel
-            `;
-
-            const hasFilter = !!filter?.value;
+            /*const hasFilter = !!filter?.value;
             const hasYear = !!yearFilter?.value;
-            const isAnnuel = typeFilter === "annuel";
+            const isAnnuel = "annuel";
             const isPeriodique = typeFilter === "périodique";
-
             let conditions = [];
-            let permissionConditions = [];
-
             if (hasFilter) {
                 conditions.push(`personnel.structure_personnel = ${JSON.stringify(filter.value)}`);
-                permissionConditions.push(`personnel.structure_personnel = ${JSON.stringify(filter.value)}`);
             }
             if (isAnnuel && hasYear) {
                 conditions.push(`YEAR(date_fin_conge) = '${yearFilter.value}'`);
-                permissionConditions.push(`YEAR(date_fin_permission) = '${yearFilter.value}'`);
-            }
-            if (isPeriodique) {
+            }*/
+            /*if (isPeriodique) {
                 conditions.push(`(date_debut_conge BETWEEN '${startDate}' AND '${endDate}' OR date_fin_conge BETWEEN '${startDate}' AND '${endDate}')`);
                 permissionConditions.push(`(date_debut_permission BETWEEN '${startDate}' AND '${endDate}' OR date_fin_permission BETWEEN '${startDate}' AND '${endDate}')`);
-            }
-            if (conditions.length > 0) {
+            }*/
+            /*if (conditions.length > 0) {
                 query += " WHERE " + conditions.join(" AND ");
-            }
-            if (permissionConditions.length > 0) {
-                permissionQuery += " WHERE " + permissionConditions.join(" AND ");
-            }
+            }*/
             console.log("REQUETE STATISTIQUE CONGE =>", query);
-            console.log("REQUETE STATISTIQUE PERMISSION =>", permissionQuery);
-            // fetching datas
+            /* fetching datas */
             window.electronAPI.getSpecificConge(query, 'conge');
             window.electronAPI.retrieveSpecificConge((event, res) => {
                 console.log(res);
                 setConges(res);
-                setSuccess("Statistiques générées !");
+                setSuccess("Statistiques générées avec succès!");
                 setTimeout(() => {
                     setSuccess("");
                 }, 7000)
@@ -126,11 +124,12 @@ const FicheStatsGlobal = () => {
     }, []);
 
     const computeStatistics = (conges) => {
-        const today = new Date();
-        let totalConges = conges.length;
+        //const today = new Date();
+        //let totalConges = conges.length;
+        const stats = {};
 
         // Congés jusqu'à aujourd'hui
-        const congesJusquaAuj = conges.filter(d => new Date(d.date_debut_conge) <= today).length;
+        //const congesJusquaAuj = conges.filter(d => new Date(d.date_debut_conge) <= today).length;
 
         // Congés par division
         const congesParDivision = {};
@@ -138,18 +137,15 @@ const FicheStatsGlobal = () => {
             const division = c.structure_personnel || "Non défini";
             congesParDivision[division] = (congesParDivision[division] || 0) + 1;
         });
-        // Personnes actuellement en congé
+        /* Personnes actuellement en congé
         const enCongesActuellement = conges.filter(c => {
             const start = new Date(c.date_debut_conge);
             const end = new Date(c.date_fin_conge);
             return today >= start && today <= end;
-        }).length;
+        }).length;*/
 
         return {
-            totalConges,
-            congesJusquaAuj,
-            congesParDivision,
-            enCongesActuellement,
+            stats,
         };
     };
     
@@ -173,7 +169,7 @@ const FicheStatsGlobal = () => {
                     <Form>
                         <div className="pl-lg-4">
                             <Row>
-                                <Col md="6">
+                                {/*<Col md="6">
                                     <FormGroup>  
                                         <Label for="type-conge">
                                             Type de statistiques
@@ -188,7 +184,7 @@ const FicheStatsGlobal = () => {
                                             placeholder="Choisir le type de statistiques"
                                         />
                                     </FormGroup>
-                                </Col>
+                                </Col>*/}
                                 <Col md="6">
                                     <FormGroup>  
                                         <Label for="type-conge">
@@ -200,21 +196,25 @@ const FicheStatsGlobal = () => {
                                             options={yearOptions}
                                             isSearchable={true}
                                             placeholder="Selectionnez une année"
-                                            isDisabled = {typeFilter === "périodique" ? true : false}
+                                            //isDisabled = {typeFilter === "périodique" ? true : false}
                                         />
                                     </FormGroup>
                                 </Col>
-                                <Col lg="12">
+                                <Col md="6">
+                                    <Label for="type-conge">
+                                        Structure
+                                    </Label> 
                                     <Select
                                         value={filter}
                                         onChange={handleFilterChange(setFilter)}
                                         options={options}
                                         isSearchable={true}
-                                        placeholder="Toutes les structures"
+                                        isMulti={true}
+                                        placeholder="Selectionnez une ou plusieurs structures"
                                     />
                                 </Col>
                             </Row>
-                            <Row>
+                            {/*<Row>
                                 <Col md="6">
                                     <FormGroup>
                                         <Label for="date-depart">
@@ -247,7 +247,7 @@ const FicheStatsGlobal = () => {
                                         />
                                     </FormGroup>
                                 </Col>
-                            </Row>
+                            </Row>*/}
                             <Row>
                                 <Col md="12">
                                     { error && 
@@ -294,9 +294,9 @@ const FicheStatsGlobal = () => {
                                     <StatsDoc
                                         stats={stats}
                                         structureName={filter}
-                                        typeStat={typeFilter}
-                                        dateDebut={startDate}
-                                        dateFin={endDate}
+                                        //typeStat={typeFilter}
+                                        //dateDebut={startDate}
+                                        //dateFin={endDate}
                                         filter={filter}
                                         anneeStat={yearFilter}
                                     />
@@ -307,9 +307,9 @@ const FicheStatsGlobal = () => {
                                     <PDFDownloadLink document={<StatsDoc
                                             stats={stats}
                                             structureName={filter}
-                                            typeStat={typeFilter}
-                                            dateDebut={startDate}
-                                            dateFin={endDate}
+                                            //typeStat={typeFilter}
+                                            //dateDebut={startDate}
+                                            //dateFin={endDate}
                                             filter={filter}
                                             anneeStat={yearFilter}
                                         />} fileName={`fiche_statistique_${date}.pdf`}>

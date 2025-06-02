@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     },
     containerTwo: {
         display: 'flex',
-        marginTop : 10,
+        marginTop : 5,
         marginLeft: 60,
         marginRight: 60,
         justifyContent: 'space-evenly',
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     // certif title
     h1CertifTitle: {
       fontSize: 14,
-      marginTop: 25,
+      marginTop: 5,
       display: 'flex',
       color: '#000000',
       textAlign: 'center',
@@ -232,7 +232,60 @@ const styles = StyleSheet.create({
         marginTop: 3,
         marginLeft: 5,
         textTransform: 'uppercase',
-    }
+    },
+    // table with css 
+    containerTable: {
+        display: 'flex',
+        border: '1px solid black',
+        marginTop : 5,
+        padding: 0,
+        marginLeft: 20,
+        marginRight: 20,
+        justifyContent: 'space-evenly',
+        flexDirection: 'column',
+    },
+    containerTableFirstRow1st : {
+        display: 'flex',
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    containerTableFirstRowTd : {
+        border: '1px solid black',
+        textTransform: 'uppercase',
+        textAlign: 'center',
+        width: 200,
+        padding: 5,
+        fontSize: 10,
+    },
+    containerTableFirstRowTdNoBorderBottom : {
+        border: '1px solid black',
+        borderBottom: 'none',
+        textTransform: 'uppercase',
+        textAlign: 'center',
+        verticalAlign: 'sub',
+        width: 200,
+        padding: 5,
+        fontSize: 10,
+    },
+    containerTableSndRowTdNoBorderTop : {
+        border: '1px solid black',
+        borderTop: 'none',
+        textTransform: 'uppercase',
+        textAlign: 'center',
+        verticalAlign: 'super',
+        width: 200,
+        padding: 5,
+        fontSize: 10,
+    },
+    containerTableSndRowTd : {
+        border: '1px solid black',
+        textTransform: 'uppercase',
+        textAlign: 'center',
+        width: 100,
+        padding: 5,
+        fontSize: 10,
+    },
 });
 
 // Create Document Component
@@ -243,7 +296,7 @@ const StatsDoc = (
 
     return (
             <Document>
-                <Page size="A4" style={styles.page}>
+                <Page size="A4" orientation='landscape' style={styles.page}>
                     {/* first row : entete */}
                     <View style={styles.container}>
                         {/* top left text */}
@@ -307,6 +360,7 @@ const StatsDoc = (
                             <Text style={styles.line}>------------</Text>
                         </View>
                     </View>
+                    {/** second row : title */}
                     <View style={styles.containerTwo}>
                         <View style={styles.section}>
                             <Text style={styles.h1CertifTitle}>
@@ -314,44 +368,314 @@ const StatsDoc = (
                             </Text>
                         </View>
                     </View>
-                    <View style={styles.containerTwo}>
-                        <View style={styles.section}>
-                            <Text style={styles.h1CertifTitle}>
-                                STATISTIQUES {props.typeStat}
+                    {/** Table container */}
+                    <View style={styles.containerTable}>
+                        {/** first row */}
+                        <View style={styles.containerTableFirstRow1st}>
+                            <Text style={styles.containerTableFirstRowTdNoBorderBottom}>
+                                Annee 
+                            </Text>
+                            <Text style={styles.containerTableFirstRowTd}>
+                                Jan
+                            </Text>
+                            <Text style={styles.containerTableFirstRowTd}>
+                                Fév
+                            </Text>
+                            <Text style={styles.containerTableFirstRowTd}>
+                                Mar
+                            </Text>
+                            <Text style={styles.containerTableFirstRowTd}>
+                                Avr
+                            </Text>
+                            <Text style={styles.containerTableFirstRowTd}>
+                                Mai
+                            </Text>
+                            <Text style={styles.containerTableFirstRowTd}>
+                                Jui
+                            </Text>
+                            <Text style={styles.containerTableFirstRowTd}>
+                                Juil
+                            </Text>
+                            <Text style={styles.containerTableFirstRowTd}>
+                                Aoû
+                            </Text>
+                            <Text style={styles.containerTableFirstRowTd}>
+                                Sep
+                            </Text>
+                            <Text style={styles.containerTableFirstRowTd}>
+                                Oct
+                            </Text>
+                            <Text style={styles.containerTableFirstRowTd}>
+                                Nov
+                            </Text>
+                            <Text style={styles.containerTableFirstRowTd}>
+                                Dec
+                            </Text>
+                            <Text style={styles.containerTableFirstRowTd}>
+                                Annee
+                            </Text>
+                        </View>
+                        <View style={styles.containerTableFirstRow1st}>
+                            <Text style={styles.containerTableSndRowTdNoBorderTop}>
+                                Struc
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                fnc
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                con
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                fnc
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                con
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                fnc
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                con
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                fnc
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                con
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                fnc
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                con
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                fnc
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                con
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                fnc
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                con
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                fnc
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                con
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                fnc
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                con
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                fnc
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                con
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                fnc
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                con
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                fnc
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                con
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                fnc
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                con
+                            </Text>
+                        </View>
+                        {/** table body */}
+                        <View style={styles.containerTableFirstRow1st}>
+                            <Text style={styles.containerTableFirstRowTd}>
+                                cab
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                        </View>
+                        {/** table end */}
+                        <View style={styles.containerTableFirstRow1st}>
+                            <Text style={styles.containerTableFirstRowTd}>
+                                Tot. DGB
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
+                            </Text>
+                            <Text style={styles.containerTableSndRowTd}>
+                                0
                             </Text>
                         </View>
                     </View>
-                    <View style={styles.containerTwo}>
-                        <View style={styles.section}>
-                            <Text style={styles.h2CertifSubtitle}>
-                                Total des congés : {props.stats.totalConges}
-                            </Text>
-                            <Text style={styles.h2CertifSubtitle}>
-                                Congés jusqu'à aujourd'hui : {props.stats.congesJusquaAuj}
-                            </Text>
-                            <Text style={styles.h2CertifSubtitle}>
-                                Personnels actuellement en congé : {props.stats.enCongesActuellement}
+                    {/** third row : footer */}
+                    <View style={styles.containerQr}>
+                        <View style={styles.sectionQr}>
+                            <Text style={styles.qrText}>
+                                GESCON-APP - {d.getTime()} - {d.getFullYear()}
                             </Text>
                         </View>
                     </View>
-                    <View style={styles.containerTwo}>
-                        <View style={styles.section}>
-                            <Text style={styles.h1CertifTitle}>
-                                Répartition par division :
-                            </Text>
-                            {Object.entries(props.stats.congesParDivision).map(([division, count]) => (
-                                <Text style={styles.h2CertifSubtitle} key={division}>{division} : {count}</Text>
-                            ))}
-                        </View>
-                    </View>
-                  <View style={styles.containerQr}>
-                      <View style={styles.sectionQr}>
-                          <Text style={styles.qrText}>
-                              GESCON-APP - {d.getTime()} - {d.getFullYear()}
-                          </Text>
-                      </View>
-                  </View>
-              </Page>
+                </Page>
             </Document>
         );
 }

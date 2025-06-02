@@ -119,8 +119,6 @@ const Conges = () => {
 
   // edit specific conge : 
   const handleEditConge = (congeToEdit) => {
-    // console.log(congeToEdit);
-    // Récupère les données du congé et pré-remplit les champs
     setName(congeToEdit.nom_prenom_personnel);
     setMatricule(congeToEdit.matricule_personnel);
     const start_date = new Date(congeToEdit.date_debut_conge);
