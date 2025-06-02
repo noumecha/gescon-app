@@ -289,9 +289,7 @@ const styles = StyleSheet.create({
 });
 
 // Create Document Component
-const StatsDoc = (
-    props
-) => {
+const StatsDoc = ({year, stats}) => {
     const d = new Date();
 
     return (
@@ -373,7 +371,7 @@ const StatsDoc = (
                         {/** first row */}
                         <View style={styles.containerTableFirstRow1st}>
                             <Text style={styles.containerTableFirstRowTdNoBorderBottom}>
-                                Annee 
+                                {year}
                             </Text>
                             <Text style={styles.containerTableFirstRowTd}>
                                 Jan

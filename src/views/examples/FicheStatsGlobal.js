@@ -127,16 +127,42 @@ const FicheStatsGlobal = () => {
         //const today = new Date();
         //let totalConges = conges.length;
         const stats = {};
-
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
         // Congés jusqu'à aujourd'hui
         //const congesJusquaAuj = conges.filter(d => new Date(d.date_debut_conge) <= today).length;
 
         // Congés par division
-        const congesParDivision = {};
         conges.forEach(c => {
-            const division = c.structure_personnel || "Non défini";
-            congesParDivision[division] = (congesParDivision[division] || 0) + 1;
+            const rawStructure = c.structure_personnel || "Non défini";
+            const match = rawStructure.match(/\[([^\]]+)\]/); // extract inside [ ]
+            const structure = match ? match[1] : "Non défini";
+            const type = c.type_personnel === 1 ? "fonctionnaire" : "contractuel";
+            const startDate = new Date(c.date_fin_conge);
+            const monthName = monthNames[startDate.getMonth()]; // from 0-11
+
+            // Initialise structure if not yet present
+            if (!stats[structure]) {
+                stats[structure] = {
+                    fonctionnaire: { total: 0 },
+                    contractuel: { total: 0 },
+                    total: 0
+                };
+                // Init month counters
+                monthNames.forEach(month => {
+                    stats[structure].fonctionnaire[month] = 0;
+                    stats[structure].contractuel[month] = 0;
+                });
+            }
+
+            // Incrémentation
+            stats[structure][type][monthName]++;
+            stats[structure][type].total++;
+            stats[structure].total++;
         });
+
         /* Personnes actuellement en congé
         const enCongesActuellement = conges.filter(c => {
             const start = new Date(c.date_debut_conge);
@@ -293,12 +319,12 @@ const FicheStatsGlobal = () => {
                                 <PDFViewer showToolbar={0} className="w-100"  height={800}>
                                     <StatsDoc
                                         stats={stats}
-                                        structureName={filter}
+                                        //structureName={filter}
                                         //typeStat={typeFilter}
                                         //dateDebut={startDate}
                                         //dateFin={endDate}
-                                        filter={filter}
-                                        anneeStat={yearFilter}
+                                        //filter={filter}
+                                        year={yearFilter}
                                     />
                                 </PDFViewer>
                             </Row>
@@ -306,12 +332,12 @@ const FicheStatsGlobal = () => {
                                 <Col className="order-xl-1 mt-2" xl="8">
                                     <PDFDownloadLink document={<StatsDoc
                                             stats={stats}
-                                            structureName={filter}
+                                            //structureName={filter}
                                             //typeStat={typeFilter}
                                             //dateDebut={startDate}
                                             //dateFin={endDate}
-                                            filter={filter}
-                                            anneeStat={yearFilter}
+                                            //filter={filter}
+                                            year={yearFilter}
                                         />} fileName={`fiche_statistique_${date}.pdf`}>
                                         {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 
                                         <Button
