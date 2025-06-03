@@ -342,6 +342,9 @@ const Conges = () => {
             handleStatutFilter={handleStatutFilter}
             statutFilter={statutFilter}
             handleSearch={handleSearch}
+            setSuccess={setSuccess}
+            setError={setError}
+            setStatus={setStatus}
             search={search}
             generateSuccess={generateSuccess}
             handleRefresh={handleRefresh}

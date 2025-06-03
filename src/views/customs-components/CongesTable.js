@@ -30,7 +30,10 @@ const CongesTable = ({
     search,
     generateSuccess,
     handleRefresh,
-    conge,
+    conge, 
+    setSuccess,
+    setError,
+    setStatus,
     handleEditConge,
 }) => {
 
@@ -75,7 +78,7 @@ const CongesTable = ({
     }
 
     const handleDeleteConge = (c) => {
-        deleteConge(c);
+        deleteConge(c, setSuccess, setError, setStatus);
     }
 
     return (
@@ -95,6 +98,7 @@ const CongesTable = ({
                         <option value="programmé">programmé</option>
                         <option value="en cours">en cours</option>
                         <option value="terminé">terminé</option>
+                        <option value="annulé">annulé</option>
                     </Input>
                     </Col>
                     <Col lg="6">
