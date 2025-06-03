@@ -289,9 +289,9 @@ const styles = StyleSheet.create({
 });
 
 // Create Document Component
-const StatsDoc = ({year, stats}) => {
+const StatsDoc = (props) => {
     const d = new Date();
-
+    console.log("StatsDoc props: ", props.stats);
     return (
             <Document>
                 <Page size="A4" orientation='landscape' style={styles.page}>
@@ -371,7 +371,7 @@ const StatsDoc = ({year, stats}) => {
                         {/** first row */}
                         <View style={styles.containerTableFirstRow1st}>
                             <Text style={styles.containerTableFirstRowTdNoBorderBottom}>
-                                {year}
+                                {props && props.year ? props.year.value : 2026}
                             </Text>
                             <Text style={styles.containerTableFirstRowTd}>
                                 Jan
@@ -497,6 +497,37 @@ const StatsDoc = ({year, stats}) => {
                             </Text>
                         </View>
                         {/** table body */}
+                        {props.stats && Object.keys(props.stats.stats).length > 0 && 
+                            Object.entries(props.stats.stats).map(([structureName, data], index) => (
+                                <View key={index} style={styles.containerTableFirstRow1st}>
+                                    <Text style={styles.containerTableFirstRowTd}>
+                                        {structureName}
+                                    </Text>
+                                    {/* Monthly stats: fonctionnaire & contractuel */}
+                                    {[
+                                        "January", "February", "March", "April", "May", "June",
+                                        "July", "August", "September", "October", "November", "December"
+                                    ].map((month, i) => (
+                                        <React.Fragment key={i}>
+                                            {/* Fonctionnaire */}
+                                            <Text style={styles.containerTableSndRowTd}>
+                                                {(data.fonctionnaire && data.fonctionnaire[month]) ?? 0}
+                                            </Text>
+                                            {/* Contractuel */}
+                                            <Text style={styles.containerTableSndRowTd}>
+                                                {(data.contractuel && data.contractuel[month]) ?? 0}
+                                            </Text>
+                                        </React.Fragment>
+                                    ))}
+                                    <Text style={styles.containerTableSndRowTd}>
+                                        {data.fonctionnaire?.total ?? 0}
+                                    </Text>
+                                    <Text style={styles.containerTableSndRowTd}>
+                                        {data.contractuel?.total ?? 0}
+                                    </Text>
+                                </View>
+                            ))
+                        }
                         <View style={styles.containerTableFirstRow1st}>
                             <Text style={styles.containerTableFirstRowTd}>
                                 cab

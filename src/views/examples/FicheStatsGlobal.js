@@ -14,8 +14,8 @@ const FicheStatsGlobal = () => {
     const [success, setSuccess] = useState("");
     //const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
     //const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
-    const [filter, setFilter] = useState(null); // structure filter
-    const [yearFilter, setYearFilter] = useState(null);
+    const [filter, setFilter] = useState([]); // structure filter
+    const [yearFilter, setYearFilter] = useState(null); // year filter
     //const [typeFilter, setTypeFilter] = useState(null); // periodique | annuel
     const [structureNames, setStructureNames] = useState([]);
     const [years, setYears] = useState([]);
@@ -60,8 +60,7 @@ const FicheStatsGlobal = () => {
             const structures = Object.entries(filter).map(([key, value]) => ({
                 names : value.value
             }));
-            const strucArray = structures.map(s => `'${s.names.replace(/'/g, "''")}'`).join(", ");;
-            console.log(strucArray)
+            const strucArray = structures.map(s => `'${s.names.replace(/'/g, "''")}'`).join(", ");
             let query = `
                 SELECT * FROM conge 
                 INNER JOIN personnel ON personnel.id_personnel = conge.id_personnel AND personnel.structure_personnel IN (${strucArray})
@@ -88,7 +87,7 @@ const FicheStatsGlobal = () => {
             /* fetching datas */
             window.electronAPI.getSpecificConge(query, 'conge');
             window.electronAPI.retrieveSpecificConge((event, res) => {
-                console.log(res);
+                //console.log(res);
                 setConges(res);
                 setSuccess("Statistiques générées avec succès!");
                 setTimeout(() => {
@@ -123,59 +122,57 @@ const FicheStatsGlobal = () => {
         fetchDatas();
     }, []);
 
-    const computeStatistics = (conges) => {
-        //const today = new Date();
-        //let totalConges = conges.length;
+    const computeStatistics = (conges, filter) => {
         const stats = {};
         const monthNames = [
             "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
         ];
-        // Congés jusqu'à aujourd'hui
-        //const congesJusquaAuj = conges.filter(d => new Date(d.date_debut_conge) <= today).length;
-
-        // Congés par division
-        conges.forEach(c => {
-            const rawStructure = c.structure_personnel || "Non défini";
-            const match = rawStructure.match(/\[([^\]]+)\]/); // extract inside [ ]
-            const structure = match ? match[1] : "Non défini";
-            const type = c.type_personnel === 1 ? "fonctionnaire" : "contractuel";
-            const startDate = new Date(c.date_fin_conge);
-            const monthName = monthNames[startDate.getMonth()]; // from 0-11
-
-            // Initialise structure if not yet present
+        const selectedStructures = Object.entries(filter).map(([key, value]) => value.value);
+        selectedStructures.forEach(structureName => {
+            const rawStructure = structureName || "Non défini";
+            const match = rawStructure.match(/\[([^\]]+)\]/);
+            const structure = match ? match[1] : structureName; 
             if (!stats[structure]) {
                 stats[structure] = {
                     fonctionnaire: { total: 0 },
                     contractuel: { total: 0 },
                     total: 0
                 };
-                // Init month counters
                 monthNames.forEach(month => {
                     stats[structure].fonctionnaire[month] = 0;
                     stats[structure].contractuel[month] = 0;
                 });
             }
-
-            // Incrémentation
+        });
+        conges.forEach(c => {
+            const rawStructure = c.structure_personnel;
+            if (!selectedStructures.includes(rawStructure)) return;
+            const match = rawStructure.match(/\[([^\]]+)\]/);
+            const structure = match ? match[1] : c.structure_personnel;
+            const type = c.type_personnel === 1 ? "fonctionnaire" : "contractuel";
+            const endDate = new Date(c.date_fin_conge);
+            const monthName = monthNames[endDate.getMonth()];
+            if (!stats[structure]) {
+                stats[structure] = {
+                    fonctionnaire: { total: 0 },
+                    contractuel: { total: 0 },
+                    total: 0
+                };
+                monthNames.forEach(month => {
+                    stats[structure].fonctionnaire[month] = 0;
+                    stats[structure].contractuel[month] = 0;
+                });
+            }
             stats[structure][type][monthName]++;
             stats[structure][type].total++;
             stats[structure].total++;
         });
 
-        /* Personnes actuellement en congé
-        const enCongesActuellement = conges.filter(c => {
-            const start = new Date(c.date_debut_conge);
-            const end = new Date(c.date_fin_conge);
-            return today >= start && today <= end;
-        }).length;*/
-
-        return {
-            stats,
-        };
+        return { stats };
     };
     
-    const stats = computeStatistics(conges);
+    const stats = computeStatistics(conges, filter);
 
     return (
         <>
