@@ -168,8 +168,29 @@ const FicheStatsGlobal = () => {
             stats[structure][type].total++;
             stats[structure].total++;
         });
+        const globalMonthTotals = {};
+        let totalFonctionnaire = 0;
+        let totalContractuel = 0;
 
-        return { stats };
+        monthNames.forEach(month => {
+            globalMonthTotals[month] = { fonctionnaire: 0, contractuel: 0 };
+        });
+
+        Object.values(stats).forEach(structureData => {
+            monthNames.forEach(month => {
+                const fonc = structureData.fonctionnaire?.[month] || 0;
+                const cont = structureData.contractuel?.[month] || 0;
+
+                globalMonthTotals[month].fonctionnaire += fonc;
+                globalMonthTotals[month].contractuel += cont;
+
+                totalFonctionnaire += fonc;
+                totalContractuel += cont;
+            });
+        });
+
+        console.log(globalMonthTotals);
+        return { stats, globalMonthTotals, totalFonctionnaire,  totalContractuel};
     };
     
     const stats = computeStatistics(conges, filter);

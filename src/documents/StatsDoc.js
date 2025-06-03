@@ -282,6 +282,9 @@ const styles = StyleSheet.create({
         border: '1px solid black',
         textTransform: 'uppercase',
         textAlign: 'center',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+        flexWrap: 'wrap',
         width: 100,
         padding: 5,
         fontSize: 10,
@@ -528,171 +531,30 @@ const StatsDoc = (props) => {
                                 </View>
                             ))
                         }
-                        <View style={styles.containerTableFirstRow1st}>
-                            <Text style={styles.containerTableFirstRowTd}>
-                                cab
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                        </View>
                         {/** table end */}
                         <View style={styles.containerTableFirstRow1st}>
                             <Text style={styles.containerTableFirstRowTd}>
-                                Tot. DGB
+                                Total
+                            </Text>
+                            {props.stats && Object.keys(props.stats.globalMonthTotals).length > 0 && 
+                                Object.entries(props.stats.globalMonthTotals).map(([monthName, monthData], index) => (
+                                    <React.Fragment key={index}>
+                                        {/* Fonctionnaire */}
+                                        <Text style={styles.containerTableSndRowTd}>
+                                            {monthData.fonctionnaire}
+                                        </Text>
+                                        {/* Contractuel */}
+                                        <Text style={styles.containerTableSndRowTd}>
+                                            {monthData.contractuel}
+                                        </Text>
+                                    </React.Fragment>
+                                ))
+                            }
+                            <Text style={styles.containerTableSndRowTd}>
+                                {props.stats && props.stats.totalFonctionnaire}
                             </Text>
                             <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
-                            </Text>
-                            <Text style={styles.containerTableSndRowTd}>
-                                0
+                                {props.stats && props.stats.totalContractuel}
                             </Text>
                         </View>
                     </View>
