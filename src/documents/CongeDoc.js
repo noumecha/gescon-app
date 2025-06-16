@@ -367,7 +367,7 @@ const CongeDoc = (props) => {
                             : props.structure}
                     </Text>
                     <Text style={styles.amParagraph5}>
-                        - interessee/dossier
+                        - interesse{props.sexe === "M" ? "" : "e"}/dossier
                     </Text>
                     <Text style={styles.amParagraph6}>
                         - chrono/archives
