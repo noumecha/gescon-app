@@ -267,7 +267,7 @@ const Conges = () => {
   useEffect(() => {
     const getSpecificConge = async () => {
       try {
-        const specific_conge_query = `SELECT * FROM conge WHERE id_personnel = ${id_personnel}`;
+        const specific_conge_query = `SELECT * FROM conge WHERE id_personnel = ${id_personnel} ORDER BY id_conge DESC`;
         window.electronAPI.getSpecificConge(specific_conge_query);
         await window.electronAPI.retrieveSpecificConge((event, res) => {
           for (let index = 0; index < res.length; index++) {

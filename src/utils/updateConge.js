@@ -134,13 +134,14 @@ const updateConge = async (
                 }
             }
         }
+        //console.log(congeToEdit.attestation_conge);
         // leave attestation datas
         const attestation = {
             numero_conge_admin : (congeToEdit.libelle_type_conge === "congé administratif" && duration === 18 + person.dette_conge && person.id_type_personnel === 2) 
             || (congeToEdit.libelle_type_conge === "congé administratif" && duration === 30 && person.id_type_personnel === 1) 
             ? 0 : total_conge_admin += 1,
             name: person.nom_prenom_personnel.replace(/'/g, "''"),
-            matricule: person.matricule,
+            matricule: congeToEdit.attestation_conge.matricule,
             sexe: person.sexe_personnel,
             poste: person.poste_personnel.replace(/'/g, "''"),
             type: person.id_type_personnel === 2 ? "contractuelle" : "fonctionnaire",
@@ -151,7 +152,7 @@ const updateConge = async (
             startDate: formatDateDayForm(startDate) + "/" + formatDateMonthForm(startDate) +"/"+formatDate(startDate).getFullYear(),
             endDate: formatDateDayForm(endDate) + "/" + formatDateMonthForm(endDate) + "/"+formatDate(endDate).getFullYear(),
             repriseDate: formatDateDayForm(repriseDate) + "/" + formatDateMonthForm(repriseDate) + "/" + formatDate(repriseDate).getFullYear(),
-            typeConge: congeToEdit.libelle_type_conge,
+            typeConge: congeToEdit.attestation_conge.typeConge,
             preposition: person.preposition_personnel,
             grade : person.grade_personnel.replace(/'/g, "''"),
             created_at : new Date().toISOString().slice(0,19).replace('T',' '),
