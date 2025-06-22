@@ -2,7 +2,6 @@
  * determinate the left days between two conges dates
  */
 const leftDays = (startDate, endDate, attestation) => {
-    let leftDays
     let typePersonnel = JSON.stringify(attestation.type)
     const curr_date = new Date();
     if (curr_date >= startDate && curr_date <= endDate) {
@@ -14,9 +13,9 @@ const leftDays = (startDate, endDate, attestation) => {
                     weekdaysToAdd--;
                 }
             }
-            leftDays = Math.ceil((endDate - curr_date) / (1000 * 3600 * 24));
+            return Math.ceil((endDate - curr_date) / (1000 * 3600 * 24));
         } else {
-            leftDays = Math.ceil((endDate - curr_date) / (1000 * 3600 * 24));
+            return Math.ceil((endDate - curr_date) / (1000 * 3600 * 24));
         }
     } else {
         if (typePersonnel === "Contractuelle") {
@@ -27,12 +26,11 @@ const leftDays = (startDate, endDate, attestation) => {
                     weekdaysToAdd--;
                 }
             }
-            leftDays = Math.ceil((endDate - startDate) / (1000 * 3600 * 24))
+            return Math.ceil((endDate - startDate) / (1000 * 3600 * 24))
         } else {
-            leftDays = Math.ceil((endDate - startDate) / (1000 * 3600 * 24))
+            return Math.ceil((endDate - startDate) / (1000 * 3600 * 24))
         }
     }
-    return leftDays
 }
 
 export { leftDays }

@@ -19,6 +19,7 @@ import filterPersonnel from 'utils/filterPersonnel';
 import usePagination from 'hooks/usePagination';
 import { formatDateMonthForm } from 'utils/dates-utils';
 import { deleteConge } from 'utils/deleteConge';
+import { leftDays } from 'utils/calculs-utils';
 
 const CongesTable = ({
     loadingText, 
@@ -43,7 +44,7 @@ const CongesTable = ({
 
     const { pageNumber, pageCount, handlePageChange, currentPageData, offset, handlePagePrev, handlePageNext } = usePagination(filterConge, perPage);
 
-    const leftDays = (startDate, endDate, attestation) => {
+    /*const leftDays = (startDate, endDate, attestation) => {
         let leftDays
         let typePersonnel = JSON.stringify(attestation.type)
         const curr_date = new Date();
@@ -75,7 +76,7 @@ const CongesTable = ({
             }
         }
         return leftDays
-    }
+    }*/
 
     const handleDeleteConge = (c) => {
         deleteConge(c, setSuccess, setError, setStatus);
@@ -200,11 +201,13 @@ const CongesTable = ({
                                                     </DropdownItem>
                                                     <DropdownItem
                                                         onClick={() => handleEditConge(c)}
+                                                        disabled={c.statut_conge === "annulé" ? true : false}
                                                     >
                                                         Modifier
                                                     </DropdownItem>
                                                     <DropdownItem
                                                         onClick={() => handleDeleteConge(c)}
+                                                        disabled={c.statut_conge === "annulé" ? true : false}
                                                     >
                                                         Supprimer/annuler
                                                     </DropdownItem>

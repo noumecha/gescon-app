@@ -1,3 +1,4 @@
+import { leftDays } from "./calculs-utils";
 import { formatDate } from "./dates-utils";
 import { nbDaysBetween, formatDateDayForm, formatDateMonthForm } from "./dates-utils";
 import { personConge } from "./personConges";
@@ -14,10 +15,15 @@ const updateConge = async (
         const type = typeConge[0];
         const curr_date = new Date();
         const userConge = personConge(person.id_personnel);
-        const old_duration = congeToEdit.duration;
-        const left_duration = person.id_type_personnel === 2 ? person.nb_jours_conges + person.dette_conge : person.nb_jours_conges;
+        const old_duration = congeToEdit.duree_conge;
+        const left_duration = old_duration - duration;
         // check if the duration is valid
         if (!validateDuration(duration, setError)) return;
+        console.log("duration : " + duration);
+        console.log("person conges left : " +  person.nb_jours_conges);
+        console.log("old_duration : " + congeToEdit.duree_conge);
+        console.log("jours conges restant : " + left_duration);
+        // check if the duration is less than or equal to the left duration
         if (person.id_type_personnel === 2) {
             if ((duration > old_duration + person.nb_jours_conges + person.dette_conge) && (formatDate(startDate).getFullYear() === curr_date.getFullYear()) 
                 && (type.libelle_type_conge === "congé administratif")) {
@@ -51,7 +57,16 @@ const updateConge = async (
             },7000)
             return;
         }
-        if ((person.id_type_personnel === 2 && ((person.nb_jours_conges + person.dette_conge) === 0)) && (type.libelle_type_conge === "congé administratif")) {
+        // test for contractual personnel 
+        if ((person.id_type_personnel === 2 && ((left_duration + person.nb_jours_conges + person.dette_conge) === 0)) && (type.libelle_type_conge === "congé administratif")) {
+            setError(`${formatPersonnelName(person.sexe_personnel, person.nom_prenom_personnel)} a déja epuisé tout ces congés pour l'année`);
+            setTimeout(() => {
+                setError("");
+            },7000)
+            return;
+        }
+        // test for contractual personnel 
+        if ((person.id_type_personnel === 1 && ((left_duration + person.nb_jours_conges) === 0)) && (type.libelle_type_conge === "congé administratif")) {
             setError(`${formatPersonnelName(person.sexe_personnel, person.nom_prenom_personnel)} a déja epuisé tout ces congés pour l'année`);
             setTimeout(() => {
                 setError("");
@@ -60,7 +75,6 @@ const updateConge = async (
         }
         // tests for administratif person
         if (person.id_type_personnel === 1) {
-            console.log(duration, type.libelle_type_conge);
             if (duration > old_duration + person.nb_jours_conges && (type.libelle_type_conge === "congé administratif")) {
                 setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponible");
                 setTimeout(() => {
@@ -134,7 +148,7 @@ const updateConge = async (
                 }
             }
         }
-        //console.log(congeToEdit.attestation_conge);
+        //console.log("nombre total de congés admin : " + total_conge_admin);
         // leave attestation datas
         const attestation = {
             numero_conge_admin : (congeToEdit.libelle_type_conge === "congé administratif" && duration === 18 + person.dette_conge && person.id_type_personnel === 2) 

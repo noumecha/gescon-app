@@ -338,7 +338,15 @@ const CongeDoc = (props) => {
                     </Text>
                     <Text style={styles.pCertifText}>
                         L'intéressé{props.sexe === "M" ? "" : "e"} jouira 
-                        {props.numero_conge_admin !== 0 ? props.numero_conge_admin === 1 ? " de la " + props.numero_conge_admin + "ère partie " : " de la " + props.numero_conge_admin + "ème partie " : " " } 
+                        {props.numero_conge_admin !== 0 
+                            ? props.numero_conge_admin === 1 
+                                ? " de la première partie " 
+                                : props.numero_conge_admin === 2 
+                                    ? " de la deuxième partie " 
+                                    : props.numero_conge_admin === 3 ?
+                                    " de la troisième partie " 
+                                    : " "
+                            : " "}
                         dudit congé pendant la période allant du <Text style={fontStyles.bold}>{props.startDate}</Text> au <Text style={fontStyles.bold}>{props.endDate}</Text> et 
                         reprendra le service le <Text style={fontStyles.bold}>{props.repriseDate} à 7 heures 30 précises.</Text>
                     </Text>
