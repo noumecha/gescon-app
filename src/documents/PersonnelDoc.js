@@ -234,10 +234,8 @@ const styles = StyleSheet.create({
 
 // Create Document Component
 const PersonnelDoc = (props) => {
-
-    const d = new Date();
-
-    return (
+  const d = new Date();
+  return (
         <Document>
         <Page size="A4" style={styles.page}>
             {/* first row : entete */}

@@ -127,8 +127,10 @@ function getConge(event, req) {
     });
 }
 
+// function for getting specific data
+
 function getAttestationConge(even, req) {
-    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_conge,statut_attestation_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel  AND attestation_conge != "null" AND attestation_conge != "";', (err, res) => {
+    pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_conge,statut_attestation_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel  AND attestation_conge != "null" AND attestation_conge != "" ORDER BY id_conge DESC;', (err, res) => {
         if (err) throw err;
         even.sender.send('all-attestation-conge', res);
     });
@@ -159,6 +161,13 @@ function getArchiveAttRepConge(event) {
     pool.query('SELECT archive_att_reprise_conge.id_conge,id_archive_att_reprise_conge,nom_prenom_personnel,matricule_personnel,created_at_archive_att_reprise_conge,fichier_archive_att_reprise_conge FROM conge,personnel,archive_att_reprise_conge WHERE conge.id_personnel = personnel.id_personnel AND conge.id_conge = archive_att_reprise_conge.id_conge;', (err, res) => {
         if (err) throw err;
         event.sender.send('all-archive-att-rep-conge', res);
+    });
+}
+// data -> getting generic data : 
+function getData(event, req) {
+    pool.query(req, (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-specific-data', res);
     });
 }
 // congés -> getting specific conge by req
@@ -366,6 +375,14 @@ function getStructuresNames(event, req) {
     });
 }
 
+// conges years 
+function getCongeYears(event, req) {
+    pool.query('SELECT DISTINCT YEAR(date_fin_conge) AS annee FROM conge;', (err, res) => {
+        if (err) throw err;
+        event.sender.send('all-conges-years', res);
+    });
+}
+
 function getStructuresNamePersonnel(event, req) {
     pool.query(req, (err, res) => {
         if (err) throw err;
@@ -416,6 +433,7 @@ app.whenReady().then(() => {
     ipcMain.on('get-specific-conge-type', getSpecificCongeType);
     // conge  
     ipcMain.on('get-specific-conge', getSpecificConge);
+    ipcMain.on('get-specific-data', getData);
     ipcMain.on('get-conge', getConge);
     ipcMain.on('add-archive-attestation-conge', addArchiveAttestationConge)
     ipcMain.on('update-conge', updateConge);
@@ -456,6 +474,8 @@ app.whenReady().then(() => {
     ipcMain.on('get-structures-names', getStructuresNames);
     ipcMain.on('get-structures-name-personnel', getStructuresNamePersonnel);
     ipcMain.on('get-structures-conges', getStructuresConges);
+    // provisory year management 
+    ipcMain.on('get-conges-years', getCongeYears);
     // set the App title
     ipcMain.on('set-title', handleSetTitle);
     ipcMain.on('user-login', userLogin);

@@ -8,7 +8,6 @@ import Decision from "views/examples/Decision.js";
 import Permission from "views/examples/Permission";
 import AttestationConge from "views/examples/AttestationConge";
 import AttestationPermission from "views/examples/AttestationPermission";
-//import FichePersonnel from "views/examples/FichePersonnel";
 import ArchiveAttestationConge from "views/examples/ArchiveAttestationConge";
 import ArchiveAttestationPermission from "views/examples/ArchiveAttestationPermission";
 import PersonnelDetails from "views/examples/PersonnelDetails";
@@ -17,8 +16,8 @@ import AttestationRepPermission from "views/examples/AttestationRepPermission";
 import AttestationRepConge from "views/examples/AttestationRepConge";
 import ArchiveAttestationRepPermission from "views/examples/ArchiveAttestationRepPermission";
 import ArchiveAttestationRepConge from "views/examples/ArchiveAttestationRepConge";
-//import Tables from "views/examples/Tables";
-//import Icons from "views/examples/Icons";
+import FicheSuivie from "views/examples/FicheSuivie";
+import FicheStatsGlobal from "views/examples/FicheStatsGlobal";
 
 var routes = [
   {
@@ -167,6 +166,20 @@ var routes = [
     icon: "ni ni-circle-08 text-blue",
     component: <Register />,
     layout: "/admin",
+  },
+  {
+    path: "/fiches-de-suivies",
+    name: "Fiches de suivies",
+    icon: "ni ni-single-copy-04 text-blue",
+    component: <FicheSuivie />,
+    layout: "/admin"
+  },
+  {
+    path: "/fiches-statistiques",
+    name: "fiches statistiques",
+    icon: "ni ni-single-copy-04 text-blue",
+    component: <FicheStatsGlobal />,
+    layout: "/admin"
   },
 ];
 export default routes;

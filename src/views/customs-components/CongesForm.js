@@ -1,18 +1,5 @@
 import React from 'react';
-import {
-    Row,
-    Col,
-    Card,
-    CardHeader,
-    Alert,
-    Form,
-    Input,
-    FormGroup,
-    Label,
-    FormText,
-    Button,
-    CardBody
-} from 'reactstrap';
+import { Row,Col,Card,CardHeader,Alert,Form,Input,FormGroup,Label,FormText,Button,CardBody } from 'reactstrap';
 
 const CongesForm = ({
     status,
@@ -44,6 +31,8 @@ const CongesForm = ({
     endDate,
     selectedDec,
     error,
+    buttonText,
+    buttonClass,
     success,
     saveConge,
     actived,
@@ -351,11 +340,11 @@ const CongesForm = ({
                     <Row className="mt-3">
                       <Col md="6">
                         <Button
-                          color="primary"
+                          color={buttonClass}
                           onClick={saveConge}
                           //disabled={actived}
                         >
-                          Générer l'attestation
+                          {buttonText}
                         </Button>
                       </Col>
                     </Row>

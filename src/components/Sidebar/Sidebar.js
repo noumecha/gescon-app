@@ -45,15 +45,15 @@ const Sidebar = (props) => {
   };
   // creates the links that appear in the left menu / Sidebar
   const createLinks = (routes) => {
-    const excludesRoutes = ['/attestation-conge','/attestation-permission','/attestation_rep_permissions','/attestation_rep_conges','/personnel-details','/login','/register','/archive','/archive_permissions','/archive_att_rep_permissions','/archive_att_rep_conges']
+    const includesRoutes = ['/index','/conges','/permission','/personnel','/personnel-details','/structures','/decision','/user-profile']
     return routes.map((prop, key) => {
-      if (!excludesRoutes.includes(prop.path)) {
+      if (includesRoutes.includes(prop.path)) {
         return (
           <NavItem key={key}>
             <NavLink
-              to={{pathname: prop.layout + prop.path}}
+              to={prop.layout + prop.path}
               tag={NavLinkRRD}
-              onClick={() => closeCollapse()}
+              onClick={closeCollapse}
             >
               <i className={prop.icon} />
               {prop.name}
@@ -104,6 +104,25 @@ const Sidebar = (props) => {
       return null;
     });
   };
+  const createFichesLinks = (routes) => {
+    const includesRoutes = ['/fiches-de-suivies', '/fiches-statistiques',]
+    return routes.map((prop, key) => {
+      if(includesRoutes.includes(prop.path)) {
+        return(
+          <NavItem key={key}>
+            <NavLink
+              to={{pathname: prop.layout + prop.path}}
+              tag={NavLinkRRD}
+              onClick={closeCollapse}
+            >
+              <i className={prop.icon} />
+              {prop.name}
+            </NavLink>
+          </NavItem>
+        )
+      }
+    })
+  }
 
   const { bgColor, routes, logo } = props;
   let navbarBrandProps;
@@ -218,6 +237,12 @@ const Sidebar = (props) => {
           </Form>
           {/* Navigation */}
           <Nav navbar>{createLinks(routes)}</Nav>
+          {/* Divider */}
+          <hr className="my-3" />
+          {/* Heading */}
+          <h6 className="navbar-heading text-muted">Fiches</h6>
+          {/* Archives Navigation */}
+          <Nav navbar>{createFichesLinks(routes)}</Nav>
           {/* Divider */}
           <hr className="my-3" />
           {/* Heading */}

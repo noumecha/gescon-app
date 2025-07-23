@@ -1,4 +1,4 @@
-import React from "react";
+import { React, useState } from "react";
 import {
     Card,
     Button,
@@ -14,7 +14,9 @@ import {
     DropdownMenu, 
     DropdownItem,
 } from "reactstrap";
+import filterPersonnel from "utils/filterPersonnel";
 import MyPagination from "./MyPagination";
+import usePagination from "hooks/usePagination";
 
 const PersmissionsTable = ({
     handleStatutFilter,
@@ -24,18 +26,18 @@ const PersmissionsTable = ({
     success,
     handleRefresh,
     loadingSpinner,
-    filterPermission,
-    offset,
-    perPage,
     curr_date,
     saveAttestationRepPermission,
     loadingText,
-    handlePagePrev,
-    pageCount,
-    pageNumber,
-    handlePageChange,
-    handlePageNext
+    permission
 }) => {
+    const [perPage] = useState(100);
+
+    // filtering permission
+    const filterPermission = filterPersonnel(permission, search, statutFilter, "permission")
+    
+    const { pageNumber, pageCount, currentPageData, handlePageChange, handlePagePrev,offset, handlePageNext } = usePagination(filterPermission, perPage);
+
     return (
         <Row>
             <Col lg="12">

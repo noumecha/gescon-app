@@ -5,7 +5,6 @@ import Header from "components/Headers/Header.js";
 import PermissionsForm from "views/customs-components/PermissionsForm";
 import { useEffect } from "react";
 import PersmissionsTable from "views/customs-components/PermissionsTable";
-import filterPersonnel from "utils/filterPersonnel";
 import usePermissionState from "hooks/usePermissionState";
 import usePagination from "hooks/usePagination";
 import {dateInRange, formatDate, lastDateOfMonth, firstDateOfMonth, monthToText, nbDaysBetween} from "utils/dates-utils";
@@ -33,14 +32,6 @@ const Permission = () => {
         amount : 0,
     };
     let nb = 0; // total days of permission for specifc month (particularly the month of the start date)
-
-    // filtering permission
-    const filterPermission = filterPersonnel(permission, search, status, "permission")
-
-    const { pageNumber, pageCount, currentPageData, handlePageChange, handlePagePrev, handlePageNext } = usePagination(filterPermission, perPage);
-
-    //const pageCount = Math.ceil(permission.length/perPage);
-    const offset = pageNumber * perPage;
 
     const handleSearch = (e) => {
       setSearch(e.target.value);
@@ -399,7 +390,8 @@ const Permission = () => {
                     repriseDate: (formatDate(repDate).getDate() < 10 ? "0"+formatDate(repDate).getDate() : formatDate(repDate).getDate()) + "/" + (parseInt(formatDate(repDate).getMonth()+1) < 10 ? "0"+parseInt(formatDate(repDate).getMonth()+1) : parseInt(formatDate(repDate).getMonth()+1)) +"/"+formatDate(repDate).getFullYear(),
                     preposition: preposition,
                     grade : grade.replace("'", "`"),
-                    created_at : new Date().toISOString().slice(0,19).replace('T',' ')
+                    created_at : new Date().toISOString().slice(0,19).replace('T',' '),
+                    // adding qr_code
                 }
                 const next_month_permission = {
                     month : nextMonthPermNb.month,
@@ -591,17 +583,11 @@ const Permission = () => {
               success={success}
               handleRefresh={handleRefresh}
               loadingSpinner={loadingSpinner}
-              filterPermission={filterPermission}
-              offset={offset}
               perPage={perPage}
               curr_date={curr_date}
               saveAttestationRepPermission={saveAttestationRepPermission}
               loadingText={loadingText}
-              handlePagePrev={handlePagePrev}
-              pageCount ={pageCount }
-              pageNumber={pageNumber}
-              handlePageChange={handlePageChange}
-              handlePageNext={handlePageNext}
+              permission={permission}
             />
             {/** Fomulaire de création de permission */}
             <PermissionsForm

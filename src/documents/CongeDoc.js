@@ -205,6 +205,12 @@ const styles = StyleSheet.create({
         marginLeft: 25,
         textTransform: 'uppercase',
     },
+    amParagraph6: {
+        fontSize: 10,    
+        marginTop: 3,
+        marginLeft: 30,
+        textTransform: 'uppercase',
+    },
     // center first section logo
     imageSceau: {
         height: 100,
@@ -324,15 +330,23 @@ const CongeDoc = (props) => {
                         CERTIFICAT OF DEPARTURE ON LEAVE
                     </Text>
                     <Text style={styles.pCertifText}>
-                        Le Directeur Général du Budget, sousigné, certifie que {props.sexe === "M" ? "Monsieur" : "Madame"} <Text style={fontStyles.bold}>{props.name+","}</Text> {props.grade},
+                        Le Directeur Général du Budget, soussigné, certifie que {props.sexe === "M" ? "Monsieur" : "Madame"} <Text style={fontStyles.bold}>{props.name+","}</Text> {props.grade},
                         <Text style={fontStyles.bold}> Matricule {props.matricule}</Text>, {props.poste} {props.preposition} {props.structure}, est bénéficiaire
-                        d'un {props.typeConge} de (<Text style={fontStyles.bold}>{props.type === "Contractuelle" ? 18 : 30}</Text>)
+                        d'un {props.typeConge} de (<Text style={fontStyles.bold}>{props.duration}</Text>)
                         {props.duration > 1 ? " jours" : " jour"}{props.type === "Contractuelle" ? " ouvrable" : ""}{(props.type === "Contractuelle" && props.duration > 1) ? "s" : ""},
                         accordé par décision <Text style={fontStyles.bold}>N°{props.decision}</Text> du Ministre des finances.
                     </Text>
                     <Text style={styles.pCertifText}>
                         L'intéressé{props.sexe === "M" ? "" : "e"} jouira 
-                        {props.numero_conge_admin !== 0 ? props.numero_conge_admin === 1 ? " de la " + props.numero_conge_admin + "ère partie " : " de la " + props.numero_conge_admin + "ème partie " : " " } 
+                        {props.numero_conge_admin !== 0 
+                            ? props.numero_conge_admin === 1 
+                                ? " de la première partie " 
+                                : props.numero_conge_admin === 2 
+                                    ? " de la deuxième partie " 
+                                    : props.numero_conge_admin === 3 ?
+                                    " de la troisième partie " 
+                                    : " "
+                            : " "}
                         dudit congé pendant la période allant du <Text style={fontStyles.bold}>{props.startDate}</Text> au <Text style={fontStyles.bold}>{props.endDate}</Text> et 
                         reprendra le service le <Text style={fontStyles.bold}>{props.repriseDate} à 7 heures 30 précises.</Text>
                     </Text>
@@ -353,12 +367,17 @@ const CongeDoc = (props) => {
                         - minfi/sg/drh
                     </Text>
                     <Text style={styles.amParagraph3}>
-                        - dgb/sdag/cfs-fs/df
+                        - dgb/sdag
                     </Text>
                     <Text style={styles.amParagraph4}>
-                        - interessee/dossier
+                        - dgb/{props.structure.match(/\[([^\]]+)\]/) 
+                            ? props.structure.match(/\[([^\]]+)\]/)[1] 
+                            : props.structure}
                     </Text>
                     <Text style={styles.amParagraph5}>
+                        - interesse{props.sexe === "M" ? "" : "e"}/dossier
+                    </Text>
+                    <Text style={styles.amParagraph6}>
                         - chrono/archives
                     </Text>
                 </View>

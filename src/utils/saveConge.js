@@ -6,11 +6,11 @@ import { validateDuration } from "./validateDuration";
 const saveConge = async (
   selectedPerson,selectedType,typeConge,name,startDate,endDate,duration,setDuration,
   repriseDate,matricule,type,selectedDec,struc,poste,userConge,lastPermission,setError,sexe,nb_jours_conges,
-  setSuccess,setActived,grade,demande,preposition,nbDaysConges,setStatus,document
+  setSuccess,setActived,grade,demande,preposition,setStatus,document
 ) => {
-    //Event.preventDefault();
     try {
       let total_conge_admin = 0;
+      let nbDaysConges = 0;
       const curr_date = new Date();
       if (!validateDuration(duration, setError)) return;
       if (selectedPerson.id_type_personnel === 2) {
@@ -152,8 +152,8 @@ const saveConge = async (
         }
       }
       // controls about total_conge_admin 
-      if (duration < nb_jours_conges && total_conge_admin === 2 && selectedType === "congé administratif" ) {
-        setDuration(nb_jours_conges);
+      if (duration < selectedPerson.nb_jours_conges + selectedPerson.dette_conge && total_conge_admin === 2 && selectedType === "congé administratif" ) {
+        setDuration(selectedPerson.nb_jours_conges + selectedPerson.dette_conge);
         setError(`Ce congé constitue la 3ème partie du congé administratif de ${formatPersonnelName(sexe, name)} donc la durée doit être égale au nombre de jours restants`);
         setTimeout(() => {
           setError("");
@@ -175,7 +175,7 @@ const saveConge = async (
       }
       // leave attestation datas
       const attestation = {
-        numero_conge_admin : (selectedType === "congé administratif" && duration === 18 && selectedPerson.id_type_personnel === 2) 
+        numero_conge_admin : (selectedType === "congé administratif" && duration === 18 + selectedPerson.dette_conge && selectedPerson.id_type_personnel === 2) 
         || (selectedType === "congé administratif" && duration === 30 && selectedPerson.id_type_personnel === 1) 
         ? 0 : total_conge_admin += 1,
         name: name.replace(/'/g, "''"),
@@ -186,14 +186,15 @@ const saveConge = async (
         decision: selectedDec, 
         duration: duration,
         structure: struc.replace(/'/g, "''"),
-        nb_jour_conges_restant : parseInt(nb_jours_conges - duration),
+        nb_jour_conges_restant : selectedPerson.id_type_personnel === 1 ? parseInt(selectedPerson.nb_jours_conges) : parseInt(selectedPerson.nb_jours_conges + selectedPerson.dette_conge - duration),
         startDate: formatDateDayForm(startDate) + "/" + formatDateMonthForm(startDate) +"/"+formatDate(startDate).getFullYear(),
         endDate: formatDateDayForm(endDate) + "/" + formatDateMonthForm(endDate) + "/"+formatDate(endDate).getFullYear(),
         repriseDate: formatDateDayForm(repriseDate) + "/" + formatDateMonthForm(repriseDate) + "/" + formatDate(repriseDate).getFullYear(),
         typeConge: selectedType,
         preposition: preposition,
         grade : grade.replace(/'/g, "''"),
-        created_at : new Date().toISOString().slice(0,19).replace('T',' ')
+        created_at : new Date().toISOString().slice(0,19).replace('T',' '),
+        // need to adding qr_code
       }
       // datas for the leave
       const conge_data = {
@@ -216,6 +217,7 @@ const saveConge = async (
       const req_conge = `INSERT INTO conge 
         (date_debut_conge, date_fin_conge, duree_conge, created_at_conge,attestation_conge,id_type_conge,id_personnel,demande_conge,statut_conge,statut_attestation_conge,document_a_fournir) 
         VALUES ("${conge_data.startDate}","${conge_data.endDate}",${conge_data.duration},"${conge_data.curr_date}",'${JSON.stringify(attestation)}',${conge_data.id_type_conge},${conge_data.id_personnel},"${conge_data.demandeFile}","${conge_data.statut_conge}","${conge_data.statut_attestation_conge}","${conge_data.document}");`;
+      console.log(req_conge);
       let req_personnel;
       switch (selectedType) {
         case 'congé maternité':

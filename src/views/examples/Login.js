@@ -64,7 +64,10 @@ const Login = ({ onLogin }) => {
         setUsers(res);
       })
     } catch (error) {
-        console.error("Erreur : " + error.message);
+      setError("Erreur : " + error.message);
+      setTimeout(() => {
+        setError("");
+      }, 10000);
     }
   }
 

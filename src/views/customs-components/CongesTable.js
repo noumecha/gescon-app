@@ -18,6 +18,8 @@ import MyPagination from './MyPagination';
 import filterPersonnel from 'utils/filterPersonnel';
 import usePagination from 'hooks/usePagination';
 import { formatDateMonthForm } from 'utils/dates-utils';
+import { deleteConge } from 'utils/deleteConge';
+import { leftDays } from 'utils/calculs-utils';
 
 const CongesTable = ({
     loadingText, 
@@ -29,16 +31,56 @@ const CongesTable = ({
     search,
     generateSuccess,
     handleRefresh,
-    conge,
+    conge, 
+    setSuccess,
+    setError,
+    setStatus,
+    handleEditConge,
 }) => {
 
     const [perPage] = useState(100);
-    
-    const curr_date = new Date();
 
     const filterConge = filterPersonnel(conge, search, statutFilter, "conge");
 
     const { pageNumber, pageCount, handlePageChange, currentPageData, offset, handlePagePrev, handlePageNext } = usePagination(filterConge, perPage);
+
+    /*const leftDays = (startDate, endDate, attestation) => {
+        let leftDays
+        let typePersonnel = JSON.stringify(attestation.type)
+        const curr_date = new Date();
+        if (curr_date >= startDate && curr_date <= endDate) {
+            if (typePersonnel === "Contractuelle") {
+                let weekdaysToAdd = Math.ceil((endDate - curr_date) / (1000 * 3600 * 24)) - 1;
+                while (weekdaysToAdd > 0) {
+                    endDate.setDate(endDate.getDate() + parseInt(1));
+                    if (endDate.getDay() !== 0 && endDate.getDay() !== 6) {
+                        weekdaysToAdd--;
+                    }
+                }
+                leftDays = Math.ceil((endDate - curr_date) / (1000 * 3600 * 24));
+            } else {
+                leftDays = Math.ceil((endDate - curr_date) / (1000 * 3600 * 24));
+            }
+        } else {
+            if (typePersonnel === "Contractuelle") {
+                let weekdaysToAdd =  leftDays = Math.ceil((endDate - startDate) / (1000 * 3600 * 24)) - 1;
+                while (weekdaysToAdd > 0) {
+                    startDate.setDate(startDate.getDate() + parseInt(1));
+                    if (startDate.getDay() !== 0 && startDate.getDay() !== 6) {
+                        weekdaysToAdd--;
+                    }
+                }
+                leftDays = Math.ceil((endDate - startDate) / (1000 * 3600 * 24))
+            } else {
+                leftDays = Math.ceil((endDate - startDate) / (1000 * 3600 * 24))
+            }
+        }
+        return leftDays
+    }*/
+
+    const handleDeleteConge = (c) => {
+        deleteConge(c, setSuccess, setError, setStatus);
+    }
 
     return (
         <Row className='mt-3'>
@@ -57,6 +99,7 @@ const CongesTable = ({
                         <option value="programmé">programmé</option>
                         <option value="en cours">en cours</option>
                         <option value="terminé">terminé</option>
+                        <option value="annulé">annulé</option>
                     </Input>
                     </Col>
                     <Col lg="6">
@@ -121,7 +164,7 @@ const CongesTable = ({
                                         <td>{c.nom_prenom_personnel}</td> 
                                         <td>{c.date_debut_conge.getDate() + "/" + formatDateMonthForm(c.date_debut_conge) + "/" + c.date_debut_conge.getFullYear() }</td>
                                         <td>{c.date_fin_conge.getDate() + "/" + formatDateMonthForm(c.date_fin_conge) + "/" + c.date_fin_conge.getFullYear()}</td>
-                                        <td>{c.statut_conge === "programmé" ? c.attestation_conge.duration : c.statut_conge !== "terminé" ? curr_date >= c.date_debut_conge && curr_date <= c.date_fin_conge ? Math.ceil((c.date_fin_conge - curr_date) / (1000 * 3600 * 24)) : Math.ceil((c.date_fin_conge - c.date_debut_conge)/ (1000 * 3600 * 24)) : 0 }</td>
+                                        <td>{c.statut_conge === "programmé" ? c.attestation_conge.duration : c.statut_conge !== "terminé" ? leftDays(c.date_debut_conge, c.date_fin_conge, c.attestation_conge) : 0 }</td>
                                         <td>{c.statut_conge === "en cours"
                                             ? <Badge color="success">
                                                 {c.statut_conge}
@@ -151,10 +194,22 @@ const CongesTable = ({
                                                 </DropdownToggle>
                                                 <DropdownMenu className="dropdown-menu-arrow" right>
                                                     <DropdownItem
-                                                    onClick={() => saveAttestationRepConge(c)}
-                                                    disabled={c.statut_conge === "terminé" ? false : true}
+                                                        onClick={() => saveAttestationRepConge(c)}
+                                                        disabled={c.statut_conge === "terminé" ? false : true}
                                                     >
-                                                    Générer l'attestation de reprise
+                                                        Générer l'attestation de reprise
+                                                    </DropdownItem>
+                                                    <DropdownItem
+                                                        onClick={() => handleEditConge(c)}
+                                                        disabled={c.statut_conge === "annulé" ? true : false}
+                                                    >
+                                                        Modifier
+                                                    </DropdownItem>
+                                                    <DropdownItem
+                                                        onClick={() => handleDeleteConge(c)}
+                                                        disabled={c.statut_conge === "annulé" ? true : false}
+                                                    >
+                                                        Supprimer/annuler
                                                     </DropdownItem>
                                                 </DropdownMenu>
                                             </UncontrolledDropdown>
