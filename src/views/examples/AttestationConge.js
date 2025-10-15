@@ -27,6 +27,7 @@ import {
     Alert,
   } from "reactstrap";
 import Header from "components/Headers/Header.js";
+import CustomModal from "views/customs-components/CustomModal";
 import { useState, useEffect } from "react";
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import CongeDoc from "documents/CongeDoc";
@@ -287,6 +288,15 @@ const AttestationConge = () => {
                                                                 onClick={() => handleRowClick(att_con)}
                                                             >
                                                                 Archiver ce document
+                                                                <CustomModal
+                                                                    modal={modal}
+                                                                    toggleModal={toggleModal}
+                                                                    modalData={modalData}
+                                                                    handleArchiveChange={handleArchiveChange}
+                                                                    saveArchive={saveArchive}
+                                                                    errorArchive={errorArchive}
+                                                                    successArchive={successArchive}
+                                                                />
                                                                 <Modal isOpen={modal} toggle={toggleModal} {...modalData}>
                                                                     <ModalHeader toggle={toggleModal}>
                                                                         <Row>
