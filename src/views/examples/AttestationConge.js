@@ -100,7 +100,7 @@ const AttestationConge = () => {
 
     const handleSearch = (e) => {
         setSearch(e.target.value);
-    }    
+    }
 
     /** for the pagination */
     const pageCount = Math.ceil(attestation_conge.length/perPage);
@@ -125,7 +125,7 @@ const AttestationConge = () => {
             window.electronAPI.getAttestationConge();
             await window.electronAPI.retrieveAttestationConge((event, res) => {
                 for (let index = 0; index < res.length; index++) {
-                    res[index].attestation_conge = JSON.parse(res[index].attestation_conge)                                
+                    res[index].attestation_conge = JSON.parse(res[index].attestation_conge)
                 }
                 setAttestationConge(res);
                 setTimeout(() => 
@@ -212,7 +212,7 @@ const AttestationConge = () => {
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody>                                            
+                                    <tbody>
                                         {loadingSpinner && (
                                         <tr>
                                             <td colSpan="7" className="text-center">

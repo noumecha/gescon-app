@@ -281,6 +281,7 @@ const FicheStatsGlobal = () => {
                                             <PDFDownloadLink
                                                 document={<NewStatsDoc stats={stats} year={yearFilter} />}
                                                 fileName={`fiche_statistique_${date}.pdf`}
+                                                className="d-flex align-items-center justify-content-center"
                                             >
                                                 {({ blob, url, loading, error }) =>
                                                 loading ? (
@@ -291,24 +292,28 @@ const FicheStatsGlobal = () => {
                                                         alignItems: "center",
                                                         justifyContent: "center",
                                                         minHeight: "120px",
-                                                    }}
-                                                    >
-                                                    {/* Loader Spinner */}
-                                                    <div
-                                                        className="spinner-border text-success"
-                                                        role="status"
-                                                        style={{ width: "3rem", height: "3rem", marginBottom: "12px" }}
-                                                    >
-                                                    </div>
-
-                                                    {/* Message */}
-                                                    <div style={{ fontSize: "14px", color: "#198754", fontWeight: "500" }}>
-                                                        Génération du fichier PDF en cours, veuillez patienter...
-                                                    </div>
+                                                    }}>
+                                                        <div
+                                                            className="spinner-border text-success"
+                                                            role="status"
+                                                            style={{
+                                                                width: "10rem",
+                                                                height: "10rem",
+                                                        }}>
+                                                            <span className="sr-only">Loading...</span>
+                                                        </div>
+                                                        <div style={{
+                                                            fontSize: "14px",
+                                                            color: "#198754",
+                                                            fontWeight: "500",
+                                                            textAlign: "center"
+                                                        }}>
+                                                            Génération du fichier PDF en cours, veuillez patienter...
+                                                        </div>
                                                     </div>
                                                 ) : (
                                                     <Button color="success">
-                                                    Télécharger
+                                                        Télécharger
                                                     </Button>
                                                 )
                                                 }

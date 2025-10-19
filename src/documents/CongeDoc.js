@@ -1,13 +1,14 @@
 import React from 'react';
-import { Page, Text, View, Document, StyleSheet, Font } from '@react-pdf/renderer';//Image,
+import { Page, Text, View, Document, StyleSheet, Font, Image} from '@react-pdf/renderer';//Image,
 //import image from './docs-images/sceau-img.PNG';
 import TimesNewRoman from './docs-fonts/times new roman.ttf';
 import TimesNewRomanBold from './docs-fonts/times new roman bold.ttf';
 import TimesNewRomanItalic from './docs-fonts/times new roman bold italic.ttf';
+import { generateQRCode } from 'utils/generateQRCode';
 
 // Create styles
 Font.register({ 
-    family: 'Times-Roman', 
+    family: 'Times-Roman',
     fonts : [
         {src: TimesNewRoman},
         {src: TimesNewRomanItalic},
@@ -47,8 +48,8 @@ const styles = StyleSheet.create({
     },
     containerTwo: {
         display: 'flex',
-        marginLeft: 60,
-        marginRight: 60,
+        marginLeft: 40,
+        marginRight: 40,
         justifyContent: 'space-evenly',
         flexDirection: 'column',
     },
@@ -56,8 +57,8 @@ const styles = StyleSheet.create({
         display: 'flex',
         alignItems: 'flex-start',
         marginTop: 30,
-        marginLeft: 60,
-        marginRight: 60,
+        marginLeft: 40,
+        marginRight: 40,
         justifyContent: 'space-evenly',
         flexDirection: 'column',
     },
@@ -65,10 +66,9 @@ const styles = StyleSheet.create({
     containerDateNumber: {
         display: 'flex',
         flexDirection: 'row',
-        marginTop: 15,
-        marginLeft: 30,
-        marginRight: 30,
-        //justifyContent: 'space-between',
+        marginTop: 150,
+        marginLeft: 60,
+        marginRight: 60,
     },
     h4TitleNumber: {
         fontSize: 10,
@@ -104,11 +104,6 @@ const styles = StyleSheet.create({
         lineHeight: 1,
         marginRight: -60,
     },
-    /*topSectionImage: {
-        position: 'absolute',
-        marginTop: -20,
-        left: "44%",
-    },*/
     // certif title
     h1CertifTitle: {
       fontSize: 14,
@@ -211,12 +206,7 @@ const styles = StyleSheet.create({
         marginLeft: 30,
         textTransform: 'uppercase',
     },
-    // center first section logo
-    imageSceau: {
-        height: 100,
-        width: 100,
-    }, 
-    // center text : 
+    // center text :
     containerQr: {
         display: 'flex',
         justifyContent: 'space-between',
@@ -226,28 +216,63 @@ const styles = StyleSheet.create({
         marginTop: 270,
     },
     sectionQr: {
-      display: 'flex',
-      alignItems: 'center',
+        display: 'flex',
+        alignItems: 'center',
     },
     qrText: {
         textAlign: 'center',
-        fontSize: 10, 
+        fontSize: 10,
         marginTop: 3,
         marginLeft: 5,
         textTransform: 'uppercase',
-    }
+    },
+    //
+    // header
+    header: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        position: 'absolute',
+        top: 15,
+        left: 25,
+        right: 25,
+        textAlign: 'center',
+        fontSize: 10,
+        paddingBottom: 3,
+    },
+    footer: {
+        position: 'absolute',
+        bottom: 15,
+        left: 25,
+        right: 25,
+        borderTop: '1 solid black',
+        paddingTop: 3,
+        fontSize: 9,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    qrCode: {
+        width: 35,
+        height: 35,
+    },
 });
 
 // Create Document Component
 const CongeDoc = (props) => {
 
     const d = new Date();
+    const qrText = `GESCON-APP - ${d.getFullYear()} - ${d.getTime()}`;
+    const [qrData, setQrData] = React.useState(null);
+    React.useEffect(() => {
+        generateQRCode(qrText).then(setQrData);
+    }, []);
 
     return (
         <Document>
         <Page size="A4" style={styles.page}>
-            {/* first row : entete */}
-            <View style={styles.container}>
+            {/* Global Header */}
+            <View style={styles.header} fixed>
                 {/* top left text */}
                 <View style={styles.topSectionOne}>
                     <Text style={styles.h1TitleFirst}>
@@ -278,11 +303,6 @@ const CongeDoc = (props) => {
                     </Text>
                     <Text style={styles.line}>------------</Text>
                 </View>
-                {/* image */}
-                {/*<View style={styles.topSectionImage}>
-                    <Image style={styles.imageSceau} src={image}/>
-                </View>*/}
-                {/* top right text */}
                 <View style={styles.topSectionTwo}>
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIC OF CAMEROON
@@ -300,7 +320,7 @@ const CongeDoc = (props) => {
                     </Text>
                     <Text style={styles.line}>------------</Text>
                     <Text style={styles.h1TitleBold}>
-                        DIRECTORATE GENERAL OF BUDGET 
+                        DIRECTORATE GENERAL OF BUDGET
                     </Text>
                     <Text style={styles.line}>------------</Text>
                     <Text style={styles.h1Title}>
@@ -318,7 +338,7 @@ const CongeDoc = (props) => {
                     N°{new Date().getFullYear() % 100}/__________/MINFI/SG/DGB/SDAG/SP
                 </Text>
                 <Text style={styles.h4TitleDate}>
-                    Yaoundé, le 
+                    Yaoundé, le
                 </Text>
             </View>
             <View style={styles.containerTwo}>
@@ -382,12 +402,10 @@ const CongeDoc = (props) => {
                     </Text>
                 </View>
             </View>
-            <View style={styles.containerQr}>
-                <View style={styles.sectionQr}>
-                    <Text style={styles.qrText}>
-                        GESCON-APP - {d.getTime()} - {d.getFullYear()}
-                    </Text>
-                </View>
+            {/* Global Footer */}
+            <View style={styles.footer} fixed>
+                <Text>Généré le {d.toLocaleDateString()} à {d.toLocaleTimeString()}</Text>
+                {qrData && <Image src={qrData} style={styles.qrCode} />}
             </View>
         </Page>
     </Document>

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet, Font, Image } from '@react-pdf/renderer';
-import QRCode from 'qrcode';
 import TimesNewRoman from './docs-fonts/times new roman.ttf';
 import TimesNewRomanBold from './docs-fonts/times new roman bold.ttf';
 import TimesNewRomanItalic from './docs-fonts/times new roman bold italic.ttf';
+import { generateQRCode } from 'utils/generateQRCode';
 
 // Font registration
 Font.register({
@@ -15,14 +15,6 @@ Font.register({
     ],
 });
 Font.registerHyphenationCallback(word => [word]);
-
-const generateQRCode = async (text) => {
-    try {
-        return await QRCode.toDataURL(text);
-    } catch {
-        return null;
-    }
-};
 
 const makeBreakable = (str) => {
     if (!str) return str;
