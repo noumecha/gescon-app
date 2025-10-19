@@ -175,7 +175,8 @@ const FicheStatsGlobal = () => {
                 totalContractuel += cont;
             });
         });
-        return { stats, globalMonthTotals, totalFonctionnaire,  totalContractuel};
+        const isGlobal = filter && Object.keys(filter).length > 0 ? false : true
+        return { stats, globalMonthTotals, totalFonctionnaire,  totalContractuel, isGlobal};
     };
     
     const stats = computeStatistics(conges, filter, structureNames);
