@@ -2,7 +2,8 @@ import { Container } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import { Row,Col,Card,CardHeader,CardBody,Button,Alert,Form,Input,FormGroup,Label } from 'reactstrap';
 import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
-import StatsDoc from "documents/StatsDoc";
+//import StatsDoc from "documents/StatsDoc";
+import NewStatsDoc from "documents/NewStatsDoc";
 import Select from "react-select";
 import { useState, useEffect } from "react";
 
@@ -19,20 +20,11 @@ const FicheStatsGlobal = () => {
     //const [typeFilter, setTypeFilter] = useState(null); // periodique | annuel
     const [structureNames, setStructureNames] = useState([]);
     const [years, setYears] = useState([]);
+    const [showPDF, setShowPDF] = useState(false);
 
     const handleInputChange = (setStateFunction) => (e) => {
         setStateFunction(e.target.value);
     };
-
-    /*const types = [
-        { libelle_type_stat: "annuel" },
-        { libelle_type_stat: "périodique" },
-    ];
-
-    const typesOptions = types.map((t, i) => ({
-        value: t.libelle_type_stat,
-        label: t.libelle_type_stat,
-    }));*/
 
     const yearOptions = years.map((y, i) => ({
         value: y.annee,
@@ -50,39 +42,29 @@ const FicheStatsGlobal = () => {
 
     const generateStats = async () => {
         try {
-            if(filter === null || yearFilter === null) {
-                setError("Selectionner au moins une structure et une année pour générer les statistiques.");
+            if(yearFilter === null) {
+                setError("Selectionner au moins une année pour générer les statistiques.");
                 setTimeout(() => {
                     setError("");
                 }, 7000);
                 return ;
             }
-            const structures = Object.entries(filter).map(([key, value]) => ({
-                names : value.value
-            }));
-            const strucArray = structures.map(s => `'${s.names.replace(/'/g, "''")}'`).join(", ");
-            let query = `
-                SELECT * FROM conge 
-                INNER JOIN personnel ON personnel.id_personnel = conge.id_personnel AND personnel.structure_personnel IN (${strucArray})
-            `;
-            /*const hasFilter = !!filter?.value;
-            const hasYear = !!yearFilter?.value;
-            const isAnnuel = "annuel";
-            const isPeriodique = typeFilter === "périodique";
-            let conditions = [];
-            if (hasFilter) {
-                conditions.push(`personnel.structure_personnel = ${JSON.stringify(filter.value)}`);
+            let query = '';
+            if (filter !== null) {
+                const structures = Object.entries(filter).map(([key, value]) => ({
+                    names : value.value
+                }));
+                const strucArray = structures.map(s => `'${s.names.replace(/'/g, "''")}'`).join(", ");
+                query = `
+                    SELECT * FROM conge
+                    INNER JOIN personnel ON personnel.id_personnel = conge.id_personnel AND personnel.structure_personnel IN (${strucArray})
+                `;
             }
-            if (isAnnuel && hasYear) {
-                conditions.push(`YEAR(date_fin_conge) = '${yearFilter.value}'`);
-            }*/
-            /*if (isPeriodique) {
-                conditions.push(`(date_debut_conge BETWEEN '${startDate}' AND '${endDate}' OR date_fin_conge BETWEEN '${startDate}' AND '${endDate}')`);
-                permissionConditions.push(`(date_debut_permission BETWEEN '${startDate}' AND '${endDate}' OR date_fin_permission BETWEEN '${startDate}' AND '${endDate}')`);
-            }*/
-            /*if (conditions.length > 0) {
-                query += " WHERE " + conditions.join(" AND ");
-            }*/
+            query = `
+                SELECT * FROM conge
+                INNER JOIN personnel ON personnel.id_personnel = conge.id_personnel
+                ORDER BY personnel.structure_personnel, conge.date_debut_conge;
+                `;
             console.log("REQUETE STATISTIQUE CONGE =>", query);
             /* fetching datas */
             window.electronAPI.getSpecificConge(query, 'conge');
@@ -90,6 +72,7 @@ const FicheStatsGlobal = () => {
                 //console.log(res);
                 setConges(res);
                 setSuccess("Statistiques générées avec succès!");
+                setShowPDF(true); // ✅ show PDF only now
                 setTimeout(() => {
                     setSuccess("");
                 }, 7000)
@@ -122,17 +105,21 @@ const FicheStatsGlobal = () => {
         fetchDatas();
     }, []);
 
-    const computeStatistics = (conges, filter) => {
+    const computeStatistics = (conges, filter, structureNames) => {
         const stats = {};
         const monthNames = [
             "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
         ];
-        const selectedStructures = Object.entries(filter).map(([key, value]) => value.value);
+        //const selectedStructures = Object.entries(filter).map(([key, value]) => value.value);
+        const selectedStructures =
+        filter && Object.keys(filter).length > 0
+            ? Object.entries(filter).map(([_, value]) => value.value)
+            : structureNames.map(s => s.structure_personnel);
         selectedStructures.forEach(structureName => {
             const rawStructure = structureName || "Non défini";
             const match = rawStructure.match(/\[([^\]]+)\]/);
-            const structure = match ? match[1] : structureName; 
+            const structure = match ? match[1] : structureName;
             if (!stats[structure]) {
                 stats[structure] = {
                     fonctionnaire: { total: 0 },
@@ -188,188 +175,151 @@ const FicheStatsGlobal = () => {
                 totalContractuel += cont;
             });
         });
-
-        console.log(globalMonthTotals);
         return { stats, globalMonthTotals, totalFonctionnaire,  totalContractuel};
     };
     
-    const stats = computeStatistics(conges, filter);
+    const stats = computeStatistics(conges, filter, structureNames);
 
     return (
         <>
             <Header />
             <Container className="mt--7" fluid>
                 <Row className="mt-5">
-          <Col className="order-xl-1" md="12" lg="12">
-            <Card className="bg-secondary shadow">
-                <CardHeader className="bg-white border-0">
-                    <Row className="align-items-center">
-                        <Col xs="8">
-                            <h3 className="mb-0">Définir les paramètres des statistiques</h3>
+                    <Col className="order-xl-1" md="12" lg="12">
+                        <Card className="bg-secondary shadow">
+                            <CardHeader className="bg-white border-0">
+                                <Row className="align-items-center">
+                                    <Col xs="8">
+                                        <h3 className="mb-0">Définir les paramètres des statistiques</h3>
+                                    </Col>
+                                </Row>
+                            </CardHeader>
+                            <CardBody>
+                                <Form>
+                                    <div className="pl-lg-4">
+                                        <Row>
+                                            <Col md="6">
+                                                <FormGroup>
+                                                    <Label for="type-conge">
+                                                        Année
+                                                    </Label>
+                                                    <Select
+                                                        value={yearFilter}
+                                                        onChange={handleFilterChange(setYearFilter)}
+                                                        options={yearOptions}
+                                                        isSearchable={true}
+                                                        placeholder="Selectionnez une année"
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                            <Col md="6">
+                                                <Label for="type-conge">
+                                                    Structure
+                                                </Label> 
+                                                <Select
+                                                    value={filter}
+                                                    onChange={handleFilterChange(setFilter)}
+                                                    options={options}
+                                                    isSearchable={true}
+                                                    isMulti={true}
+                                                    placeholder="Selectionnez une ou plusieurs structures"
+                                                />
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col md="12">
+                                                { error &&
+                                                    <Alert color="danger">
+                                                        {error}
+                                                    </Alert>
+                                                }
+                                                { success &&
+                                                    <Alert color="success">
+                                                        {success}
+                                                    </Alert>
+                                                }
+                                            </Col>
+                                        </Row>
+                                        <Row className="mt-3">
+                                            <Col md="6">
+                                                <Button
+                                                    color="primary"
+                                                    onClick={generateStats}
+                                                >
+                                                    Générer la fiche statistiques
+                                                </Button>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                </Form>
+                            </CardBody>
+                        </Card>
+                    </Col>
+                </Row>
+                {showPDF && (
+                    <Row className="mt-5">
+                        <Col className="order-xl-1" md="12" lg="12">
+                            <Card className="bg-secondary shadow">
+                                <CardHeader className="bg-white border-0">
+                                    <Row className="align-items-center">
+                                        <Col xs="8">
+                                            <h3 className="mb-0">Télécharger la fiche statistiques des congés et permissions</h3>
+                                        </Col>
+                                    </Row>
+                                </CardHeader>
+                                <CardBody>
+                                    <Row>
+                                        <PDFViewer showToolbar={0} className="w-100" height={800}>
+                                            <NewStatsDoc
+                                                stats={stats}
+                                                year={yearFilter}
+                                            />
+                                        </PDFViewer>
+                                    </Row>
+                                    <Row>
+                                        <Col className="order-xl-1 mt-2" xl="8" style={{ textAlign: "center" }}>
+                                            <PDFDownloadLink
+                                                document={<NewStatsDoc stats={stats} year={yearFilter} />}
+                                                fileName={`fiche_statistique_${date}.pdf`}
+                                            >
+                                                {({ blob, url, loading, error }) =>
+                                                loading ? (
+                                                    <div
+                                                    style={{
+                                                        display: "flex",
+                                                        flexDirection: "column",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        minHeight: "120px",
+                                                    }}
+                                                    >
+                                                    {/* Loader Spinner */}
+                                                    <div
+                                                        className="spinner-border text-success"
+                                                        role="status"
+                                                        style={{ width: "3rem", height: "3rem", marginBottom: "12px" }}
+                                                    >
+                                                    </div>
+
+                                                    {/* Message */}
+                                                    <div style={{ fontSize: "14px", color: "#198754", fontWeight: "500" }}>
+                                                        Génération du fichier PDF en cours, veuillez patienter...
+                                                    </div>
+                                                    </div>
+                                                ) : (
+                                                    <Button color="success">
+                                                    Télécharger
+                                                    </Button>
+                                                )
+                                                }
+                                            </PDFDownloadLink>
+                                        </Col>
+                                    </Row>
+                                </CardBody>
+                            </Card>
                         </Col>
                     </Row>
-                </CardHeader>
-                <CardBody>
-                    <Form>
-                        <div className="pl-lg-4">
-                            <Row>
-                                {/*<Col md="6">
-                                    <FormGroup>  
-                                        <Label for="type-conge">
-                                            Type de statistiques
-                                        </Label>              
-                                        <Select
-                                            //value={typeFilter}
-                                            //onChange={handleFilterChange(setTypeFilter)}
-                                            options={typesOptions}
-                                            value={typesOptions.find((opt) => opt.value === typeFilter)}
-                                            onChange={(e) => setTypeFilter(e?.value || null)}
-                                            isSearchable={true}
-                                            placeholder="Choisir le type de statistiques"
-                                        />
-                                    </FormGroup>
-                                </Col>*/}
-                                <Col md="6">
-                                    <FormGroup>  
-                                        <Label for="type-conge">
-                                            Année 
-                                        </Label>              
-                                        <Select
-                                            value={yearFilter}
-                                            onChange={handleFilterChange(setYearFilter)}
-                                            options={yearOptions}
-                                            isSearchable={true}
-                                            placeholder="Selectionnez une année"
-                                            //isDisabled = {typeFilter === "périodique" ? true : false}
-                                        />
-                                    </FormGroup>
-                                </Col>
-                                <Col md="6">
-                                    <Label for="type-conge">
-                                        Structure
-                                    </Label> 
-                                    <Select
-                                        value={filter}
-                                        onChange={handleFilterChange(setFilter)}
-                                        options={options}
-                                        isSearchable={true}
-                                        isMulti={true}
-                                        placeholder="Selectionnez une ou plusieurs structures"
-                                    />
-                                </Col>
-                            </Row>
-                            {/*<Row>
-                                <Col md="6">
-                                    <FormGroup>
-                                        <Label for="date-depart">
-                                            Date de debut
-                                        </Label>
-                                        <Input
-                                            id="date-depart"
-                                            name="date"
-                                            onChange={handleInputChange(setStartDate)}
-                                            value={startDate}
-                                            placeholder="date"
-                                            type="date"
-                                            disabled={typeFilter === "annuel" ? true : false}
-                                        />
-                                    </FormGroup>
-                                </Col>
-                                <Col md="6">
-                                    <FormGroup>
-                                        <Label for="date-fin">
-                                            Date de fin
-                                        </Label>
-                                        <Input
-                                            id="date-fin"
-                                            name="date"
-                                            value={endDate}
-                                            onChange={handleInputChange(setEndDate)}
-                                            placeholder="date"
-                                            type="date"
-                                            disabled={typeFilter === "annuel" ? true : false}
-                                        />
-                                    </FormGroup>
-                                </Col>
-                            </Row>*/}
-                            <Row>
-                                <Col md="12">
-                                    { error && 
-                                        <Alert color="danger">
-                                            {error}
-                                        </Alert>
-                                    }
-                                    { success && 
-                                        <Alert color="success">
-                                            {success}
-                                        </Alert>
-                                    }
-                                </Col>
-                            </Row>
-                            <Row className="mt-3">
-                                <Col md="6">
-                                    <Button
-                                        color="primary"
-                                        onClick={generateStats}
-                                    >
-                                        Générer la fiche statistiques
-                                    </Button>
-                                </Col>
-                            </Row>
-                        </div>
-                    </Form>
-                </CardBody>
-            </Card>
-        </Col>
-        </Row>
-            <Row className="mt-5">
-                <Col className="order-xl-1" md="12" lg="12">
-                    <Card className="bg-secondary shadow">
-                        <CardHeader className="bg-white border-0">
-                            <Row className="align-items-center">
-                                <Col xs="8">
-                                    <h3 className="mb-0">Télécharger la fiche statistiques des congés et permissions</h3>
-                                </Col>
-                            </Row>
-                        </CardHeader>
-                        <CardBody>
-                            <Row>
-                                <PDFViewer showToolbar={0} className="w-100"  height={800}>
-                                    <StatsDoc
-                                        stats={stats}
-                                        //structureName={filter}
-                                        //typeStat={typeFilter}
-                                        //dateDebut={startDate}
-                                        //dateFin={endDate}
-                                        //filter={filter}
-                                        year={yearFilter}
-                                    />
-                                </PDFViewer>
-                            </Row>
-                            <Row>
-                                <Col className="order-xl-1 mt-2" xl="8">
-                                    <PDFDownloadLink document={<StatsDoc
-                                            stats={stats}
-                                            //structureName={filter}
-                                            //typeStat={typeFilter}
-                                            //dateDebut={startDate}
-                                            //dateFin={endDate}
-                                            //filter={filter}
-                                            year={yearFilter}
-                                        />} fileName={`fiche_statistique_${date}.pdf`}>
-                                        {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 
-                                        <Button
-                                            color="success"
-                                        >
-                                            Télécharger
-                                        </Button>)}
-                                    </PDFDownloadLink>
-                                </Col>
-                            </Row>
-                        </CardBody>
-                    </Card>
-                </Col>
-                </Row>
+                )}
             </Container>
         </>
     );

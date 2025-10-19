@@ -280,7 +280,7 @@ const CongeDoc = (props) => {
                 </View>
                 {/* image */}
                 {/*<View style={styles.topSectionImage}>
-                    <Image style={styles.imageSceau} src={image}/> 
+                    <Image style={styles.imageSceau} src={image}/>
                 </View>*/}
                 {/* top right text */}
                 <View style={styles.topSectionTwo}>
@@ -390,7 +390,7 @@ const CongeDoc = (props) => {
                 </View>
             </View>
         </Page>
-      </Document>
+    </Document>
     );
 
 };

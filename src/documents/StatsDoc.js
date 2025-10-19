@@ -1,6 +1,6 @@
 import React from 'react';
-import { Page, Text, View, Document, StyleSheet, Font } from '@react-pdf/renderer';//Image,
-//import image from './docs-images/sceau-img.PNG';
+import { Page, Text, View, Document, StyleSheet, Font, Image } from '@react-pdf/renderer';
+import QRCode from 'qrcode'; // ✅ generate QR image dynamically
 import TimesNewRoman from './docs-fonts/times new roman.ttf';
 import TimesNewRomanBold from './docs-fonts/times new roman bold.ttf';
 import TimesNewRomanItalic from './docs-fonts/times new roman bold italic.ttf';
@@ -15,6 +15,16 @@ Font.register({
     ]
 });
 Font.registerHyphenationCallback(word => [word])
+
+// Generate QR code data URI
+const generateQRCode = (text) => {
+    try {
+        return QRCode.toDataURL(text);
+    } catch (e) {
+        return null;
+    }
+};
+
 const fontStyles = StyleSheet.create({
     normal: {
         fontFamily: 'Times-Roman',
@@ -294,6 +304,9 @@ const styles = StyleSheet.create({
 // Create Document Component
 const StatsDoc = (props) => {
     const d = new Date();
+    const qrText = `GESCON-APP - ${d.getFullYear()} - ${d.getTime()}`;
+    const qrData = generateQRCode(qrText);
+
     console.log("StatsDoc props: ", props.stats);
     return (
             <Document>
@@ -565,6 +578,12 @@ const StatsDoc = (props) => {
                                 GESCON-APP - {d.getTime()} - {d.getFullYear()}
                             </Text>
                         </View>
+                    </View>
+                    {/* ---------- FOOTER ---------- */}
+                    <View style={styles.footer}>
+                        <Text>Généré le {d.toLocaleDateString()}</Text>
+                        <Text render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
+                        {qrData && <Image src={qrData} style={styles.qrCode} />}
                     </View>
                 </Page>
             </Document>

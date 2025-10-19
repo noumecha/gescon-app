@@ -88,6 +88,7 @@
     "mysql2": "^3.9.2",
     "net": "^1.0.2",
     "nouislider": "15.4.0",
+    "qrcode": "^1.5.4",
     "react": "18.2.0",
     "react-bootstrap": "^2.10.1",
     "react-chartjs-2": "2.11.2",
