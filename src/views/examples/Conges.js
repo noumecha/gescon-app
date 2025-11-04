@@ -39,7 +39,8 @@ const Conges = () => {
 
   const handleUpdateConge = () => {
     updateConge(
-      congeToEdit, duration, setError, startDate, typeConge, personnel, setSuccess, endDate, repriseDate, setStatus, demande, document, setDuration
+      congeToEdit, duration, setError, startDate, typeConge, personnel, setSuccess,
+      endDate, repriseDate, setStatus, demande, document, setDuration
     );
   }
 
@@ -160,9 +161,9 @@ const Conges = () => {
       }
     };
     changeDuration();
-  },[selectedPerson, selectedType])
+  },[selectedPerson, selectedType, setDuration])
 
-  // useEffect changing libelle 
+  // useEffect changing libelle
   useEffect(() => {
     setTypeConge((prevTypeConge) =>
       prevTypeConge.map((t) =>
@@ -208,7 +209,7 @@ const Conges = () => {
       }
     };
     calculateEndDate();
-  }, [startDate, duration,selectedType, selectedPerson?.id_type_personnel]);
+  }, [startDate, duration,selectedType, selectedPerson?.id_type_personnel, selectedPerson, setEndDate, setRepriseDate]);
 
   /** useEffect for updating personnel and congé base on some state of current date */
   useEffect(() => {
@@ -261,7 +262,7 @@ const Conges = () => {
       }
     }
     updatePersonnelState()
-  }, [conge]);
+  }, [conge, setSuccess]);
 
   // useEffect for getting conge for a specific user
   useEffect(() => {
@@ -271,7 +272,7 @@ const Conges = () => {
         window.electronAPI.getSpecificConge(specific_conge_query);
         await window.electronAPI.retrieveSpecificConge((event, res) => {
           for (let index = 0; index < res.length; index++) {
-            res[index].attestation_conge = JSON.parse(res[index].attestation_conge)                                                
+            res[index].attestation_conge = JSON.parse(res[index].attestation_conge)
           }
           setUserConge(res);
         })
@@ -281,7 +282,7 @@ const Conges = () => {
     }
     getSpecificConge();
     fetchDatas(setConge, setLoadingSpinner, setSelectedDec, setTypeConge, setLastPermission, selectedPerson, id_personnel);
-  },[id_personnel, selectedPerson]);
+  },[id_personnel, selectedPerson, setConge, setLoadingSpinner, setSelectedDec, setTypeConge, setLastPermission, setUserConge]);
 
   // useEffect for getting specific personnel data
   const getSpecificPersonnel = (personnelId) => {

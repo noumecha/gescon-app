@@ -31,10 +31,6 @@
     "compile:scss": "sass src/assets/scss/argon-dashboard-react.scss src/assets/css/argon-dashboard-react.css",
     "minify:scss": "sass src/assets/scss/argon-dashboard-react.scss src/assets/css/argon-dashboard-react.min.css --style compressed",
     "build:scss": "npm run compile:scss && npm run minify:scss && npm run map:scss",
-    "electron-build": "electron-builder",
-    "build-all": "electron-builder -mwl",
-    "postinstall": "electron-builder install-app-deps",
-    "rebuild": "electron-rebuild --verbose",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "make:mac": "electron-forge make --platform darwin"
@@ -128,7 +124,6 @@
     "docxtemplater": "^3.46.0",
     "electron": "^32.1.2",
     "electron-packager": "^17.1.2",
-    "electron-rebuild": "^3.2.9",
     "fs": "^0.0.1-security",
     "gulp": "^4.0.2",
     "gulp-append-prepend": "1.0.9",

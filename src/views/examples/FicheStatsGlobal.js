@@ -1,30 +1,27 @@
 import { Container } from "reactstrap";
 import Header from "components/Headers/Header.js";
-import { Row,Col,Card,CardHeader,CardBody,Button,Alert,Form,Input,FormGroup,Label } from 'reactstrap';
+import { Row,Col,Card,CardHeader,CardBody,Button,Alert,Form,FormGroup,Label } from 'reactstrap';
 import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
-//import StatsDoc from "documents/StatsDoc";
-import NewStatsDoc from "documents/NewStatsDoc";
+import GlobalStatsDoc from "documents/GlobalStatsDoc";
 import Select from "react-select";
 import { useState, useEffect } from "react";
 
 const FicheStatsGlobal = () => {
     const date = new Date().getDate() + '_' + parseInt(new Date().getMonth() + 1 )+ '_' + new Date().getFullYear()
     const [conges, setConges] = useState([]);
-    //const [permissions, setPermissions] = useState([]);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
-    //const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
-    //const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
-    const [filter, setFilter] = useState([]); // structure filter
-    const [yearFilter, setYearFilter] = useState(null); // year filter
-    //const [typeFilter, setTypeFilter] = useState(null); // periodique | annuel
+    const [filter, setFilter] = useState([]);
+    const [yearFilter, setYearFilter] = useState(null);
     const [structureNames, setStructureNames] = useState([]);
     const [years, setYears] = useState([]);
+    const [statType, setStatType] = useState([]);
     const [showPDF, setShowPDF] = useState(false);
 
-    const handleInputChange = (setStateFunction) => (e) => {
-        setStateFunction(e.target.value);
-    };
+    const typeOptions = [
+        { value: "globales", label: "Globales" },
+        { value: "structure", label: "Par Structure" },
+    ];
 
     const yearOptions = years.map((y, i) => ({
         value: y.annee,
@@ -37,7 +34,7 @@ const FicheStatsGlobal = () => {
     }));
     
     const handleFilterChange = (setState) => (selectedOption) => {
-        setState(selectedOption); 
+        setState(selectedOption);
     };
 
     const generateStats = async () => {
@@ -65,14 +62,13 @@ const FicheStatsGlobal = () => {
                 INNER JOIN personnel ON personnel.id_personnel = conge.id_personnel
                 ORDER BY personnel.structure_personnel, conge.date_debut_conge;
                 `;
-            console.log("REQUETE STATISTIQUE CONGE =>", query);
             /* fetching datas */
-            window.electronAPI.getSpecificConge(query, 'conge');
-            window.electronAPI.retrieveSpecificConge((event, res) => {
-                //console.log(res);
+            window.electronAPI.getSpecificConge(query);
+            await window.electronAPI.retrieveSpecificConge((event, res) => {
+                console.log(res);
                 setConges(res);
                 setSuccess("Statistiques générées avec succès!");
-                setShowPDF(true); // ✅ show PDF only now
+                setShowPDF(true);
                 setTimeout(() => {
                     setSuccess("");
                 }, 7000)
@@ -137,7 +133,7 @@ const FicheStatsGlobal = () => {
             if (!selectedStructures.includes(rawStructure)) return;
             const match = rawStructure.match(/\[([^\]]+)\]/);
             const structure = match ? match[1] : c.structure_personnel;
-            const type = c.type_personnel === 1 ? "fonctionnaire" : "contractuel";
+            const type = c.id_type_personnel === 1 ? "fonctionnaire" : "contractuel";
             const endDate = new Date(c.date_fin_conge);
             const monthName = monthNames[endDate.getMonth()];
             if (!stats[structure]) {
@@ -199,7 +195,7 @@ const FicheStatsGlobal = () => {
                                 <Form>
                                     <div className="pl-lg-4">
                                         <Row>
-                                            <Col md="6">
+                                            <Col md="12">
                                                 <FormGroup>
                                                     <Label for="type-conge">
                                                         Année
@@ -214,6 +210,20 @@ const FicheStatsGlobal = () => {
                                                 </FormGroup>
                                             </Col>
                                             <Col md="6">
+                                                <FormGroup>
+                                                    <Label for="type-conge">
+                                                        Type de statitistiques
+                                                    </Label>
+                                                    <Select
+                                                        value={statType}
+                                                        onChange={handleFilterChange(setStatType)}
+                                                        options={typeOptions}
+                                                        isSearchable={true}
+                                                        placeholder="Selectionnez un type de statistiques"
+                                                    />
+                                                </FormGroup>
+                                            </Col>
+                                            <Col md="6">
                                                 <Label for="type-conge">
                                                     Structure
                                                 </Label> 
@@ -221,9 +231,10 @@ const FicheStatsGlobal = () => {
                                                     value={filter}
                                                     onChange={handleFilterChange(setFilter)}
                                                     options={options}
+                                                    isDisabled={statType.value === "globales" ? true : false}
                                                     isSearchable={true}
-                                                    isMulti={true}
-                                                    placeholder="Selectionnez une ou plusieurs structures"
+                                                    isMulti={statType.value === "structure" ? false : true}
+                                                    placeholder="Selectionnez une structure"
                                                 />
                                             </Col>
                                         </Row>
@@ -271,7 +282,7 @@ const FicheStatsGlobal = () => {
                                 <CardBody>
                                     <Row>
                                         <PDFViewer showToolbar={0} className="w-100" height={800}>
-                                            <NewStatsDoc
+                                            <GlobalStatsDoc
                                                 stats={stats}
                                                 year={yearFilter}
                                             />
@@ -280,7 +291,7 @@ const FicheStatsGlobal = () => {
                                     <Row>
                                         <Col className="order-xl-1 mt-2" xl="8" style={{ textAlign: "center" }}>
                                             <PDFDownloadLink
-                                                document={<NewStatsDoc stats={stats} year={yearFilter} />}
+                                                document={<GlobalStatsDoc stats={stats} year={yearFilter} />}
                                                 fileName={`fiche_statistique_${date}.pdf`}
                                                 className="d-flex align-items-center justify-content-center"
                                             >

@@ -266,7 +266,7 @@ const CongeDoc = (props) => {
     const [qrData, setQrData] = React.useState(null);
     React.useEffect(() => {
         generateQRCode(qrText).then(setQrData);
-    }, []);
+    }, [qrText]);
 
     return (
         <Document>
@@ -354,7 +354,7 @@ const CongeDoc = (props) => {
                         <Text style={fontStyles.bold}> Matricule {props.matricule}</Text>, {props.poste} {props.preposition} {props.structure}, est bénéficiaire
                         d'un {props.typeConge} de (<Text style={fontStyles.bold}>{props.duration}</Text>)
                         {props.duration > 1 ? " jours" : " jour"}{props.type === "Contractuelle" ? " ouvrable" : ""}{(props.type === "Contractuelle" && props.duration > 1) ? "s" : ""},
-                        accordé par décision <Text style={fontStyles.bold}>N°{props.decision}</Text> du Ministre des finances.
+                        accordé par décision <Text style={fontStyles.bold}>N°{props.decision}</Text> du Ministre des Finances.
                     </Text>
                     <Text style={styles.pCertifText}>
                         L'intéressé{props.sexe === "M" ? "" : "e"} jouira 
