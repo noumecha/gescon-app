@@ -129,6 +129,8 @@
     "gulp-append-prepend": "1.0.9",
     "officegen": "^0.6.5",
     "path": "^0.12.7",
+    "puppeteer": "^24.29.0",
+    "puppeteer-core": "^24.29.0",
     "wait-on": "^7.2.0",
     "webpack": "^5.90.3",
     "webpack-cli": "^5.1.4",

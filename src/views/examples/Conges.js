@@ -39,8 +39,7 @@ const Conges = () => {
 
   const handleUpdateConge = () => {
     updateConge(
-      congeToEdit, duration, setError, startDate, typeConge, personnel, setSuccess,
-      endDate, repriseDate, setStatus, demande, document, setDuration
+      congeToEdit, duration, setError, startDate, typeConge, personnel, setSuccess, endDate, repriseDate, setStatus, demande, document, setDuration
     );
   }
 
@@ -161,9 +160,9 @@ const Conges = () => {
       }
     };
     changeDuration();
-  },[selectedPerson, selectedType, setDuration])
+  },[selectedPerson, selectedType])
 
-  // useEffect changing libelle
+  // useEffect changing libelle 
   useEffect(() => {
     setTypeConge((prevTypeConge) =>
       prevTypeConge.map((t) =>
@@ -209,7 +208,7 @@ const Conges = () => {
       }
     };
     calculateEndDate();
-  }, [startDate, duration,selectedType, selectedPerson?.id_type_personnel, selectedPerson, setEndDate, setRepriseDate]);
+  }, [startDate, duration,selectedType, selectedPerson?.id_type_personnel]);
 
   /** useEffect for updating personnel and congé base on some state of current date */
   useEffect(() => {
@@ -262,7 +261,7 @@ const Conges = () => {
       }
     }
     updatePersonnelState()
-  }, [conge, setSuccess]);
+  }, [conge]);
 
   // useEffect for getting conge for a specific user
   useEffect(() => {
@@ -282,7 +281,7 @@ const Conges = () => {
     }
     getSpecificConge();
     fetchDatas(setConge, setLoadingSpinner, setSelectedDec, setTypeConge, setLastPermission, selectedPerson, id_personnel);
-  },[id_personnel, selectedPerson, setConge, setLoadingSpinner, setSelectedDec, setTypeConge, setLastPermission, setUserConge]);
+  },[id_personnel, selectedPerson]);
 
   // useEffect for getting specific personnel data
   const getSpecificPersonnel = (personnelId) => {

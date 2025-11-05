@@ -12,14 +12,13 @@ const GlobalStatsDoc = ({ stats, year }) => {
 
     React.useEffect(() => {
         generateQRCode(qrText).then(setQrData);
-    }, [qrText]);
+    }, []);
 
     if (!stats || !stats.stats) return null;
 
     const entries = Object.entries(stats.stats);
     const rowsPerPage = 14;
-
-    // ⚡ Si ce sont des statistiques globales, on n’applique pas de pagination
+    
     const pages = stats.isGlobal ? [entries] : chunkArray(entries, rowsPerPage);
 
     const months = [

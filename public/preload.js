@@ -7,7 +7,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 contextBridge.exposeInMainWorld("electronAPI", {
     devName: dev,
-    // pour le login : 
+    // pour le login :
     userLogin: (username,password) => ipcRenderer.send('user-login', username, password),
     loginSuccess: (callback) => ipcRenderer.on('login-success', callback),
     loginFail: (callback) => ipcRenderer.on('login-fail', callback),
@@ -23,7 +23,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     addCongeType: (req) => ipcRenderer.send('add-conge-type', req),
     getCongeType: () => ipcRenderer.send('get-conge-type'),
     retrieveCongeType: (callback) => ipcRenderer.on('all-conge-type', callback),
-    // conge :  
+    // conge :
+    getStatsConge: (req) => ipcRenderer.invoke('get-stats-conge', req),
     getSpecificConge: (req) => ipcRenderer.send('get-specific-conge' , req),
     retrieveSpecificConge: (callback) => ipcRenderer.on('all-specific-conge', callback),
     addConge: (req) => ipcRenderer.send('add-conge', req),

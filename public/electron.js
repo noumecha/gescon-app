@@ -1,6 +1,7 @@
 const path = require('path');
 const { app, BrowserWindow, ipcMain } = require('electron');
 const mysql = require('mysql2');
+
 //const isDev = import('electron-is-dev');
 
 let mainWindow;
@@ -24,8 +25,8 @@ function createWindow() {
     mainWindow.setMenuBarVisibility(false);
 
     mainWindow.loadURL(
-        `http://localhost:3000`
-        //`file://${path.join(__dirname, '../build/index.html')}`
+        //`http://localhost:3000`
+        `file://${path.join(__dirname, '../build/index.html')}`
     );
 
 };
@@ -42,9 +43,9 @@ const pool = mysql.createPool({
     user: 'root',
     password: '',
     database: 'gescon_db'
-}) 
+})
 
-// fucntion for the personnel : 
+// fucntion for the personnel :
 function addPersonnelDette(event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
@@ -431,7 +432,20 @@ app.whenReady().then(() => {
     ipcMain.on('get-conge-type', getCongeType);
     ipcMain.on('add-conge-type', addCongeType);
     ipcMain.on('get-specific-conge-type', getSpecificCongeType);
-    // conge  
+    // conge
+    // Handle invoked queries cleanly
+    ipcMain.handle("get-stats-conge", async (event, query) => {
+        return new Promise((resolve, reject) => {
+            pool.query(query, (err, results) => {
+            if (err) {
+                console.error("SQL error:", err);
+                reject(err);
+            } else {
+                resolve(results);
+            }
+            });
+        });
+    });
     ipcMain.on('get-specific-conge', getSpecificConge);
     ipcMain.on('get-specific-data', getData);
     ipcMain.on('get-conge', getConge);

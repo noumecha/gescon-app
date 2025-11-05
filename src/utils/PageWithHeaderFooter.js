@@ -1,4 +1,5 @@
 import { Text, Page, View, Image } from '@react-pdf/renderer';
+import image from '../documents/docs-images/sceau-img.PNG'
 import styles from 'utils/styles';
 
 const PageWithHeaderFooter = ({ children, headerText, qrData }) => {
@@ -37,6 +38,11 @@ const PageWithHeaderFooter = ({ children, headerText, qrData }) => {
                     </Text>
                     <Text style={styles.line}>------------</Text>
                 </View>
+                {/* image */}
+                <View style={styles.topSectionImage}>
+                    <Image style={styles.imageSceau} src={image}/>
+                </View>
+                {/* top right text */}
                 <View style={styles.topSectionTwo}>
                     <Text style={styles.h1TitleFirst}>
                         REPUBLIC OF CAMEROON

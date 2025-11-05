@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
         fontSize: 10,
         paddingBottom: 3,
     },
-        topSectionOne: {
+    topSectionOne: {
         fontSize: 9,
         flex: 1,
         textAlign: 'center',
@@ -48,6 +48,15 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         lineHeight: 1,
         marginRight: -60,
+    },
+    // center first section logo
+    topSectionImage: {
+        position: 'absolute',
+        left: "44%",
+    },
+    imageSceau: {
+        height: 100,
+        width: 100,
     },
     line: {
         textAlign: 'center',
