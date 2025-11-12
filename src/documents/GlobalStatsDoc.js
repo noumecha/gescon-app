@@ -34,11 +34,14 @@ const GlobalStatsDoc = ({ stats, year }) => {
     return (
         <Document>
             {pages.map((pageEntries, pageIndex) => (
-                <PageWithHeaderFooter key={pageIndex} qrData={qrData}>
+                <PageWithHeaderFooter key={pageIndex} pageIndex={pageIndex} qrData={qrData}>
+                    
                     {/* Title */}
-                    <Text style={styles.title}>
+                    {pageIndex === 0 && (
+                        <Text style={styles.title}>
                         {`FICHE STATISTIQUES DES CONGÉS ${year?.value || d.getFullYear()}`}
-                    </Text>
+                        </Text>
+                    )}
 
                     {/* Table */}
                     <View style={styles.table}>

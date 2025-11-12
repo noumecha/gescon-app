@@ -33,11 +33,13 @@ const StructStatsDoc = ({ stats, year, structure }) => {
     return (
         <Document>
             {pages.map((pageEntries, pageIndex) => (
-                <PageWithHeaderFooter key={pageIndex} qrData={qrData}>
+                <PageWithHeaderFooter key={pageIndex} pageIndex={pageIndex} qrData={qrData}>
+                    
                     {/* Title */}
+                    {pageIndex === 0 && (
                     <Text style={styles.title} break>
                         {`STATISTIQUES DES CONGÉS - ${structure?.value || 'Structure'} -  ${year?.value || d.getFullYear()}`.toUpperCase()}
-                    </Text>
+                    </Text>)}
 
                     {/* Table */}
                     <View style={styles.table}>
