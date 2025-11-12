@@ -17,7 +17,6 @@ const FicheStatsGlobal = () => {
     const [years, setYears] = useState([]);
     const [showPdf, setShowPdf] = useState(false);
     const [statType, setStatType] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
 
     const monthNames = [
         "January", "February", "March", "April", "May", "June",
@@ -54,6 +53,7 @@ const FicheStatsGlobal = () => {
 
     const generateStats = async () => {
         try {
+            // building query
             let query = '';
             if(yearFilter === null) {
                 errorShow({msg: "Selectionner une année pour générer les statistiques.", type: "error"});
@@ -67,8 +67,19 @@ const FicheStatsGlobal = () => {
                 errorShow({msg: "Selectionner au moins une structure pour générer ses statistiques.", type: "error"});
                 return ;
             }
-            if(statType.value === "globales") {
-                setFilter([]);
+            if(statType.value === "globales" && filter.length > 0) {
+                const structures = Object.entries(filter).map(([key, value]) => ({
+                    names : value
+                }));
+                const strucArray = structures.map(s => `'${s.names.value.replace(/'/g, "''")}'`).join(", ");
+                query = `
+                    SELECT * FROM conge
+                    INNER JOIN personnel ON personnel.id_personnel = conge.id_personnel
+                    WHERE personnel.structure_personnel IN (${strucArray})
+                    ORDER BY personnel.structure_personnel, conge.date_debut_conge;
+                    `;
+            }
+            if (statType.value === "globales" && filter.length === 0) {
                 query = `
                     SELECT * FROM conge
                     INNER JOIN personnel ON personnel.id_personnel = conge.id_personnel
@@ -279,21 +290,6 @@ const FicheStatsGlobal = () => {
         }
     };
 
-    const handleGeneratePdf = async () => {
-        setIsLoading(true);
-        const result = await window.electronAPI.generatePdf({
-            stats: structStats,
-            structure: filter,
-            year: yearFilter
-        });
-        setIsLoading(false);
-
-        if (result.success) {
-            alert(`PDF enregistré : ${result.filePath}`);
-        } else {
-            alert("Erreur : " + result.error);
-        }
-    };
     const stats = computeStatistics(conges, filter, structureNames);
     const structStats = computeStructStats(conges);
 
@@ -351,7 +347,6 @@ const FicheStatsGlobal = () => {
                                                     value={filter}
                                                     onChange={handleFilterChange(setFilter)}
                                                     options={options}
-                                                    isDisabled={statType.value === "globales" ? true : false}
                                                     isSearchable={true}
                                                     isMulti={statType.value === "structure" ? false : true}
                                                     placeholder="Selectionnez une structure"
@@ -371,7 +366,6 @@ const FicheStatsGlobal = () => {
                                             <Col md="6">
                                                 <Button
                                                     color="primary"
-                                                    //onClick={statType && statType.value === "globales" ? generateStats : handleGeneratePdf}
                                                     onClick={generateStats}
                                                 >
                                                     Générer la fiche statistiques
@@ -398,7 +392,7 @@ const FicheStatsGlobal = () => {
                                 <CardBody>
                                     <Row>
                                         {/* Désactive PDFViewer si gros fichier */}
-                                        {Object.keys(structStats.stats || {}).length < 100 ? (
+                                        {Object.keys(structStats.stats || {}).length <= 40 ? (
                                             <PDFViewer showToolbar={0} className="w-100" height={800}>
                                                 {statType && statType.value === "globales"
                                                 ? ( <GlobalStatsDoc stats={stats} year={yearFilter}/>)
@@ -421,7 +415,7 @@ const FicheStatsGlobal = () => {
                                                 className="d-flex align-items-center justify-content-center"
                                             >
                                             {({ loading }) =>
-                                                loading ? "Génération du fichier PDF en cours..." : <Button color="success">Télécharger</Button>
+                                                loading ? "Génération du fichier PDF en cours veuillez patientez..." : <Button color="success">Télécharger</Button>
                                             }
                                             </PDFDownloadLink>
                                         </Col>

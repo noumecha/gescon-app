@@ -4,15 +4,14 @@ import { useState, useEffect } from "react";
 
 const Header = () => {
 
-  //const [demande, setDemande] = useState([]);
   const [nberPersonnel, setNberPersonnel] = useState();
+  const [currentConge, setCurrentConge] = useState([]);
   const [conge, setConge] = useState([]);
   const [perf, setPerf] = useState(100);
 
-
   useEffect(() => {
     const func = async () => {
-      const prf = conge.length === 0 ? 100 : Number.parseFloat(100 - ((conge.length * 100)/nberPersonnel)).toFixed(2);
+      const prf = Number.parseFloat(((conge.length/nberPersonnel) * 100)).toFixed(2);
       setPerf(prf);
     }
     func();
@@ -20,20 +19,23 @@ const Header = () => {
 
   useEffect(() => {
     const func = async () => {
-        try {
-            const req_get = `SELECT * FROM personnel WHERE statut_personnel = "en congé"`;
-            window.electronAPI.getSpecificPersonnel(req_get);
-            await window.electronAPI.retrieveSpecificPersonnel((event, res) => {
-              setConge(res);
-            })
-            window.electronAPI.getPersonnel();
-            await window.electronAPI.receivePersonnel((event, res) => {
-              //console.log("pers event : " + res.length);
-              setNberPersonnel(res.length);
-            });
-        } catch (error) {
-            console.error("Erreur : " + error.message);
-        }
+      try {
+        const req_get = `SELECT * FROM personnel WHERE statut_personnel = "en congé"`;
+        window.electronAPI.getSpecificPersonnel(req_get);
+        await window.electronAPI.retrieveSpecificPersonnel((event, res) => {
+          setCurrentConge(res);
+        })
+        window.electronAPI.getPersonnel();
+        await window.electronAPI.receivePersonnel((event, res) => {
+          setNberPersonnel(res.length);
+        });
+        window.electronAPI.getConge();
+        await window.electronAPI.retrieveConge((event, res) => {
+          setConge(res);
+        })
+      } catch (error) {
+        console.error("Erreur : " + error.message);
+      }
     }
     func();
   }, []);
@@ -81,7 +83,7 @@ const Header = () => {
                           Personnels en Congés
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
-                          { conge ? conge.length : 0 }
+                          { currentConge ? currentConge.length : 0 }
                         </span>
                       </div>
                       <Col className="col-auto">
@@ -104,7 +106,7 @@ const Header = () => {
                         >
                           Ratio
                         </CardTitle>
-                        <span className="h2 font-weight-bold mb-0"> {nberPersonnel ? perf : 0}%</span>
+                        <span className="h2 font-weight-bold mb-0"> {perf}%</span>
                       </div>
                       <Col className="col-auto">
                         <div className="icon icon-shape bg-info text-white rounded-circle shadow">

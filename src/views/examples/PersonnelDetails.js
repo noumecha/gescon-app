@@ -44,22 +44,7 @@ const PersonnelDetails = () => {
 
     useEffect(() => {
         setTotalDays(selectedPerson.nb_jours_conges + selectedPerson.nb_jours_permission);
-        /*if (nberConge.length > 0 || nberPermission.length > 0) {
-            let total = 0;
-            nberConge.forEach(element => {
-                total += element.duree_conge;
-            });
-            if (nberPermission.length > 0) {
-                let total_permission = 0;
-                nberPermission.forEach(element => {
-                    total_permission += element.duree_permission;
-                });
-                setTotalDays(total + total_permission);
-            } else {
-                setTotalDays(total);
-            }
-        }*/
-    },[selectedPerson] /*[nberConge, nberPermission]*/)
+    },[selectedPerson])
 
     function formatDate(d, m) {
         const date = new Date(d);
@@ -72,7 +57,7 @@ const PersonnelDetails = () => {
         if (m === 1) {
             return new Date(year, month, day).getDate() + "/" + (new Date(year, month, day).getMonth() < 10 ? "0"+parseInt(new Date(year, month, day).getMonth()+1) : parseInt(new Date(year, month, day).getMonth()+1))+ "/" + new Date(year, month, day).getFullYear()
         }
-    }  
+    }
 
     //let statistics = [stat1, stat2]
     let statistics = nberConge.reduce((acc, conge) => {

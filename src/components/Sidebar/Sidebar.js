@@ -261,19 +261,9 @@ const Sidebar = (props) => {
           <h6 className="navbar-heading text-muted">Autres</h6>
           {/* Navigation */}
           <Nav className="mb-md-3" navbar>
-            <NavItem>
-              <NavLink 
-                to="/admin/conges"
-                tag={NavLinkRRD}
-                onClick={closeCollapse}
-              >
-                <i className="ni ni-spaceship text-dark" />
-                Tutoriel
-              </NavLink>
-            </NavItem>
             { user.role_utilisateur === "administrateur" ? (
                 <NavItem>
-                  <NavLink 
+                  <NavLink
                     to="/admin/register"
                     tag={NavLinkRRD}
                     onClick={closeCollapse}
@@ -285,7 +275,7 @@ const Sidebar = (props) => {
               ) : ""
             }
             <NavItem>
-              <NavLink 
+              <NavLink
                 to="/admin/user-profile"
                 tag={NavLinkRRD}
                 onClick={closeCollapse}
@@ -297,7 +287,7 @@ const Sidebar = (props) => {
             <NavItem>
               <NavLink
                 tag={NavLinkRRD}
-                onClick={handleLogout}           
+                onClick={handleLogout}
               >
                 <i className="ni ni-spaceship text-dark" />
                 Se Deconnecter

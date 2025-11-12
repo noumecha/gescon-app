@@ -25,7 +25,7 @@ import {
     FormText,
     Label,
     Alert,
-  } from "reactstrap";
+} from "reactstrap";
 import Header from "components/Headers/Header.js";
 import { useState, useEffect } from "react";
 import { PDFDownloadLink } from '@react-pdf/renderer';
@@ -38,7 +38,7 @@ const AttestationConge = () => {
     const [perPage] = useState(100);
     const [filter, setFilter] = useState("");
     const [search, setSearch] = useState("");
-    const [modalData, setModalData] = useState(null); 
+    const [modalData, setModalData] = useState(null);
     const [modal, setModal] = useState(false);
     const [errorArchive, setErrorArchive] = useState("");
     const [successArchive, setSuccessArchive] = useState("");
@@ -46,7 +46,7 @@ const AttestationConge = () => {
     const [loadingSpinner, setLoadingSpinner] = useState(true);
     const loadingText = "Aucune donnée dans la base de données";
 
-    // usefull functions : 
+    // usefull functions :
 
     const toggleModal = () => {
         setModal(!modal)
@@ -71,8 +71,8 @@ const AttestationConge = () => {
         if (!archive) {
             setErrorArchive("Veuillez sélectionner un fichier");
             setTimeout(() => {
-              setErrorArchive("");
-            }, 7000)
+                setErrorArchive("");
+            }, 4000)
             return;
         }
         const date = new Date().toISOString().slice(0,19).replace('T',' ');
@@ -83,14 +83,14 @@ const AttestationConge = () => {
             setSuccessArchive("attestation archivé avec succès")
             setTimeout(() => {
                 setSuccessArchive("");
-            }, 7000)
+            }, 4000)
         })
         window.electronAPI.updateConge(req_conge);
         window.electronAPI.updateCongeSuccess((event, res) => {
             setSuccessArchive("congé mis à jour avec succès")
             setTimeout(() => {
                 setSuccessArchive("");
-            }, 7000)
+            }, 4000)
         });
     }
 
@@ -128,7 +128,7 @@ const AttestationConge = () => {
                     res[index].attestation_conge = JSON.parse(res[index].attestation_conge)
                 }
                 setAttestationConge(res);
-                setTimeout(() => 
+                setTimeout(() =>
                 setLoadingSpinner(false)
                 , 3000);
             })
@@ -143,14 +143,14 @@ const AttestationConge = () => {
     
     const handleRefresh = () => {
         try {
-          setLoadingSpinner(true);
-          setTimeout(() => 
-          setLoadingSpinner(false)
-          , 3000);
-          fetchDatas();
-          console.log("datas refreshed successfully");
+            setLoadingSpinner(true);
+            setTimeout(() => 
+            setLoadingSpinner(false)
+            , 3000);
+            fetchDatas();
+            console.log("datas refreshed successfully");
         } catch (err) {
-          console.error("error on refresh : " + err.message);
+            console.error("error on refresh : " + err.message);
         }
     }
 
@@ -158,7 +158,7 @@ const AttestationConge = () => {
         <>
         <Header />
         {/* Page content */}
-        <Container className="mt--7" fluid> 
+        <Container className="mt--7" fluid>
             <Row>
                 <Col lg="12">
                     <Input
@@ -287,85 +287,12 @@ const AttestationConge = () => {
                                                                 onClick={() => handleRowClick(att_con)}
                                                             >
                                                                 Archiver ce document
-                                                                <Modal isOpen={modal} toggle={toggleModal} {...modalData}>
-                                                                    <ModalHeader toggle={toggleModal}>
-                                                                        <Row>
-                                                                            <Col>
-                                                                                <h3 className="mb-0">Archiver ce document</h3>
-                                                                            </Col>
-                                                                        </Row>
-                                                                    </ModalHeader>
-                                                                    <ModalBody>
-                                                                        <CardBody>
-                                                                            <Form>
-                                                                                <Row>
-                                                                                    <Col>  
-                                                                                        <FormGroup>
-                                                                                        <Label
-                                                                                            for="demande-file"
-                                                                                        >
-                                                                                            Attestation signé
-                                                                                        </Label>
-                                                                                        <Input
-                                                                                            id="demande-file"
-                                                                                            name="file"
-                                                                                            type="file"
-                                                                                            accept=".jpeg, .png, .jpg"
-                                                                                            onChange={(e) => handleArchiveChange(e)}
-                                                                                        />
-                                                                                        <FormText>
-                                                                                            selectionner l'attestion signé à archivé (fichier accepté .jpeg, .png, .jpg)
-                                                                                        </FormText>
-                                                                                        </FormGroup>
-                                                                                    </Col>
-                                                                                </Row>
-                                                                                <Row>
-                                                                                    <Col md="6">
-                                                                                        <Button
-                                                                                            color="success"
-                                                                                            size="md"
-                                                                                            onClick={() => saveArchive(modalData)}
-                                                                                            /*onClick={() => {
-                                                                                                console.log("current archive : " + modalData.nom_prenom_personnel)
-                                                                                            }}*/
-                                                                                        >
-                                                                                            Archiver
-                                                                                        </Button>
-                                                                                    </Col>
-                                                                                    <Col>
-                                                                                        <Button
-                                                                                            color="danger"
-                                                                                            size="md"
-                                                                                            onClick={() => toggleModal()}
-                                                                                        >
-                                                                                            Terminer
-                                                                                        </Button>
-                                                                                    </Col>
-                                                                                </Row>
-                                                                                <Row className="mt-3">
-                                                                                    <Col>
-                                                                                        { errorArchive && (
-                                                                                            <Alert color="danger">
-                                                                                                {errorArchive}
-                                                                                            </Alert>
-                                                                                        )}
-                                                                                        { successArchive && (
-                                                                                            <Alert color="success">
-                                                                                                {successArchive}
-                                                                                            </Alert>
-                                                                                        )}                                                                                    
-                                                                                    </Col>
-                                                                                </Row>
-                                                                            </Form>
-                                                                        </CardBody>
-                                                                    </ModalBody>
-                                                                </Modal>
                                                             </DropdownItem>
                                                         </DropdownMenu>
                                                     </UncontrolledDropdown>
                                                 </td>
                                             </tr>
-                                        ))) : 
+                                        ))) :
                                             !loadingSpinner && (
                                                 <tr>
                                                     <td colSpan="7" className="text-center">
@@ -374,6 +301,79 @@ const AttestationConge = () => {
                                                 </tr>
                                         )}
                                     </tbody>
+                                    <Modal isOpen={modal} toggle={toggleModal} {...modalData}>
+                                        <ModalHeader toggle={toggleModal}>
+                                            <Row>
+                                                <Col>
+                                                    <h3 className="mb-0">Archiver ce document</h3>
+                                                </Col>
+                                            </Row>
+                                        </ModalHeader>
+                                        <ModalBody>
+                                            <CardBody>
+                                                <Form>
+                                                    <Row>
+                                                        <Col>
+                                                            <FormGroup>
+                                                            <Label
+                                                                for="demande-file"
+                                                            >
+                                                                Attestation signé
+                                                            </Label>
+                                                            <Input
+                                                                id="demande-file"
+                                                                name="file"
+                                                                type="file"
+                                                                accept=".jpeg, .png, .jpg"
+                                                                onChange={(e) => handleArchiveChange(e)}
+                                                            />
+                                                            <FormText>
+                                                                selectionner l'attestion signé à archivé (fichier accepté .jpeg, .png, .jpg)
+                                                            </FormText>
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row>
+                                                        <Col md="6">
+                                                            <Button
+                                                                color="success"
+                                                                size="md"
+                                                                onClick={() => saveArchive(modalData)}
+                                                                /*onClick={() => {
+                                                                    console.log("current archive : " + modalData.nom_prenom_personnel)
+                                                                }}*/
+                                                            >
+                                                                Archiver
+                                                            </Button>
+                                                        </Col>
+                                                        <Col>
+                                                            <Button
+                                                                color="danger"
+                                                                size="md"
+                                                                onClick={() => toggleModal()}
+                                                            >
+                                                                Terminer
+                                                            </Button>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row className="mt-3">
+                                                        <Col>
+                                                            { errorArchive && (
+                                                                <Alert color="danger">
+                                                                    {errorArchive}
+                                                                </Alert>
+                                                            )}
+                                                            { successArchive && (
+                                                                <Alert color="success">
+                                                                    {successArchive}
+                                                                </Alert>
+                                                            )}                                                                                    
+                                                        </Col>
+                                                    </Row>
+                                                </Form>
+                                            </CardBody>
+                                        </ModalBody>
+                                    </Modal>
                                 </Table>
                             </Card>
                         </div>
@@ -398,7 +398,7 @@ const AttestationConge = () => {
                 </CardFooter>
             </Row>
         </Container>
-      </>
+        </>
     );
 }
 
