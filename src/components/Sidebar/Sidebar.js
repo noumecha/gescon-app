@@ -45,7 +45,7 @@ const Sidebar = (props) => {
   };
   // creates the links that appear in the left menu / Sidebar
   const createLinks = (routes) => {
-    const includesRoutes = ['/index','/conges','/permission','/personnel','/personnel-details','/structures','/decision','/user-profile']
+    const includesRoutes = ['/index','/conges','/permission','/personnel','/structures','/decision','/user-profile']
     return routes.map((prop, key) => {
       if (includesRoutes.includes(prop.path)) {
         return (

@@ -106,7 +106,7 @@ const Header = () => {
                         >
                           Ratio
                         </CardTitle>
-                        <span className="h2 font-weight-bold mb-0"> {perf}%</span>
+                        <span className="h2 font-weight-bold mb-0"> {perf ?? 0}%</span>
                       </div>
                       <Col className="col-auto">
                         <div className="icon icon-shape bg-info text-white rounded-circle shadow">

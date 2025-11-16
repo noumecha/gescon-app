@@ -135,6 +135,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#000',
         backgroundColor: '#eee',
+        position: "relative",
         padding: 3,
         textAlign: 'center',
         fontSize: 9,
@@ -171,6 +172,11 @@ const styles = StyleSheet.create({
         fontSize: 9,
         lineHeight: 1.15,
     },
+    //
+    text : {
+        marginBottom: 20,
+        position: "absolute",
+    }
 });
 
 export default styles;

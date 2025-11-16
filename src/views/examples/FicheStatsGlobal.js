@@ -4,7 +4,7 @@ import { Row,Col,Card,CardHeader,CardBody,Button,Alert,Form,FormGroup,Label } fr
 import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 import GlobalStatsDoc from "documents/GlobalStatsDoc";
 import Select from "react-select";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import StructStatsDoc from "documents/StrucStatsDoc";
 
 const FicheStatsGlobal = () => {
@@ -67,36 +67,44 @@ const FicheStatsGlobal = () => {
                 errorShow({msg: "Selectionner au moins une structure pour générer ses statistiques.", type: "error"});
                 return ;
             }
-            if(statType.value === "globales" && filter.length > 0) {
+            if(statType.value === "globales" && filter.length > 0 && yearFilter.value !== "") {
                 const structures = Object.entries(filter).map(([key, value]) => ({
                     names : value
                 }));
                 const strucArray = structures.map(s => `'${s.names.value.replace(/'/g, "''")}'`).join(", ");
                 query = `
-                    SELECT * FROM conge
-                    INNER JOIN personnel ON personnel.id_personnel = conge.id_personnel
+                    SELECT *
+                    FROM personnel
+                    LEFT JOIN conge
+                        ON personnel.id_personnel = conge.id_personnel
+                        AND YEAR(conge.date_debut_conge) = ${yearFilter.value}
                     WHERE personnel.structure_personnel IN (${strucArray})
-                    ORDER BY personnel.structure_personnel, conge.date_debut_conge;
-                    `;
+                    ORDER BY personnel.structure_personnel, conge.date_debut_conge;`;
             }
-            if (statType.value === "globales" && filter.length === 0) {
+            if (statType.value === "globales" && filter.length === 0 && yearFilter.value !== "") {
                 query = `
-                    SELECT * FROM conge
-                    INNER JOIN personnel ON personnel.id_personnel = conge.id_personnel
+                    SELECT *
+                    FROM personnel
+                    LEFT JOIN conge
+                        ON personnel.id_personnel = conge.id_personnel
+                        AND YEAR(conge.date_debut_conge) = ${yearFilter.value}
                     ORDER BY personnel.structure_personnel, conge.date_debut_conge;
                     `;
             }
-            if (statType.value === "structure" && filter.value !== "") {
+            if (statType.value === "structure" && filter.value !== "" && yearFilter.value !== "") {
                 const structures = Object.entries(filter).map(([key, value]) => ({
                     names : value
                 }));
                 const strucArray = structures.map(s => `'${s.names.replace(/'/g, "''")}'`).join(", ");
                 query = `
-                    SELECT personnel.*, conge.*
+                    SELECT *
                     FROM personnel
-                    LEFT JOIN conge ON personnel.id_personnel = conge.id_personnel
-                    WHERE personnel.structure_personnel IN (${strucArray});
-                    `;
+                    LEFT JOIN conge
+                        ON personnel.id_personnel = conge.id_personnel
+                        AND YEAR(conge.date_debut_conge) = ${yearFilter.value}
+                    WHERE personnel.structure_personnel IN (${strucArray})
+                    ORDER BY personnel.structure_personnel, conge.date_debut_conge;
+                `;
             }
             // fetching datas
             const res = await window.electronAPI.getStatsConge(query);
@@ -249,7 +257,7 @@ const FicheStatsGlobal = () => {
                         stats[personnelKey].months[month] = null;
                     });
                 }
-                stats[personnelKey].months[monthName] = `(${duration} jrs)`;//`${c.date_debut_conge} → ${c.date_fin_conge} (${duration} jrs)`;
+                stats[personnelKey].months[monthName] = `(${duration} jrs)`;
                 stats[personnelKey].total++;
                 stats[personnelKey].conges.push({
                     monthName,
@@ -366,8 +374,8 @@ const FicheStatsGlobal = () => {
                                             <Col md="6">
                                                 <Button
                                                     color="primary"
-                                                    onClick={generateStats}
-                                                >
+                                                    onClick={() => generateStats()}
+                                                    >
                                                     Générer la fiche statistiques
                                                 </Button>
                                             </Col>
@@ -390,21 +398,6 @@ const FicheStatsGlobal = () => {
                             </CardHeader>
                             {showPdf && (
                                 <CardBody>
-                                    <Row>
-                                        {/* Désactive PDFViewer si gros fichier */}
-                                        {Object.keys(structStats.stats || {}).length <= 40 ? (
-                                            <PDFViewer showToolbar={0} className="w-100" height={800}>
-                                                {statType && statType.value === "globales"
-                                                ? ( <GlobalStatsDoc stats={stats} year={yearFilter}/>)
-                                                : <StructStatsDoc stats={structStats} year={yearFilter} structure={filter}/>
-                                                }
-                                            </PDFViewer>
-                                        ) : (
-                                            <div className="text-center text-danger">
-                                                Le PDF est trop volumineux pour être affiché — téléchargez-le directement.
-                                            </div>
-                                        )}
-                                    </Row>
                                     <Row>
                                         <Col className="order-xl-1 mt-2" xl="8" style={{ textAlign: "center" }}>
                                             <PDFDownloadLink

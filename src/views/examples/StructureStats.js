@@ -72,7 +72,7 @@ const StructureStats = () => {
 
     useEffect(() => {
         const func = async () => {
-          const prf = congeStruc === 0 ? 100 : Number.parseFloat(100 - ((congeStruc * 100)/ strucPers)).toFixed(2);
+          const prf = Number.parseFloat(((congeStruc/strucPers) * 100)).toFixed(2);
           setPerf(prf);
         }
         func();
@@ -182,7 +182,7 @@ const StructureStats = () => {
                             >
                               Ratio
                             </CardTitle>
-                            <span className="h2 font-weight-bold mb-0"> { perf ? perf : 0}%</span>
+                            <span className="h2 font-weight-bold mb-0"> { perf ?? 0}%</span>
                           </div>
                           <Col className="col-auto">
                             <div className="icon icon-shape bg-info text-white rounded-circle shadow">

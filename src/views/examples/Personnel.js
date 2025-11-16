@@ -6,7 +6,7 @@ import {
     Row,
     Col,
     Alert,
-  } from "reactstrap";
+} from "reactstrap";
 import Header from "components/Headers/Header.js";
 import ReactPaginate from "react-paginate";
 import { useState, useEffect, useCallback } from "react";
@@ -30,7 +30,7 @@ const Personnel = () => {
     const [status, setStatus] = useState("");
     const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
-    const [modalData, setModalData] = useState(null); 
+    const [modalData, setModalData] = useState(null);
     const [modal, setModal] = useState(false);
     const [errorDette, setErrorDette] = useState("");
     const [successDette, setSuccessDette] = useState("");
@@ -76,9 +76,9 @@ const Personnel = () => {
         } else {
             console.log("Please select a file");
         }
-    } 
+    }
 
-    // Conge dette definition 
+    // Conge dette definition
     const toggleModal = () => {
         setModal(!modal)
     }
@@ -88,7 +88,7 @@ const Personnel = () => {
         if(person.id_type_personnel === 1) {
             setError("Impossible de définir une dette de congé pour un personnel administratif");
             setTimeout(() => {
-              setError("");
+                setError("");
             }, 7000)
             return;
         } else {
@@ -106,14 +106,14 @@ const Personnel = () => {
         if (dette === "") {
             setErrorDette("Veuillez Entrez une valeur valide");
             setTimeout(() => {
-              setErrorDette("");
+                setErrorDette("");
             }, 7000)
             return;
         }
         if (dette > 36) {
             setErrorDette("La dette de congé ne peux pas dépasser 36jours");
             setTimeout(() => {
-              setErrorDette("");
+                setErrorDette("");
             }, 7000)
             return;
         }
@@ -147,10 +147,10 @@ const Personnel = () => {
                     amount: 0,
                 }
                 const req = `
-                    INSERT INTO personnel 
+                    INSERT INTO personnel
                     (ordre_personnel, matricule_personnel, nom_prenom_personnel, grade_personnel, poste_personnel, structure_personnel, cellule_personnel, sexe_personnel, date_recrutement_personnel, situation_matrimoniale_personnel,
                     region_personnel, departement_personnel, date_naiss_personnel, telephone_personnel,id_type_personnel, categorie_personnel, arrondissement_personnel,nb_jours_permission,nb_jours_conges,nb_jours_conges_maladie,nb_jours_conges_maternite,nb_jours_conges_deces,nb_jours_conges_mariage,statut_personnel,next_month_permission,preposition_personnel,dette_conge)
-                    VALUES 
+                    VALUES
                     (${excelData[i].ORDRE},"${excelData[i].MATRICULE}","${excelData[i].NOM_PRENOM}",
                     "${excelData[i].GRADE}","${excelData[i].POSTE}","${excelData[i].STRUCTURE}","${excelData[i].STRUCTURE_01}","${excelData[i].SEXE}",
                     "${excelData[i].DATE_RECRUTEMENT}","${excelData[i].SITUATION_MATRIMONIALE}","${excelData[i].REGION}",
@@ -178,11 +178,11 @@ const Personnel = () => {
             }, 3000)
         }
     }
-    // useEffect() update for the new year 
+    // useEffect() update for the new year
     /*const updateYear = async () => {
         try {
             for (let x = 0; x < personnel.length; x++) {
-                // --- ---- ---- 
+                // --- ---- ----
                 if (personnel[x].nb_jours_conges < 18 && personnel[x].id_type_personnel === 2) {
                     const req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges) WHERE id_personnel = ${personnel[x].id_personnel};`;
                     window.electronAPI.updatePersonnel(req_personnel);
@@ -198,7 +198,7 @@ const Personnel = () => {
                         console.log(`personnel mis à jour pour la nouvelle année`);
                     });
                 }
-                // update conge maladie 
+                // update conge maladie
                 // update conge maternite
             }
         } catch (error) {
@@ -218,10 +218,10 @@ const Personnel = () => {
             window.electronAPI.getPersonnel();
             await window.electronAPI.receivePersonnel((event, res) => {
                 for (let index = 0; index < res.length; index++) {
-                    res[index].next_month_permission = JSON.parse(res[index].next_month_permission)                                                
+                    res[index].next_month_permission = JSON.parse(res[index].next_month_permission)
                 }
                 setPersonnel(res);
-                setTimeout(() => 
+                setTimeout(() =>
                 setLoadingSpinner(false)
                 , 3000);
             })
@@ -236,14 +236,14 @@ const Personnel = () => {
 
     const handleRefresh = () => {
         try {
-          setLoadingSpinner(true);
-          setTimeout(() => 
-          setLoadingSpinner(false)
-          , 3000);
-          fetchDatas();
-          console.log("datas refreshed successfully");
+            setLoadingSpinner(true);
+            setTimeout(() => 
+            setLoadingSpinner(false)
+            , 3000);
+            fetchDatas();
+            console.log("datas refreshed successfully");
         } catch (err) {
-          console.error("error on refresh : " + err.message);
+            console.error("error on refresh : " + err.message);
         }
     }
 
@@ -265,7 +265,7 @@ const Personnel = () => {
 
     const filterPersonnel = filter !== "" || search !== "" || status !== ""
         ? personnel.filter(personnel => personnel.categorie_personnel.includes(filter) && (
-            personnel.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase()) 
+            personnel.nom_prenom_personnel.toLowerCase().includes(search.toLowerCase())
             || personnel.matricule_personnel.toLowerCase().includes(search.toLowerCase())
         ) && personnel.statut_personnel.includes(status))
         : personnel
@@ -298,28 +298,28 @@ const Personnel = () => {
         setSelectedPerson(person);
     }
 
-    // format name : 
+    // format name :
     function formatPersonnelName(person) {
         if (person.sexe_personnel === 'M')
-          return 'M. ' + person.nom_prenom_personnel;
+            return 'M. ' + person.nom_prenom_personnel;
         else
-          return 'Mme ' + person.nom_prenom_personnel;
-      }
+            return 'Mme ' + person.nom_prenom_personnel;
+    }
 
     return (
         <>
         <Header />
-        <Container className="mt--7" fluid> 
-            {/** alert for messages */} 
+        <Container className="mt--7" fluid>
+            {/** alert for messages */}
             <Row>
                 <Col lg="12">
-                    { success && 
+                    { success &&
                         <Alert className="text-center" color="success">
                             {success}
                         </Alert>
                     }
                     {
-                        error && 
+                        error &&
                         <Alert className="text-center" color="danger">
                             {error}
                         </Alert>
@@ -330,15 +330,15 @@ const Personnel = () => {
             <Row>
                 <Col lg="12">
                     <form className="form-group custom-form" onSubmit={handleFileSubmit}>
-                        <input 
-                            type="file" 
-                            className="form-control" 
-                            required 
+                        <input
+                            type="file"
+                            className="form-control"
+                            required
                             disabled={personnel.length > 0 ? true : false}
                             onChange={handleFile}
                         />
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             disabled={personnel.length > 0 ? true : false}
                             className="mt-3 btn btn-primary btn-md"
                         >
@@ -353,6 +353,12 @@ const Personnel = () => {
                 </Col>
             </Row>
             <Row>
+                <div className="col p-0">
+                    <button type="submit" disabled className="mt-3 btn btn-secondary btn-md">Exporter le fichier</button>
+                    <button type="submit" className="mt-3 btn btn-secondary btn-md" onClick={addPersonnel}>Intégrer à la base de données</button>
+                </div>
+            </Row>
+            <Row>
                 <Col lg="12">
                     {excelData || personnel.length > 0 ? (
                         <div>
@@ -362,7 +368,7 @@ const Personnel = () => {
                             <Card className="shadow">
                             </Card>
                         </div>
-                    ) : (  
+                    ) : (
                         <div>
                             <div className="mt-3 alert alert-danger" role="alert">
                                 <h3 className="mb-0 text-center text-white"> Aucun Fichier importer ! </h3>
@@ -430,7 +436,7 @@ const Personnel = () => {
                 </Col>
             </Row>
             {/** personnels table */}
-            <PersonnelsTable 
+            <PersonnelsTable
                 loadingSpinner={loadingSpinner}
                 filterPersonnel={filterPersonnel}
                 loadingText={loadingText}
@@ -460,14 +466,7 @@ const Personnel = () => {
                 handlePagePrev={handlePagePrev}
                 handlePageNext={handlePageNext}
             />
-            <Row>
-                <div className="col p-0">
-                    <button type="submit" disabled className="mt-3 btn btn-secondary btn-md">Exporter le fichier</button>
-                    <button type="submit" className="mt-3 btn btn-secondary btn-md" onClick={addPersonnel}>Intégrer à la base de données</button>
-                </div>
-            </Row>
         </Container>
-      </>
-    );  
-}
+        </>
+    );}
 export default Personnel;

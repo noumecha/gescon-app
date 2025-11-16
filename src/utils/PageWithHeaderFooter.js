@@ -78,7 +78,7 @@ const PageWithHeaderFooter = ({ children, pageIndex, headerText, qrData }) => {
 
             {/* Page Body */}
             <View style={{
-                    marginTop: 70,
+                    marginTop: pageIndex === 0 ? 70 : -45,
                     marginBottom: 45,
                 }}>
                 {children}

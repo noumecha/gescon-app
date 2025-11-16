@@ -54,7 +54,7 @@ const Login = ({ onLogin }) => {
         setError("");
       },4000);
     }
-    //login(users[0]);
+    login(users[0]);
   }
 
   const fetchUsers = async () => {

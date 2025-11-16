@@ -45,32 +45,37 @@ const GlobalStatsDoc = ({ stats, year }) => {
 
                     {/* Table */}
                     <View style={styles.table}>
-                        {/* Table Header */}
-                        {pageIndex === 0 && (
-                            <View>
-                                <View style={styles.row}>
-                                    <Text style={[styles.cellHeaderNoBorderBottom, { flex: 2.05 }]}>
-                                        {year && year.value}
+                        <View>
+                            <View style={styles.row}>
+                                <Text style={[styles.cellHeaderNoBorderBottom, { flex: 2.05 }]}>
+                                    {year && year.value}
+                                </Text>
+                                {months.map((m, i) => (
+                                    <Text key={i} style={styles.cellHeader}>
+                                        {m}
                                     </Text>
-                                    {months.map((m, i) => (
-                                        <Text key={i} style={styles.cellHeader}>
-                                            {m}
-                                        </Text>
-                                    ))}
-                                </View>
-                                <View style={styles.row}>
-                                    <Text style={[styles.cellHeaderNoBorderTop, { flex: 5 }]}>
-                                        Structure
+                                ))}
+                                {/* Totals*/}
+                                <Text style={styles.cellHeaderNoBorderBottom}></Text>
+                            </View>
+                            <View style={styles.row}>
+                                <Text style={[styles.cellHeaderNoBorderTop, { flex: 5 }]}>
+                                    Structure
+                                </Text>
+                                {months.map((m, i) => (
+                                    <React.Fragment key={i}>
+                                        <Text style={styles.cellHeader}>Fnc</Text>
+                                        <Text style={styles.cellHeader}>Con</Text>
+                                    </React.Fragment>
+                                ))}
+                                {/* Totals */}
+                                <View style={[styles.cellHeaderNoBorderTop, { flex: 2.45 }]}>
+                                    <Text style={[styles.text, {left: 15, top: -6}]}>
+                                        Total
                                     </Text>
-                                    {months.map((m, i) => (
-                                        <React.Fragment key={i}>
-                                            <Text style={styles.cellHeader}>Fnc</Text>
-                                            <Text style={styles.cellHeader}>Con</Text>
-                                        </React.Fragment>
-                                    ))}
                                 </View>
                             </View>
-                        )}
+                        </View>
 
                         {/* Table Body */}
                         {!stats?.isGlobal &&
@@ -107,8 +112,10 @@ const GlobalStatsDoc = ({ stats, year }) => {
                                     {/* Totals */}
                                     <Text style={styles.cell}>{data.fonctionnaire?.total ?? 0}</Text>
                                     <Text style={styles.cell}>{data.contractuel?.total ?? 0}</Text>
+                                    <Text style={[styles.cell, { flex: 2.47 }]}>{data.fonctionnaire?.total + data.contractuel?.total ?? 0}</Text>
                                 </View>
-                            ))}
+                            ))
+                        }
 
                         {/* Table Footer (always if global, or last page otherwise) */}
                         {(stats.isGlobal || pageIndex === pages.length - 1) && (
@@ -133,6 +140,9 @@ const GlobalStatsDoc = ({ stats, year }) => {
                                     </Text>
                                     <Text style={styles.cellHeader}>
                                         {stats.totalContractuel || 0}
+                                    </Text>
+                                    <Text style={[styles.cellHeader, { flex: 2.47 }]}>
+                                        {stats.totalFonctionnaire + stats.totalContractuel || 0}
                                     </Text>
                                 </React.Fragment>
                             </View>
