@@ -27,26 +27,26 @@ const updateConge = async (
         if (person.id_type_personnel === 2) {
             if ((duration > old_duration + person.nb_jours_conges + person.dette_conge) && (formatDate(startDate).getFullYear() === curr_date.getFullYear()) 
                 && (type.libelle_type_conge === "congé administratif")) {
-              setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponibles pour cette année");      
-                setTimeout(() => {
-                setError("");
+                setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponibles pour cette année");
+                    setTimeout(() => {
+                    setError("");
                 },7000)
-              return;
+                return;
             }
             if ((duration > old_duration + person.nb_jours_conges + person.dette_conge) && (type.libelle_type_conge === "congé administratif")) {
-              setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponibles");      
-                setTimeout(() => {
-                setError("");
+                setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponibles");
+                    setTimeout(() => {
+                    setError("");
                 },7000)
-              return;
+                return;
             }
-            // taking conge before the current year : 
+            // taking conge before the current year :
             if ((curr_date.getFullYear() - formatDate(startDate).getFullYear()) > 3) {
-              setError(`Impossible de configurer un congé pour plus de 3 ans en arrière !`);      
-                setTimeout(() => {
-                setError("");
+                setError(`Impossible de configurer un congé pour plus de 3 ans en arrière !`);
+                    setTimeout(() => {
+                    setError("");
                 },7000)
-              return;
+                return;
             }
         }
         // tests for all person
@@ -57,7 +57,7 @@ const updateConge = async (
             },7000)
             return;
         }
-        // test for contractual personnel 
+        // test for contractual personnel
         if ((person.id_type_personnel === 2 && ((left_duration + person.nb_jours_conges + person.dette_conge) === 0)) && (type.libelle_type_conge === "congé administratif")) {
             setError(`${formatPersonnelName(person.sexe_personnel, person.nom_prenom_personnel)} a déja epuisé tout ces congés pour l'année`);
             setTimeout(() => {
@@ -65,7 +65,7 @@ const updateConge = async (
             },7000)
             return;
         }
-        // test for contractual personnel 
+        // test for contractual personnel
         if ((person.id_type_personnel === 1 && ((left_duration + person.nb_jours_conges) === 0)) && (type.libelle_type_conge === "congé administratif")) {
             setError(`${formatPersonnelName(person.sexe_personnel, person.nom_prenom_personnel)} a déja epuisé tout ces congés pour l'année`);
             setTimeout(() => {
@@ -151,8 +151,8 @@ const updateConge = async (
         //console.log("nombre total de congés admin : " + total_conge_admin);
         // leave attestation datas
         const attestation = {
-            numero_conge_admin : (congeToEdit.libelle_type_conge === "congé administratif" && duration === 18 + person.dette_conge && person.id_type_personnel === 2) 
-            || (congeToEdit.libelle_type_conge === "congé administratif" && duration === 30 && person.id_type_personnel === 1) 
+            numero_conge_admin : (congeToEdit.libelle_type_conge === "congé administratif" && duration >= (18 + person.dette_conge) && person.id_type_personnel === 2)
+            || (congeToEdit.libelle_type_conge === "congé administratif" && duration >= 30 && person.id_type_personnel === 1)
             ? 0 : total_conge_admin += 1,
             name: person.nom_prenom_personnel.replace(/'/g, "''"),
             matricule: congeToEdit.attestation_conge.matricule,
@@ -174,8 +174,8 @@ const updateConge = async (
         }
         // datas for the leave
         const conge_data = {
-            numero_conge_admin : (congeToEdit.libelle_type_conge === "congé administratif" && duration === 18 && person.id_type_personnel === 2) 
-            || (congeToEdit.libelle_type_conge === "congé administratif" && duration === 30 && person.id_type_personnel === 1) 
+            numero_conge_admin : (congeToEdit.libelle_type_conge === "congé administratif" && duration >= 18 && person.id_type_personnel === 2)
+            || (congeToEdit.libelle_type_conge === "congé administratif" && duration >= 30 && person.id_type_personnel === 1)
             ? 0 : total_conge_admin += 1,
             startDate : startDate,
             endDate : endDate,
