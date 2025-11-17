@@ -1,22 +1,25 @@
 import { Container } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import { Row,Col,Card,CardHeader,CardBody,Button,Alert,Form,FormGroup,Label } from 'reactstrap';
-import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import GlobalStatsDoc from "documents/GlobalStatsDoc";
 import Select from "react-select";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import StructStatsDoc from "documents/StrucStatsDoc";
 
 const FicheStatsGlobal = () => {
-    const date = new Date().getDate() + '_' + parseInt(new Date().getMonth() + 1 )+ '_' + new Date().getFullYear()
     const [conges, setConges] = useState([]);
     const [infoMsg, setInfoMsg] = useState({});
-    const [filter, setFilter] = useState([]);
-    const [yearFilter, setYearFilter] = useState(null);
     const [structureNames, setStructureNames] = useState([]);
     const [years, setYears] = useState([]);
     const [showPdf, setShowPdf] = useState(false);
-    const [statType, setStatType] = useState([]);
+    const [statType, setStatType] = useState(null);
+    const [filter, setFilter] = useState([]);
+    const [yearFilter, setYearFilter] = useState(null);
+    const [stats, setStats] = useState(null);
+    const [structStats, setStructStats] = useState(null);
+    const [pdfDoc, setPdfDoc] = useState(null);
+
 
     const monthNames = [
         "January", "February", "March", "April", "May", "June",
@@ -51,6 +54,15 @@ const FicheStatsGlobal = () => {
         setTimeout(() => setInfoMsg(null), 3000);
     };
 
+    useEffect(() => {
+        setShowPdf(false);
+        setPdfDoc(null);
+    }, [statType, yearFilter, filter]);
+
+    useEffect(() => {
+        setFilter([]);
+    }, [statType]);
+
     const generateStats = async () => {
         try {
             // building query
@@ -73,21 +85,18 @@ const FicheStatsGlobal = () => {
                 }));
                 const strucArray = structures.map(s => `'${s.names.value.replace(/'/g, "''")}'`).join(", ");
                 query = `
-                    SELECT *
-                    FROM personnel
-                    LEFT JOIN conge
-                        ON personnel.id_personnel = conge.id_personnel
-                        AND YEAR(conge.date_debut_conge) = ${yearFilter.value}
-                    WHERE personnel.structure_personnel IN (${strucArray})
+                    SELECT * FROM conge
+                    INNER JOIN personnel
+                    ON personnel.id_personnel = conge.id_personnel WHERE personnel.structure_personnel
+                    IN (${strucArray}) && YEAR(conge.date_debut_conge) = ${yearFilter.value}
                     ORDER BY personnel.structure_personnel, conge.date_debut_conge;`;
             }
             if (statType.value === "globales" && filter.length === 0 && yearFilter.value !== "") {
                 query = `
-                    SELECT *
-                    FROM personnel
-                    LEFT JOIN conge
+                    SELECT * FROM conge
+                    INNER JOIN personnel
                         ON personnel.id_personnel = conge.id_personnel
-                        AND YEAR(conge.date_debut_conge) = ${yearFilter.value}
+                        WHERE YEAR(conge.date_debut_conge) = ${yearFilter.value}
                     ORDER BY personnel.structure_personnel, conge.date_debut_conge;
                     `;
             }
@@ -109,10 +118,12 @@ const FicheStatsGlobal = () => {
             // fetching datas
             const res = await window.electronAPI.getStatsConge(query);
             setConges(res);
+            setStats(computeStatistics(res, filter, structureNames));
+            setStructStats(computeStructStats(res));
             errorShow({msg: "Statistiques générées avec succès!", type: "success"});
             setShowPdf(true);
         } catch (err) {
-            console.error(`error message : ${err.message}}, error line : ${err.lineNumber}}`);
+            console.error(`error message : ${err.message}}`);
             errorShow({msg: "Une erreur est survenue pendant la génération des statistiques.", type: "error"});
         }
     };
@@ -298,8 +309,26 @@ const FicheStatsGlobal = () => {
         }
     };
 
-    const stats = computeStatistics(conges, filter, structureNames);
-    const structStats = computeStructStats(conges);
+    useEffect(() => {
+        if (!statType || !yearFilter || !stats || !structStats) {
+            setPdfDoc(null);
+            return;
+        }
+
+        if (statType.value === "globales") {
+            setPdfDoc(<GlobalStatsDoc stats={stats} year={yearFilter} />);
+        } else {
+            setPdfDoc(<StructStatsDoc stats={structStats} year={yearFilter} structure={filter} />);
+        }
+    }, [statType, yearFilter, showPdf]);
+
+
+    // file name according to your requested format
+    const date = new Date().getDate() + '_' + parseInt(new Date().getMonth() + 1 )+ '_' + new Date().getFullYear()
+    const safeDate = yearFilter?.value || (new Date().getFullYear());
+    const fileName = statType?.value === "globales"
+    ? `fiche_des_statistiques_globales_${safeDate}_${date}.pdf`
+    : `fiche_des_statistiques_${filter?.value || "structure"}_${safeDate}_${date}.pdf`;
 
     return (
         <>
@@ -342,7 +371,7 @@ const FicheStatsGlobal = () => {
                                                         value={statType}
                                                         onChange={handleFilterChange(setStatType)}
                                                         options={typeOptions}
-                                                        isSearchable={true}
+                                                        isSearchable
                                                         placeholder="Selectionnez un type de statistiques"
                                                     />
                                                 </FormGroup>
@@ -355,8 +384,8 @@ const FicheStatsGlobal = () => {
                                                     value={filter}
                                                     onChange={handleFilterChange(setFilter)}
                                                     options={options}
-                                                    isSearchable={true}
-                                                    isMulti={statType.value === "structure" ? false : true}
+                                                    isSearchable
+                                                    isMulti={statType?.value !== "structure"}
                                                     placeholder="Selectionnez une structure"
                                                 />
                                             </Col>
@@ -396,19 +425,19 @@ const FicheStatsGlobal = () => {
                                     </Col>
                                 </Row>
                             </CardHeader>
-                            {showPdf && (
+                            {pdfDoc && (
                                 <CardBody>
                                     <Row>
                                         <Col className="order-xl-1 mt-2" xl="8" style={{ textAlign: "center" }}>
                                             <PDFDownloadLink
-                                                document={statType && statType.value === "globales"
-                                                    ? <GlobalStatsDoc stats={stats} year={yearFilter}/>
-                                                    : <StructStatsDoc stats={structStats} year={yearFilter} structure={filter}/>}
-                                                fileName={`fiche_statistique_${date}_${filter?.value}.pdf`}
+                                                document={pdfDoc}
+                                                fileName={fileName}
                                                 className="d-flex align-items-center justify-content-center"
                                             >
                                             {({ loading }) =>
-                                                loading ? "Génération du fichier PDF en cours veuillez patientez..." : <Button color="success">Télécharger</Button>
+                                                loading
+                                                ? "Génération du fichier PDF en cours, veuillez patienter..."
+                                                : <Button color="success">Télécharger</Button>
                                             }
                                             </PDFDownloadLink>
                                         </Col>

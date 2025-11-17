@@ -47,7 +47,7 @@ const GlobalStatsDoc = ({ stats, year }) => {
                     <View style={styles.table}>
                         <View>
                             <View style={styles.row}>
-                                <Text style={[styles.cellHeaderNoBorderBottom, { flex: 2.05 }]}>
+                                <Text style={[styles.cellHeaderNoBorderBottom, { flex: 2.03 }]}>
                                     {year && year.value}
                                 </Text>
                                 {months.map((m, i) => (
