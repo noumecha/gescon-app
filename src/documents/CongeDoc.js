@@ -101,14 +101,14 @@ const CongeDoc = (props) => {
                         accordé par décision <Text style={fontStyles.bold}>N°{props.decision}</Text> du Ministre des Finances.
                     </Text>
                     <Text style={styles.pCertifText}>
-                        L'intéressé{props.sexe === "M" ? "" : "e"} jouira 
-                        {props.numero_conge_admin !== 0 
-                            ? props.numero_conge_admin === 1 
-                                ? " de la première partie " 
-                                : props.numero_conge_admin === 2 
-                                    ? " de la deuxième partie " 
+                        L'intéressé{props.sexe === "M" ? "" : "e"} jouira
+                        {props.numero_conge_admin !== 0
+                            ? props.numero_conge_admin === 1
+                                ? " de la première partie "
+                                : props.numero_conge_admin === 2
+                                    ? " de la deuxième partie "
                                     : props.numero_conge_admin === 3 ?
-                                    " de la troisième partie " 
+                                    " de la troisième partie "
                                     : " "
                             : " "}
                         dudit congé pendant la période allant du <Text style={fontStyles.bold}>{props.startDate}</Text> au <Text style={fontStyles.bold}>{props.endDate}</Text> et 

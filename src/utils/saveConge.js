@@ -175,8 +175,8 @@ const saveConge = async (
       }
       // leave attestation datas
       const attestation = {
-        numero_conge_admin : (selectedType === "congé administratif" && duration === 18 + selectedPerson.dette_conge && selectedPerson.id_type_personnel === 2) 
-        || (selectedType === "congé administratif" && duration === 30 && selectedPerson.id_type_personnel === 1) 
+        numero_conge_admin : (selectedType === "congé administratif" && duration >= (18 + selectedPerson.dette_conge) && selectedPerson.id_type_personnel === 2)
+        || (selectedType === "congé administratif" && duration === 30 && selectedPerson.id_type_personnel === 1)
         ? 0 : total_conge_admin += 1,
         name: name.replace(/'/g, "''"),
         matricule: matricule,
@@ -198,8 +198,8 @@ const saveConge = async (
       }
       // datas for the leave
       const conge_data = {
-        numero_conge_admin : (selectedType === "congé administratif" && duration === 18 && selectedPerson.id_type_personnel === 2) 
-        || (selectedType === "congé administratif" && duration === 30 && selectedPerson.id_type_personnel === 1) 
+        numero_conge_admin : (selectedType === "congé administratif" && duration === 18 && selectedPerson.id_type_personnel === 2)
+        || (selectedType === "congé administratif" && duration === 30 && selectedPerson.id_type_personnel === 1)
         ? 0 : total_conge_admin += 1,
         startDate : startDate,
         endDate : endDate,

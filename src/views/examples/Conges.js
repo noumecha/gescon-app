@@ -336,7 +336,7 @@ const Conges = () => {
             saveConge={action && action === "update" ? handleUpdateConge : handleSaveConge}
             actived={actived}
           />
-          <CongesTable 
+          <CongesTable
             loadingText={loadingText}
             saveAttestationRepConge={saveAttestationRepConge}
             handleStatutFilter={handleStatutFilter}

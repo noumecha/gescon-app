@@ -112,7 +112,7 @@ const FicheStatsGlobal = () => {
                         ON personnel.id_personnel = conge.id_personnel
                         AND YEAR(conge.date_debut_conge) = ${yearFilter.value}
                     WHERE personnel.structure_personnel IN (${strucArray})
-                    ORDER BY personnel.structure_personnel, conge.date_debut_conge;
+                    ORDER BY personnel.nom_prenom_personnel ASC, conge.date_debut_conge ASC;
                 `;
             }
             // fetching datas
@@ -176,7 +176,7 @@ const FicheStatsGlobal = () => {
                 const match = rawStructure.match(/\[([^\]]+)\]/);
                 const structure = match ? match[1] : c.structure_personnel;
                 const type = c.id_type_personnel === 1 ? "fonctionnaire" : "contractuel";
-                const endDate = new Date(c.date_fin_conge);
+                const endDate = new Date(c.date_debut_conge);
                 const monthName = monthNames[endDate.getMonth()];
                 if (!stats[structure]) {
                     stats[structure] = {
@@ -252,7 +252,7 @@ const FicheStatsGlobal = () => {
 
                 const personnelKey = `${c.nom_prenom_personnel || ""}`.trim();
                 const startDate = new Date(c.date_debut_conge);
-                const endDate = new Date(c.date_fin_conge);
+                const endDate = new Date(c.date_debut_conge);
                 const duration = c.duree_conge || 0;
                 const monthName = monthNames[endDate.getMonth()];
                 if (!stats[personnelKey]) {
