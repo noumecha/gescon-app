@@ -3,7 +3,7 @@ export const fetchDatas = async (setConge, setLoadingSpinner, setSelectedDec, se
       window.electronAPI.getConge();
       await window.electronAPI.retrieveConge((event, res) => {
         setConge(res);
-        setTimeout(() => 
+        setTimeout(() =>
         setLoadingSpinner(false)
         , 3000);
       })
@@ -18,9 +18,9 @@ export const fetchDatas = async (setConge, setLoadingSpinner, setSelectedDec, se
       })
       const last_permission_req = `SELECT * FROM permission WHERE id_personnel = ${id_personnel}`;
       window.electronAPI.getLastPermission(last_permission_req);
-      await window.electronAPI.retrieveLastPermission((event, res) => {        
+      await window.electronAPI.retrieveLastPermission((event, res) => {
           for (let index = 0; index < res.length; index++) {
-              res[index].attestation_permission = JSON.parse(res[index].attestation_permission)                                                
+              res[index].attestation_permission = JSON.parse(res[index].attestation_permission)
           }
           setLastPermission(res);
       })

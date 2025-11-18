@@ -118,7 +118,6 @@ const Personnel = () => {
             return;
         }
         const req = `UPDATE personnel SET dette_conge = ${parseInt(dette)} WHERE personnel.id_personnel = ${person.id_personnel}`;
-        console.log(`${req}`);
         window.electronAPI.addPersonnelDette(req);
         window.electronAPI.addPersonnelDetteSuccess((event, res) => {
             setSuccessDette("Dette définie avec succès");
@@ -158,11 +157,6 @@ const Personnel = () => {
                     "${excelData[i].CATEGORIE}","${excelData[i].ARRONDISSEMENT}","${nb_jours_permission}","${nb_jours_conges}","${nb_jours_conges_maladie}","${nb_jours_conges_maternite}","${nb_jours_conges_deces}","${nb_jours_conges_mariage}","${statut}",'${JSON.stringify(next_month_permission)}',"${excelData[i].PREPOSITION}"
                     ,"${dette_conge}")
                 ;`;
-                /*console.log(req);
-                WHERE NOT EXISTS (
-                    SELECT * FROM personnel
-                    WHERE matricule_personnel = "${excelData[i].MATRICULE}"
-                )*/
                 window.electronAPI.addPersonnel(req);
             }
             window.electronAPI.personnelAddedSuccess(() => {
@@ -178,39 +172,6 @@ const Personnel = () => {
             }, 3000)
         }
     }
-    // useEffect() update for the new year
-    /*const updateYear = async () => {
-        try {
-            for (let x = 0; x < personnel.length; x++) {
-                // --- ---- ----
-                if (personnel[x].nb_jours_conges < 18 && personnel[x].id_type_personnel === 2) {
-                    const req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges) WHERE id_personnel = ${personnel[x].id_personnel};`;
-                    window.electronAPI.updatePersonnel(req_personnel);
-                    window.electronAPI.congeAddedSuccess(() => {
-                        console.log(`personnel mis à jour pour la nouvelle année`);
-                    });
-                }
-                // remise à 0 pour ceux qui ont pris tout leur congé l'année précédente
-                if ((personnel[x].nb_jours_conges === 18 && personnel[x].id_type_personnel === 2) || (personnel[x].nb_jours_conges === 30 && personnel[x].id_type_personnel === 1)) {
-                    const req_personnel = `UPDATE personnel SET nb_jours_conges = 0 WHERE id_personnel = ${personnel[x].id_personnel};`;
-                    window.electronAPI.updatePersonnel(req_personnel);
-                    window.electronAPI.congeAddedSuccess(() => {
-                        console.log(`personnel mis à jour pour la nouvelle année`);
-                    });
-                }
-                // update conge maladie
-                // update conge maternite
-            }
-        } catch (error) {
-            console.log(`Erreur lors de la mise à jour annuelle ${error.message}`);
-        }
-    }
-
-    useEffect(() => {
-        if (currDate.getFullYear()) {
-            updateYear();
-        }
-    }, []);*/
 
     /** useeffect for common function and fetching */
     const fetchDatas = async () => {
@@ -241,7 +202,6 @@ const Personnel = () => {
             setLoadingSpinner(false)
             , 3000);
             fetchDatas();
-            console.log("datas refreshed successfully");
         } catch (err) {
             console.error("error on refresh : " + err.message);
         }

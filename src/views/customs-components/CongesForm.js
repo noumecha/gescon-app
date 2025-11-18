@@ -1,5 +1,6 @@
 import React from 'react';
 import { Row,Col,Card,CardHeader,Alert,Form,Input,FormGroup,Label,FormText,Button,CardBody } from 'reactstrap';
+import Select from "react-select";
 
 const CongesForm = ({
     status,
@@ -12,7 +13,7 @@ const CongesForm = ({
     matricule,
     setMatricule,
     poste,
-    setPoste, 
+    setPoste,
     type,
     setType,
     struc,
@@ -24,7 +25,7 @@ const CongesForm = ({
     setDemande,
     setDocument,
     handleInputChange,
-    setStartDate, 
+    setStartDate,
     startDate,
     duration,
     setDuration,
@@ -36,6 +37,7 @@ const CongesForm = ({
     success,
     saveConge,
     actived,
+    handleFilterChange
 }) => {
     return (
         <Row className="mt-5">
@@ -49,7 +51,7 @@ const CongesForm = ({
                 </Row>
                 <Row className="mt-2">
                   <Col md="12">
-                    { status && 
+                    { status &&
                       <Alert color="dark" isOpen={visible} toggle={onDismiss}>
                         {status}
                       </Alert>
@@ -70,7 +72,7 @@ const CongesForm = ({
                             className="form-control-label"
                             htmlFor="input-username"
                           >
-                            Nom 
+                            Nom
                           </label>
                           <Input
                             className="form-control-alternative"
@@ -186,29 +188,22 @@ const CongesForm = ({
                   <div className="pl-lg-4">
                   <Row>
                       <Col md="6">
-                        <FormGroup>  
+                        <FormGroup>
                           <Label for="type-conge">
                             Type de congé
-                          </Label>              
-                          <Input
-                            className="mb-3"
-                            type="select"
-                            id="type-conge"
+                          </Label>
+                          <Select
                             value={selectedType}
-                            onChange={handleInputChange(setSelectedType)}
-                          >
-                            {typeConge && typeConge.length > 0 
-                              ? typeConge.map((t, i) => (
-                                <option key={i}>{t.libelle_type_conge}</option>
-                              ))
-                              : (<option>Selectionner le type de congé</option>)
-                            }
-                          </Input>
+                            onChange={handleFilterChange(setSelectedType)}
+                            options={typeConge.map((t) => ({ value: t.libelle_type_conge, label: t.libelle_type_conge }))}
+                            isSearchable
+                            placeholder="Selectionner le type de congé"
+                          />
                         </FormGroup>
                       </Col>
                     </Row>
                     <Row>
-                      <Col>  
+                      <Col>
                         <FormGroup>
                           <Label
                             for="demande-file"
@@ -302,10 +297,10 @@ const CongesForm = ({
                         </FormGroup>
                       </Col>
                       <Col md="6">
-                        <FormGroup>  
+                        <FormGroup>
                           <Label for="num-decision">
                             Numero de Décision
-                          </Label>              
+                          </Label>
                           <Input
                             className="mb-3"
                             type="text"
@@ -313,24 +308,18 @@ const CongesForm = ({
                             value={selectedDec}
                             readOnly
                           >
-                            {/*decision && decision.length > 0 
-                              ? decision.map((d, i) => (
-                                <option key={i}>{d.numero_decision}</option>
-                              ))
-                              : (<option>Selectionner le numero de décision</option>)
-                            */}
                           </Input>
                         </FormGroup>
                       </Col>
                     </Row>
                     <Row>
                       <Col md="12">
-                        { error && 
+                        { error &&
                           <Alert color="danger">
                             {error}
                           </Alert>
                         }
-                        { success && 
+                        { success &&
                           <Alert color="success">
                             {success}
                           </Alert>

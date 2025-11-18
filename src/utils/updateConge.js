@@ -6,7 +6,8 @@ import { formatPersonnelName } from "./personnels-utils";
 import { validateDuration } from "./validateDuration";
 
 const updateConge = async (
-    congeToEdit, duration, setError, startDate, typeConge, personnel, setSuccess, endDate, repriseDate, setStatus, demande, document, setDuration
+    congeToEdit, duration, setError, startDate, typeConge, personnel, setSuccess, endDate, repriseDate,
+    setStatus, demande, document, setDuration
 ) => {
     try {
         let total_conge_admin = 0;
@@ -14,18 +15,15 @@ const updateConge = async (
         const person = personnel[0];
         const type = typeConge[0];
         const curr_date = new Date();
+        const left_days = leftDays(congeToEdit.date_debut_conge, congeToEdit.date_fin_conge, congeToEdit.attestation_conge);
         const userConge = personConge(person.id_personnel);
         const old_duration = congeToEdit.duree_conge;
         const left_duration = old_duration - duration;
         // check if the duration is valid
         if (!validateDuration(duration, setError)) return;
-        console.log("duration : " + duration);
-        console.log("person conges left : " +  person.nb_jours_conges);
-        console.log("old_duration : " + congeToEdit.duree_conge);
-        console.log("jours conges restant : " + left_duration);
         // check if the duration is less than or equal to the left duration
         if (person.id_type_personnel === 2) {
-            if ((duration > old_duration + person.nb_jours_conges + person.dette_conge) && (formatDate(startDate).getFullYear() === curr_date.getFullYear()) 
+            if ((duration > old_duration + person.nb_jours_conges + person.dette_conge) && (formatDate(startDate).getFullYear() === curr_date.getFullYear())
                 && (type.libelle_type_conge === "congé administratif")) {
                 setError("Vous ne pouvez pas dépassé le nombre de jours de congés disponibles pour cette année");
                     setTimeout(() => {
@@ -83,7 +81,7 @@ const updateConge = async (
                 return;
             }
         }
-        // get all administrative conge 
+        // get all administrative conge
         if (userConge && userConge.length > 0) {
             for (let index = 0; index < userConge.length; index++) {
             if (userConge[index].attestation_conge.typeConge === "congé administratif") {
@@ -91,10 +89,10 @@ const updateConge = async (
             }
             }
         }
-        // controls about total_conge_admin 
+        // controls about total_conge_admin
         if (duration < old_duration + person.nb_jours_conges + person.dette_conge && total_conge_admin === 2 && congeToEdit.libelle_type_conge === "congé administratif" ) {
             setDuration(old_duration + person.nb_jours_conges + person.dette_conge);
-            setError(`Ce congé constitue la 3ème partie du congé administratif de ${formatPersonnelName(person.sexe_personnel, person.nom_prenom_personnel)} 
+            setError(`Ce congé constitue la 3ème partie du congé administratif de ${formatPersonnelName(person.sexe_personnel, person.nom_prenom_personnel)}
                 donc la durée doit être égale au nombre de jours restants`);
             setTimeout(() => {
             setError("");
@@ -112,22 +110,18 @@ const updateConge = async (
                 let csd = formatDate(startDate).getDate() + '/' + formatDateMonthForm(startDate) + '/' + formatDate(startDate).getFullYear();
                 nbDaysConges += nbDaysBetween(formatDate(userConge[index].date_debut_conge),formatDate(userConge[index].date_fin_conge)) + 1;
                 if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) && (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
-                    //console.log(`1`);
                     setError(`Impossible de configurer le congé pour cette date car ${formatPersonnelName(person.sexe_personnel, person.nom_prenom_personnel)} a déja un congé prévu`);
                     return;
                 }
                 if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) || (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge)  && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
-                    //console.log(`2`);  
                     setError(`Impossible de configurer le congé pour cette date car ${formatPersonnelName(person.sexe_personnel, person.nom_prenom_personnel)} a déja pris un congé`);
                     return;
                 }
                 if (formatDate(startDate) === formatDate(userConge[index].attestation_conge.date_debut_conge)) {
-                    //console.log(`3`);
                     setError(`Impossible de configurer le congé pour cette date car ${formatPersonnelName(person.sexe_personnel, person.nom_prenom_personnel)} a un congé prévu cette meme date`);
                     return;
                 }
                 if (formatDate(startDate) === formatDate(userConge[index].date_debut_conge)) {
-                    //console.log(`3`);
                     setError(`Impossible de configurer le congé pour cette date car ${formatPersonnelName(person.sexe_personnel, person.nom_prenom_personnel)} a un congé prévu cette meme date`);
                     return;
                 }
@@ -140,7 +134,7 @@ const updateConge = async (
                 },7000)
             }
         }
-        // get all administrative conge 
+        // get all administrative conge
         if (userConge.length > 0) {
             for (let index = 0; index < userConge.length; index++) {
                 if (userConge[index].attestation_conge.typeConge === "congé administratif") {
@@ -148,7 +142,6 @@ const updateConge = async (
                 }
             }
         }
-        //console.log("nombre total de congés admin : " + total_conge_admin);
         // leave attestation datas
         const attestation = {
             numero_conge_admin : (congeToEdit.libelle_type_conge === "congé administratif" && duration >= (18 + person.dette_conge) && person.id_type_personnel === 2)
@@ -190,7 +183,7 @@ const updateConge = async (
             statut_personnel : curr_date.toISOString().slice(0,19).replace('T',' ') >= startDate && curr_date.toISOString().slice(0,19).replace('T',' ') <= endDate ? "en congé" : "en poste",
         }
         // query for saving leaves
-        const req_conge = `UPDATE conge 
+        const req_conge = `UPDATE conge
                 SET date_debut_conge = "${conge_data.startDate}",
                 date_fin_conge = "${conge_data.endDate}",
                 duree_conge = ${conge_data.duration},
@@ -200,41 +193,45 @@ const updateConge = async (
                 statut_attestation_conge = "${conge_data.statut_attestation_conge}"
             WHERE id_conge = ${congeToEdit.id_conge} AND id_personnel = ${person.id_personnel}
             ;`;
-        console.log(req_conge);
         let req_personnel;
         switch (congeToEdit.libelle_type_conge) {
             case 'congé maternité':
             case 'congé paternité':
-                req_personnel = `UPDATE personnel SET nb_jours_conges_maternite = (nb_jours_conges_maternite + ${parseInt(duration)}) WHERE id_personnel = ${conge_data.id_personnel}`;
+                req_personnel = `UPDATE personnel SET nb_jours_conges_maternite = (nb_jours_conges_maternite + ${parseInt(duration)})
+                    WHERE id_personnel = ${conge_data.id_personnel}`;
                 break;
             case 'congé maladie':
-                req_personnel = `UPDATE personnel SET nb_jours_conges_maladie = (nb_jours_conges_maladie + ${parseInt(duration)}) WHERE id_personnel = ${conge_data.id_personnel}`;
+                req_personnel = `UPDATE personnel SET nb_jours_conges_maladie = (nb_jours_conges_maladie + ${parseInt(duration)})
+                    WHERE id_personnel = ${conge_data.id_personnel}`;
                 break;
             case 'congé mariage':
-                req_personnel = `UPDATE personnel SET nb_jours_conges_mariage	= (nb_jours_conges_mariage + ${parseInt(duration)}) WHERE id_personnel = ${conge_data.id_personnel}`;
+                req_personnel = `UPDATE personnel SET nb_jours_conges_mariage	= (nb_jours_conges_mariage + ${parseInt(duration)})
+                    WHERE id_personnel = ${conge_data.id_personnel}`;
                 break;
             case 'congé décès':
-                req_personnel = `UPDATE personnel SET nb_jours_conges_deces = (nb_jours_conges_deces - ${parseInt(duration)}) WHERE id_personnel = ${conge_data.id_personnel}`;
+                req_personnel = `UPDATE personnel SET nb_jours_conges_deces = (nb_jours_conges_deces - ${parseInt(duration)})
+                    WHERE id_personnel = ${conge_data.id_personnel}`;
                 break;
             default:
                 req_personnel = '';
                 break;
         }
         if (person.nb_jours_conges === parseInt(0)) {
-            req_personnel = `UPDATE personnel SET dette_conge = (dette_conge - ${parseInt(duration)}) WHERE id_personnel = ${conge_data.id_personnel};`;
+            req_personnel = `UPDATE personnel SET dette_conge = (dette_conge - ${parseInt(duration)})
+                WHERE id_personnel = ${conge_data.id_personnel};`;
         } else {
             let diff_dette_conge;
             if (duration > old_duration) {
                 diff_dette_conge = duration - old_duration + person.nb_jours_conges;
             } else {
                 diff_dette_conge = old_duration - duration + person.nb_jours_conges;
-            }         
+            }
             req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges - ${parseInt(person.nb_jours_conges)}), dette_conge = (dette_conge - ${parseInt(diff_dette_conge)} ) WHERE id_personnel = ${conge_data.id_personnel};`;
         }
         // saving leaves
         window.electronAPI.addConge(req_conge);
         window.electronAPI.updatePersonnel(req_personnel);
-        window.electronAPI.congeAddedSuccess(() => { 
+        window.electronAPI.congeAddedSuccess(() => {
             setSuccess("congé mis à jour avec succès");
             setStatus(`Le satut de ${formatPersonnelName(person.sexe_personnel, person.nom_prenom_personnel)} a été mis à jour !`);
         });

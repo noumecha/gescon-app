@@ -19,7 +19,7 @@ const leftDays = (startDate, endDate, attestation) => {
         }
     } else {
         if (typePersonnel === "Contractuelle") {
-            let weekdaysToAdd =  leftDays = Math.ceil((endDate - startDate) / (1000 * 3600 * 24)) - 1;
+            let weekdaysToAdd = Math.ceil((endDate - startDate) / (1000 * 3600 * 24)) - 1;
             while (weekdaysToAdd > 0) {
                 startDate.setDate(startDate.getDate() + parseInt(1));
                 if (startDate.getDay() !== 0 && startDate.getDay() !== 6) {

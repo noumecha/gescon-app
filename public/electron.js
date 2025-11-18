@@ -21,17 +21,17 @@ function createWindow() {
             preload: path.join(__dirname, '../public/preload.js')
         }
     });
-    
+
     mainWindow.setMenuBarVisibility(false);
 
     mainWindow.loadURL(
-        //`http://localhost:3000`
-        `file://${path.join(__dirname, '../build/index.html')}`
+        `http://localhost:3000`
+        //`file://${path.join(__dirname, '../build/index.html')}`
     );
 
 };
 
-function handleSetTitle (event, title) {
+function handleSetTitle(event, title) {
     const webContents = event.sender
     const win = BrowserWindow.fromWebContents(webContents)
     win.setTitle(title)
@@ -74,7 +74,7 @@ function getPersonnel(event, arg) {
 function updatePersonnel(event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
-        event.sender.send('update-personnel-success', {message: 'Personnel mis à jour avec succès!'});
+        event.sender.send('update-personnel-success', { message: 'Personnel mis à jour avec succès!' });
     });
 }
 // functions for decision : 
@@ -114,15 +114,15 @@ function updateDecision(event, req) {
 }
 
 function deleteDecision(event, req) {
-    pool.query(req, (err) =>{
+    pool.query(req, (err) => {
         if (err) throw err;
         event.sender.send('decision-deleted-success', { message: 'Decision supprimée avec succès!' });
     })
 }
 
-// functions for getting all conges : 
+// functions for getting all conges :
 function getConge(event, req) {
-    pool.query('SELECT * FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel;', (err, res) => {
+    pool.query('SELECT * FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel ORDER BY id_conge DESC;', (err, res) => {
         if (err) throw err;
         event.sender.send('all-conge', res);
     });
@@ -136,7 +136,7 @@ function getAttestationConge(even, req) {
         even.sender.send('all-attestation-conge', res);
     });
 }
-    // attestation reprise congé & archive attestation rep congés
+// attestation reprise congé & archive attestation rep congés
 function getAttestationRepConge(event, req) {
     pool.query('SELECT id_conge,nom_prenom_personnel,matricule_personnel,attestation_reprise_service,statut_att_rep_conge FROM conge,personnel WHERE conge.id_personnel = personnel.id_personnel AND attestation_reprise_service != "null" AND attestation_reprise_service != "";', (err, res) => {
         if (err) throw err;
@@ -178,7 +178,7 @@ function getSpecificConge(event, req) {
         event.sender.send('all-specific-conge', res);
     });
 }
-    // congés -> congés
+// congés -> congés
 function addConge(event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
@@ -189,7 +189,7 @@ function addConge(event, req) {
 function updateConge(event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
-        event.sender.send('update-conge-success', {message: 'Conge mis à jour avec succès!'});
+        event.sender.send('update-conge-success', { message: 'Conge mis à jour avec succès!' });
     });
 }
 
@@ -239,7 +239,7 @@ function addPermission(event, req) {
 function updatePermission(event, req) {
     pool.query(req, (err) => {
         if (err) throw err;
-        event.sender.send('update-permission-success', {message: 'Permission mis à jour avec succès!'});
+        event.sender.send('update-permission-success', { message: 'Permission mis à jour avec succès!' });
     });
 }
 
@@ -264,7 +264,7 @@ function deleteArchiveAttPermission(event, req) {
     })
 }
 
-    // permission -> attestation reprise permission & archives: 
+// permission -> attestation reprise permission & archives: 
 function getAttestationRepPermission(event) {
     pool.query('SELECT id_permission,nom_prenom_personnel,matricule_personnel,attestation_reprise_permission,statut_permission,statut_att_reprise_permission FROM permission,personnel WHERE permission.id_personnel = personnel.id_personnel AND attestation_reprise_permission !="null" AND attestation_reprise_permission !="";', (err, res) => {
         if (err) throw err;
@@ -301,7 +301,7 @@ function getLastPermission(event, req) {
 }
 
 // functions for conge type :
-function getSpecificCongeType (event, arg) {
+function getSpecificCongeType(event, arg) {
     pool.query('SELECT * FROM type_conge WHERE id_type_conge =?', [arg], (err, res) => {
         if (err) throw err;
         event.sender.send('specific-conge-type', res);
@@ -401,7 +401,7 @@ function getStructuresConges(event, req) {
  * In this following code is the main 
  * code when the app is started
  */
-function userLogin (event, {username, password}) {
+function userLogin(event, { username, password }) {
     pool.query('SELECT * FROM utilisateur', (err, results) => {
         if (err) throw err;
         event.sender.send('login-success', results);
@@ -417,7 +417,7 @@ app.whenReady().then(() => {
         });
     });
     ipcMain.on('add-personnel', addPersonnel);
-    ipcMain.on('add-personnel-dette',addPersonnelDette);
+    ipcMain.on('add-personnel-dette', addPersonnelDette);
     ipcMain.on('get-personnel', getPersonnel);
     ipcMain.on('get-specific-personnel', getSpecificPersonnel);
     ipcMain.on('update-personnel', updatePersonnel);
@@ -437,12 +437,12 @@ app.whenReady().then(() => {
     ipcMain.handle("get-stats-conge", async (event, query) => {
         return new Promise((resolve, reject) => {
             pool.query(query, (err, results) => {
-            if (err) {
-                console.error("SQL error:", err);
-                reject(err);
-            } else {
-                resolve(results);
-            }
+                if (err) {
+                    console.error("SQL error:", err);
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
             });
         });
     });
@@ -455,7 +455,7 @@ app.whenReady().then(() => {
     ipcMain.on('get-attestation-conge', getAttestationConge);
     ipcMain.on('get-archive-att-conge', getArchiveAttConge);
     ipcMain.on('delete-archive-att-conge', deleteArchiveAttConge);
-        // conge -> attestation reprise
+    // conge -> attestation reprise
     ipcMain.on('get-attestation-rep-conge', getAttestationRepConge);
     ipcMain.on('add-archive-attestation-rep-conge', addArchiveAttestationRepConge);
     ipcMain.on('get-archive-att-rep-conge', getArchiveAttRepConge);
@@ -469,10 +469,10 @@ app.whenReady().then(() => {
     ipcMain.on('get-attestation-permission', getAttestationPermission);
     ipcMain.on('get-archive-att-permission', getArchiveAttPermission);
     ipcMain.on('delete-archive-att-permission', deleteArchiveAttPermission);
-        // permission -> attestation reprise permission
+    // permission -> attestation reprise permission
     ipcMain.on('get-attestation-rep-permission', getAttestationRepPermission);
     ipcMain.on('add-archive-attestation-rep-permission', addArchiveAttestationRepPermission);
-        // permission -> archive attestation reprise permission
+    // permission -> archive attestation reprise permission
     ipcMain.on('get-archive-att-rep-permission', getArchiveAttRepPermission);
     ipcMain.on('delete-archive-att-rep-permission', deleteArchiveAttRepPermission);
     // document à fournir : 

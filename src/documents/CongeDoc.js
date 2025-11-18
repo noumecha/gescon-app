@@ -111,11 +111,11 @@ const CongeDoc = (props) => {
                                     " de la troisième partie "
                                     : " "
                             : " "}
-                        dudit congé pendant la période allant du <Text style={fontStyles.bold}>{props.startDate}</Text> au <Text style={fontStyles.bold}>{props.endDate}</Text> et 
+                        dudit congé pendant la période allant du <Text style={fontStyles.bold}>{props.startDate}</Text> au <Text style={fontStyles.bold}>{props.endDate}</Text> et
                         reprendra le service le <Text style={fontStyles.bold}>{props.repriseDate} à 7 heures 30 précises.</Text>
                     </Text>
                     <Text style={styles.pCertifText}>
-                    En foi de quoi, le présent certificat est établi et délivré à l'intéressé{props.sexe === "M" ? "" : "e"} pour servir et valoir ce que de droit./-                                                                    
+                    En foi de quoi, le présent certificat est établi et délivré à l'intéressé{props.sexe === "M" ? "" : "e"} pour servir et valoir ce que de droit./-
                     </Text>
                 </View>
             </View>
@@ -134,8 +134,8 @@ const CongeDoc = (props) => {
                         - dgb/sdag
                     </Text>
                     <Text style={styles.amParagraph4}>
-                        - dgb/{props.structure.match(/\[([^\]]+)\]/) 
-                            ? props.structure.match(/\[([^\]]+)\]/)[1] 
+                        - dgb/{props.structure.match(/\[([^\]]+)\]/)
+                            ? props.structure.match(/\[([^\]]+)\]/)[1]
                             : props.structure}
                     </Text>
                     <Text style={styles.amParagraph5}>

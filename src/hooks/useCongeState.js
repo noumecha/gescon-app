@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { formatPersonnelName } from "utils/personnels-utils";
 
 const useCongeState = () => {
     const location = useLocation();
     // recuperation des attributs d'un personnel depuis personnel.js
-    const { selectedPerson } = location.state || {};
+    //const { selectedPerson } = location.state || {};
+    const { selectedPerson: navSelectedPerson } = location.state || {};
+    const [selectedPerson, setSelectedPerson] = useState(navSelectedPerson || null);
     const [userConge, setUserConge] = useState([]);
     const [lastPermission, setLastPermission] = useState([]);
     const [typeConge, setTypeConge] = useState([]);
@@ -41,13 +43,20 @@ const useCongeState = () => {
     const [actived, setActived] = useState(selectedPerson === undefined ? true : false);
     const [duration, setDuration] = useState(selectedPerson ? selectedPerson.id_type_personnel === 1 ? selectedPerson.nb_jours_conges : selectedPerson.nb_jours_conges + selectedPerson.dette_conge : "");
 
+    useEffect(() => {
+        if (navSelectedPerson) {
+            setSelectedPerson(navSelectedPerson);
+        }
+    }, [navSelectedPerson]);
+
+
     return {
         endDate, setEndDate, name, setName, telephone, setTelphone, typeConge, setTypeConge,
-        startDate, setStartDate, matricule, setMatricule, type, setType, nb_jours_conges,
+        startDate, setStartDate, matricule, setMatricule, type, setType, nb_jours_conges, selectedPerson, setSelectedPerson,
         duration, setDuration, poste, setPoste, demande, setDemande, sexe, preposition, grade, id_personnel,
         conge, setConge, lastPermission, setLastPermission, error, setError, success, setSuccess,loadingText,
         visible, setVisible, search, setSearch, statutFilter, setStatutFilter, pageNumber, setPageNumber,
-        userConge, setUserConge, loadingSpinner, setLoadingSpinner, actived, setActived, status, setStatus, selectedPerson,
+        userConge, setUserConge, loadingSpinner, setLoadingSpinner, actived, setActived, status, setStatus,
         repriseDate, setRepriseDate, selectedType, setSelectedType, selectedDec, setSelectedDec, struc, setStruc, document, setDocument,
         generateSuccess, setGenerateSuccess
     };
