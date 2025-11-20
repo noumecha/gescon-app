@@ -118,7 +118,7 @@ const saveConge = async (
           setError(`Impossible de définir un congé pour cette date car ${formatPersonnelName(sexe, name)} a déja un congé prévu`);
           return;
         }
-        if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) || (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
+        if (((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) || (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) && (userConge[index].statut_conge !== "annulé")) {
           setError(`Impossible de définir un congé pour cette date car ${formatPersonnelName(sexe, name)} a déja pris un congé`);
           return;
         }
@@ -244,10 +244,15 @@ const saveConge = async (
         req_personnel = '';
         break;
     }
-    if (selectedPerson.nb_jours_conges === parseInt(0)) {
+    if (selectedPerson.nb_jours_conges === parseInt(0) && selectedPerson.dette_conge !== parseInt(0) && selectedPerson.dette_conge >= parseInt(duration)) {
       req_personnel = `UPDATE personnel SET dette_conge = (dette_conge - ${parseInt(duration)})
         WHERE id_personnel = ${conge_data.id_personnel};`;
-    } else {
+    }
+    if(selectedPerson.nb_jours_conges >= parseInt(duration)) {
+      req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges - ${parseInt(duration)})
+        WHERE id_personnel = ${conge_data.id_personnel};`;
+    }
+    if (selectedPerson.nb_jours_conges < parseInt(duration) && (selectedPerson.nb_jours_conges + selectedPerson.dette_conge) >= parseInt(duration)) {
       let diff_dette_conge = duration - selectedPerson.nb_jours_conges;
       req_personnel = `UPDATE personnel SET nb_jours_conges = (
         nb_jours_conges - ${parseInt(selectedPerson.nb_jours_conges)}

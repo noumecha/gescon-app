@@ -11,6 +11,9 @@ import useCongeState from "hooks/useCongeState";
 // CRUDs functions
 import { saveConge } from "utils/saveConge";
 import { updateConge } from "utils/updateConge";
+import { formatPersonnelName } from "utils/personnels-utils";
+import { leftDays } from "utils/calculs-utils";
+import { getPerson } from "utils/getPerson";
 
 const Conges = () => {
   
@@ -122,7 +125,7 @@ const Conges = () => {
   }
 
   // edit specific conge :
-  const handleEditConge = (congeToEdit) => {
+  const handleEditConge = async (congeToEdit) => {
     setName(congeToEdit.nom_prenom_personnel);
     setMatricule(congeToEdit.matricule_personnel);
     const start_date = new Date(congeToEdit.date_debut_conge);
@@ -149,7 +152,13 @@ const Conges = () => {
     setAction("update");
     setCongeToEdit(congeToEdit);
     getSpecificPersonnel(congeToEdit.id_personnel);
-    setStatus("Mofification du "+ congeToEdit.attestation_conge.typeConge + " de " + congeToEdit.nom_prenom_personnel);
+    const person = await getPerson(congeToEdit.id_personnel);
+    const left_days = leftDays(congeToEdit.date_debut_conge, congeToEdit.date_fin_conge, congeToEdit.attestation_conge);
+    const nbCongesDisp = person.nb_jours_conges + person.dette_conge + left_days;
+    // default status on edit :
+    setStatus(`${formatPersonnelName(person.sexe_personnel, person.nom_prenom_personnel)} a encore
+      ${nbCongesDisp} ${nbCongesDisp > 1 ? "jours" : "jour"} de congés disponibles`
+    );
   };
 
   // useEffect change duration

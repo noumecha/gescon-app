@@ -12,7 +12,7 @@ const deleteConge = async (conge, setSuccess, setError, setStatus) => {
         console.log("requires datas => left days : " + left_days + " | person : " + JSON.stringify(person));
         const req_conge = `UPDATE conge SET  statut_conge = "annulé" WHERE id_conge = ${conge.id_conge} AND id_personnel = ${conge.id_personnel};`;
         console.log(req_conge);
-        /*let req_personnel;
+        let req_personnel;
         switch (conge.libelle_type_conge) {
             case 'congé maternité':
             case 'congé paternité':
@@ -32,9 +32,9 @@ const deleteConge = async (conge, setSuccess, setError, setStatus) => {
                 break;
         }
         if (person.nb_jours_conges === parseInt(0)) {
-            req_personnel = `UPDATE personnel SET dette_conge = (dette_conge + ${parseInt(left_days)}) WHERE id_personnel = ${conge.id_personnel};`;
+            req_personnel = `UPDATE personnel SET dette_conge = (dette_conge + ${parseInt(left_days)}), statut_personnel = 'en poste' WHERE id_personnel = ${conge.id_personnel};`;
         } else {
-            req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges + ${parseInt(left_days)}) WHERE id_personnel = ${conge.id_personnel};`;
+            req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges + ${parseInt(left_days)}), statut_personnel = 'en poste' WHERE id_personnel = ${conge.id_personnel};`;
         }
         // send request and getting response
         window.electronAPI.addConge(req_conge);
@@ -45,7 +45,7 @@ const deleteConge = async (conge, setSuccess, setError, setStatus) => {
         });
         setTimeout(() => {
             setSuccess("");
-        }, 3000);*/
+        }, 3000);
     } catch (error) {
         setError("Error when deleting conge : ", error);
         setTimeout(() => {
