@@ -8,7 +8,7 @@ import {
     CardBody,
     CardTitle,
     Col,
-    CardHeader
+    CardHeader,FormGroup
 } from "reactstrap";
 import { ChartStructureStats } from "variables/charts";
 
@@ -17,23 +17,34 @@ const StructureStats = () => {
     const [conges, setConges] = useState([]);
     const [filter, setFilter] = useState(null);
     const [personnel, setPersonnel] = useState([]);
+    const [yearFilter, setYearFilter] = useState(null);
     const [strucPers, setstrucPers] = useState(0);
     const [congeStruc, setCongeStruc] = useState(0);
     const [structureNames, setStructureNames] = useState([]);
     const [perf, setPerf] = useState(100);
+    const [years, setYears] = useState([]);
+
+    const yearOptions = years.map((y, i) => ({
+        value: y.annee,
+        label: y.annee,
+    }));
 
     const options = structureNames.map((t, i) => ({
         value: t.structure_personnel,
         label: t.structure_personnel,
     }));
     
-    const handleFilterChange = (f) => {
-      setFilter(f);
+    const handleFilterChange = (setState) => (selectedOption) => {
+      setState(selectedOption);
     };
 
     const fetchConges = async () => {
       try {
-        let req = `SELECT * FROM conge,personnel WHERE personnel.structure_personnel = ${filter ? JSON.stringify(filter.value) : "null"} AND personnel.id_personnel = conge.id_personnel;`;
+        let req = `SELECT *
+          FROM conge,personnel
+          WHERE personnel.structure_personnel = ${filter ? JSON.stringify(filter.value) : "null"}
+          AND YEAR(conge.date_debut_conge) = ${yearFilter ? yearFilter.value : "null"}
+          AND personnel.id_personnel = conge.id_personnel;`;
         //console.log(req);
         window.electronAPI.getSpecificConge(req);
         await window.electronAPI.retrieveSpecificConge((event, res) => {
@@ -51,6 +62,7 @@ const StructureStats = () => {
         if (filter === null) {
             setstrucPers(0);
             setCongeStruc(0);
+            setPerf(0);
         }
         if (personnel.length > 0) {
             personnel.forEach(person => {
@@ -70,6 +82,7 @@ const StructureStats = () => {
         setCongeStruc(total_struc_conge);
     }
 
+    // useEffect for calculating performance
     useEffect(() => {
         const func = async () => {
           const prf = Number.parseFloat(((congeStruc/strucPers) * 100)).toFixed(2);
@@ -78,6 +91,22 @@ const StructureStats = () => {
         func();
     })
 
+    // useEffect for getting years
+    useEffect(() => {
+        const fetchYears = async () => {
+          try {
+            window.electronAPI.getCongeYears();
+            await window.electronAPI.retrieveCongesYears((event, res) => {
+              setYears(res);
+            })
+          } catch (error) {
+            console.error("Erreur : " + error.message);
+          }
+        }
+        fetchYears();
+    }, []);
+
+    // useEffect for getting structure names and personnel
     const fetchDatas = async () => {
         try {
           window.electronAPI.getStructuresNames();
@@ -102,19 +131,30 @@ const StructureStats = () => {
         <div className="header bg-gradient-info pb-3 pt-5 pt-md-8">
             <Container fluid>
                 <Row className="">
-                    <Col lg="9">
+                    <Col lg="6" md="6">
                         <Select
                             value={filter}
-                            onChange={handleFilterChange}
+                            onChange={handleFilterChange(setFilter)}
                             options={options}
                             isSearchable={true}
                             placeholder="Selectionner la structure"
                         />
                     </Col>
-                    <Col lg="3">
-                        <button 
-                            type="submit" 
-                            className="btn btn-primary btn-md" 
+                    <Col lg="3" md="3">
+                      <FormGroup>
+                          <Select
+                              value={yearFilter}
+                              onChange={handleFilterChange(setYearFilter)}
+                              options={yearOptions}
+                              isSearchable={true}
+                              placeholder="Selectionnez une année"
+                          />
+                      </FormGroup>
+                    </Col>
+                    <Col lg="3" md="3">
+                        <button
+                            type="submit"
+                            className="btn btn-primary btn-md"
                             onClick={() => showStructuresStats()}
                         >
                             Afficher les Statistiques

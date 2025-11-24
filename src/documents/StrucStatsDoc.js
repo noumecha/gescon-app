@@ -4,6 +4,7 @@ import { generateQRCode } from 'utils/generateQRCode';
 import styles from 'utils/styles';
 import PageWithHeaderFooter from 'utils/PageWithHeaderFooter';
 import { chunkArray } from 'utils/stats-utils';
+import { monthsNoYear as months, fullMonths } from 'utils/docs-utils';
 
 const StructStatsDoc = ({ stats, year, structure }) => {
     const d = new Date();
@@ -29,16 +30,6 @@ const StructStatsDoc = ({ stats, year, structure }) => {
         const restPages = chunkArray(remaining, otherPageRows);
         return [firstPage, ...restPages];
     }, [entries]);
-
-    const months = [
-        "Jan", "Fév", "Mar", "Avr", "Mai", "Jui",
-        "Juil", "Aoû", "Sep", "Oct", "Nov", "Déc"
-    ];
-
-    const fullMonths = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December",
-    ];
 
     return (
         <Document>
@@ -76,8 +67,8 @@ const StructStatsDoc = ({ stats, year, structure }) => {
                                 </Text>
                                 {months.map((m, i) => (
                                     <React.Fragment key={i}>
-                                        <Text style={styles.cellHeader}>Fnc</Text>
-                                        <Text style={styles.cellHeader}>Con</Text>
+                                        <Text style={styles.cellHeader}>Fonct.</Text>
+                                        <Text style={styles.cellHeader}>Contr.</Text>
                                     </React.Fragment>
                                 ))}
                             </View>
