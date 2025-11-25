@@ -3,8 +3,8 @@ const dev = "Spaker the TMC";
 ipcRenderer.setMaxListeners(5000);
 
 window.addEventListener('DOMContentLoaded', () => {
-    console.log('Preload script loaded successfully!');
-  });
+  console.log('Preload script loaded successfully!');
+});
 contextBridge.exposeInMainWorld("electronAPI", {
     devName: dev,
     // pour le login :
@@ -18,7 +18,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     // pour les test :
     setTitle: (title) => ipcRenderer.send('set-title', title),
     ping: () => ipcRenderer.invoke('ping'),
-    // type conge : 
+    // type conge :
     congeTypeAddedSuccess: (callback) => ipcRenderer.on('conge-type-added-success', callback),
     addCongeType: (req) => ipcRenderer.send('add-conge-type', req),
     getCongeType: () => ipcRenderer.send('get-conge-type'),

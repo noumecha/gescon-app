@@ -25,8 +25,8 @@ function createWindow() {
     mainWindow.setMenuBarVisibility(false);
 
     mainWindow.loadURL(
-        `http://localhost:3000`
-        //`file://${path.join(__dirname, '../build/index.html')}`
+        //`http://localhost:3000`
+        `file://${path.join(__dirname, '../build/index.html')}`
     );
 
 };
@@ -368,7 +368,7 @@ function updateUserPassword(event, req) {
     })
 }
 
-// structures 
+// structures
 function getStructuresNames(event, req) {
     pool.query('SELECT DISTINCT structure_personnel FROM personnel', (err, res) => {
         if (err) throw err;
@@ -376,7 +376,7 @@ function getStructuresNames(event, req) {
     });
 }
 
-// conges years 
+// conges years
 function getCongeYears(event, req) {
     pool.query('SELECT DISTINCT YEAR(date_fin_conge) AS annee FROM conge;', (err, res) => {
         if (err) throw err;
@@ -397,8 +397,112 @@ function getStructuresConges(event, req) {
         event.sender.send('structures-conges', res);
     });
 }
+
 /**
- * In this following code is the main 
+ * cron jobs for udpates conge and personnel states
+ */
+
+function parseRepriseDate(str) {
+    // str = "dd/mm/yyyy"
+    const [day, month, year] = str.split("/").map(Number);
+    return new Date(year, month - 1, day);
+}
+
+function autoUpdateCongeBackend() {
+    console.log("Running auto conges updater …");
+    const now = new Date();
+    // Load all congés with personnel information
+    const sql = `SELECT * FROM conge INNER JOIN personnel ON personnel.id_personnel = conge.id_personnel;`;
+    pool.query(sql, (err, rows) => {
+        if (err) return console.error("DB error:", err);
+        rows.forEach((conge, key) => {
+            try {
+                const debut = new Date(conge.date_debut_conge);
+                const fin = new Date(conge.date_fin_conge);
+                // Parse JSON repriseDate
+                const att = JSON.parse(conge.attestation_conge);
+                const repriseDate = parseRepriseDate(att.repriseDate);
+                /** -------------------------------------------
+                 * 1️⃣ If today is between début and fin → en congé
+                --------------------------------------------*/
+                if (now >= debut && now <= fin) {
+                    const q = `
+                    UPDATE personnel
+                    SET statut_personnel = "en congé"
+                    WHERE id_personnel = ${conge.id_personnel};
+                    `;
+                    pool.query(q);
+                    const cr = `UPDATE conge SET statut_conge = "en cours" WHERE id_conge = ${conge.id_conge};`;
+                    pool.query(cr)
+                }
+                /** -------------------------------------------
+                 * 2️⃣ If today == fin de congé → terminer le congé
+                --------------------------------------------*/
+                const sameDay =
+                    now.getDate() === fin.getDate() &&
+                    now.getMonth() === fin.getMonth() &&
+                    now.getFullYear() === fin.getFullYear();
+                if (sameDay) {
+                    const q = `
+                    UPDATE conge
+                    SET statut_conge = "terminé"
+                    WHERE id_conge = ${conge.id_conge};
+                    `;
+                    pool.query(q);
+                }
+                /** -------------------------------------------
+                 * 3️⃣ If month passed after fin → terminé
+                --------------------------------------------*/
+                if (
+                    now.getFullYear() === fin.getFullYear() &&
+                    now.getMonth() > fin.getMonth()
+                ) {
+                    const q = `
+                    UPDATE conge
+                    SET statut_conge = "terminé"
+                    WHERE id_conge = ${conge.id_conge};
+                    `;
+                    pool.query(q);
+                }
+                /** -------------------------------------------
+                 * 4️⃣ If today == reprise date → en poste
+                --------------------------------------------*/
+                const sameRepriseDay =
+                    now.getDate() === repriseDate.getDate() &&
+                    now.getMonth() === repriseDate.getMonth() &&
+                    now.getFullYear() === repriseDate.getFullYear();
+                if (sameRepriseDay) {
+                    const q = `
+                    UPDATE personnel
+                    SET statut_personnel = "en poste"
+                    WHERE id_personnel = ${conge.id_personnel};
+                    `;
+                    pool.query(q);
+                }
+                /** -------------------------------------------
+                 * 5️⃣ If month passed after reprise date → en poste
+                --------------------------------------------*/
+                if (
+                    now.getFullYear() === repriseDate.getFullYear() &&
+                    now.getMonth() > repriseDate.getMonth()
+                ) {
+                    const q = `
+                    UPDATE personnel
+                    SET statut_personnel = "en poste"
+                    WHERE id_personnel = ${conge.id_personnel};
+                    `;
+                    pool.query(q);
+                }
+            } catch (error) {
+                console.error("Error processing congé:", error);
+            }
+        });
+        console.log("Auto conges update completed");
+    });
+}
+
+/**
+ * In this following code is the main
  * code when the app is started
  */
 function userLogin(event, { username, password }) {
@@ -407,8 +511,19 @@ function userLogin(event, { username, password }) {
         event.sender.send('login-success', results);
     });
 }
+
+/**
+ * run functions
+ */
 app.whenReady().then(() => {
-    ipcMain.handle('ping', () => 'pong!');
+    // run cron on start and every day
+    autoUpdateCongeBackend();
+    setInterval(() => {
+        autoUpdateCongeBackend();
+    }, 24 * 60 * 60 * 1000);
+
+    // ping pong test
+    ipcMain.handle('ping', () => 'pongrr!');
     // personnel datas get
     ipcMain.on('requete-sql', (event, arg) => {
         pool.query('SELECT * FROM personnel', (err, results) => {

@@ -1,4 +1,5 @@
 import { leftDays } from "./calculs-utils";
+import { formatDate } from "./dates-utils";
 import { getPerson } from "./getPerson";
 import { formatPersonnelName } from "./personnels-utils";
 /**
@@ -9,9 +10,6 @@ const deleteConge = async (conge, setSuccess, setError, setStatus) => {
     try {
         const left_days = leftDays(conge.date_debut_conge, conge.date_fin_conge, conge.attestation_conge)
         const person = await getPerson(conge.id_personnel);
-        console.log("requires datas => left days : " + left_days + " | person : " + JSON.stringify(person));
-        const req_conge = `UPDATE conge SET  statut_conge = "annulé" WHERE id_conge = ${conge.id_conge} AND id_personnel = ${conge.id_personnel};`;
-        console.log(req_conge);
         let req_personnel;
         switch (conge.libelle_type_conge) {
             case 'congé maternité':
@@ -31,13 +29,26 @@ const deleteConge = async (conge, setSuccess, setError, setStatus) => {
                 req_personnel = '';
                 break;
         }
+        // req conge
+        let req_conge = `UPDATE conge SET  statut_conge = "annulé" WHERE id_conge = ${conge.id_conge} AND id_personnel = ${conge.id_personnel};`;
+        if (formatDate(conge.date_debut_conge) > formatDate(new Date())) {
+            req_conge = `DELETE FROM conge WHERE id_conge = ${conge.id_conge} AND id_personnel = ${conge.id_personnel};`;
+            req_personnel = `UPDATE personnel SET nb_jours_conges = ${parseInt(left_days)}, statut_personnel = 'en poste' WHERE id_personnel = ${conge.id_personnel};`;
+        }
+        if (formatDate(new Date()) >= formatDate(conge.date_debut_conge) && formatDate(new Date()) <= formatDate(conge.date_fin_conge)) {
+            req_conge = `UPDATE conge SET  statut_conge = "annulé" WHERE id_conge = ${conge.id_conge} AND id_personnel = ${conge.id_personnel};`;
+            req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges + ${parseInt(left_days)}), statut_personnel = 'en poste' WHERE id_personnel = ${conge.id_personnel};`;
+        }
+        // req personnel
         if (person.nb_jours_conges === parseInt(0)) {
             req_personnel = `UPDATE personnel SET dette_conge = (dette_conge + ${parseInt(left_days)}), statut_personnel = 'en poste' WHERE id_personnel = ${conge.id_personnel};`;
         } else {
             req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges + ${parseInt(left_days)}), statut_personnel = 'en poste' WHERE id_personnel = ${conge.id_personnel};`;
         }
+        console.log("req_conge update : ", req_conge);
+        console.log("req_personnel update : ", req_personnel);
         // send request and getting response
-        window.electronAPI.addConge(req_conge);
+        /*window.electronAPI.addConge(req_conge);
         window.electronAPI.updatePersonnel(req_personnel);
         window.electronAPI.congeAddedSuccess(() => {
             setSuccess("congé supprimer/annuler avec succès");
@@ -45,7 +56,7 @@ const deleteConge = async (conge, setSuccess, setError, setStatus) => {
         });
         setTimeout(() => {
             setSuccess("");
-        }, 3000);
+        }, 3000);*/
     } catch (error) {
         setError("Error when deleting conge : ", error);
         setTimeout(() => {

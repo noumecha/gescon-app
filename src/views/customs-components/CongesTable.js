@@ -130,7 +130,7 @@ const CongesTable = ({
                                         <td>{c.nom_prenom_personnel}</td>
                                         <td>{c.date_debut_conge.getDate() + "/" + formatDateMonthForm(c.date_debut_conge) + "/" + c.date_debut_conge.getFullYear() }</td>
                                         <td>{c.date_fin_conge.getDate() + "/" + formatDateMonthForm(c.date_fin_conge) + "/" + c.date_fin_conge.getFullYear()}</td>
-                                        <td>{c.statut_conge === "programmé" ? c.attestation_conge.duration : c.statut_conge !== "terminé" ? leftDays(c.date_debut_conge, c.date_fin_conge, c.attestation_conge) : 0 }</td>
+                                        <td>{c.statut_conge === "programmé" ? c.duree_conge : c.statut_conge !== "terminé" ? leftDays(c.date_debut_conge, c.date_fin_conge, c.attestation_conge) : 0 }</td>
                                         <td>{c.statut_conge === "en cours"
                                             ? <Badge color="success">
                                                 {c.statut_conge}
@@ -173,7 +173,7 @@ const CongesTable = ({
                                                     </DropdownItem>
                                                     <DropdownItem
                                                         onClick={() => handleDeleteConge(c)}
-                                                        disabled={c.statut_conge === "annulé" ? true : false}
+                                                        disabled={c.statut_conge === "annulé" || c.statut_conge === "terminé" ? true : false}
                                                     >
                                                         Supprimer/annuler
                                                     </DropdownItem>

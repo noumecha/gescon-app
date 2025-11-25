@@ -43,7 +43,7 @@ const Index = (props) => {
   const [data, setData] = useState([])
   useEffect(() => {
     const func = async () => {
-      try { 
+      try {
         window.electronAPI.getConge();
         await window.electronAPI.retrieveConge((event, res) => {
           setConge(res);

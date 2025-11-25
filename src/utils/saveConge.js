@@ -1,5 +1,5 @@
 import { formatDate } from "./dates-utils";
-import { nbDaysBetween, formatDateDayForm, formatDateMonthForm } from "./dates-utils";
+import { formatDateDayForm, formatDateMonthForm } from "./dates-utils";
 import { formatPersonnelName } from "./personnels-utils";
 import { validateDuration } from "./validateDuration";
 
@@ -10,7 +10,6 @@ const saveConge = async (
 ) => {
   try {
     let total_conge_admin = 0;
-    let nbDaysConges = 0;
     const curr_date = new Date();
     if (!validateDuration(duration, setError)) return;
     if (selectedPerson.id_type_personnel === 2) {
@@ -113,12 +112,14 @@ const saveConge = async (
     if (userConge.length > 0) {
       for (let index = 0; index < userConge.length; index++) {
         let csd = formatDate(startDate).getDate() + '/' + formatDateMonthForm(startDate) + '/' + formatDate(startDate).getFullYear();
-        nbDaysConges += nbDaysBetween(formatDate(userConge[index].date_debut_conge), formatDate(userConge[index].date_fin_conge)) + 1;
-        if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) && (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
+        if ((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge))
+          && (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) {
           setError(`Impossible de définir un congé pour cette date car ${formatPersonnelName(sexe, name)} a déja un congé prévu`);
           return;
         }
-        if (((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge)) || (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge))) && (userConge[index].statut_conge !== "annulé")) {
+        if (((formatDate(startDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(startDate) <= formatDate(userConge[index].date_fin_conge))
+          || (formatDate(endDate) >= formatDate(userConge[index].date_debut_conge) && formatDate(endDate) <= formatDate(userConge[index].date_fin_conge)))
+          && (userConge[index].statut_conge !== "annulé")) {
           setError(`Impossible de définir un congé pour cette date car ${formatPersonnelName(sexe, name)} a déja pris un congé`);
           return;
         }

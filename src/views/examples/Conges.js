@@ -155,7 +155,6 @@ const Conges = () => {
     const person = await getPerson(congeToEdit.id_personnel);
     const left_days = leftDays(congeToEdit.date_debut_conge, congeToEdit.date_fin_conge, congeToEdit.attestation_conge);
     const nbCongesDisp = person.nb_jours_conges + person.dette_conge + left_days;
-    // default status on edit :
     setStatus(`${formatPersonnelName(person.sexe_personnel, person.nom_prenom_personnel)} a encore
       ${nbCongesDisp} ${nbCongesDisp > 1 ? "jours" : "jour"} de congés disponibles`
     );
@@ -246,52 +245,6 @@ const Conges = () => {
     };
     calculateEndDate();
   }, [startDate, duration, selectedType, selectedPerson?.id_type_personnel]);
-
-  /** useEffect for updating personnel and congé base on some state of current date */
-  useEffect(() => {
-    const updatePersonnelState = async () => {
-      try {
-      //const statut = currrent date >= conge_data.startDate && currrent date <= conge_data.endDate ? "en congé" : "en poste";
-      if (conge.length > 0) {
-        let date = new Date();
-        for (let x = 0; x < conge.length; x++) {
-          conge[x].attestation_conge = JSON.parse(conge[x].attestation_conge);
-          conge[x].attestation_conge.repriseDate = conge[x].attestation_conge.repriseDate.split('/');
-          conge[x].attestation_conge.repriseDate = new Date(conge[x].attestation_conge.repriseDate[2], conge[x].attestation_conge.repriseDate[1], conge[x].attestation_conge.repriseDate[0]);
-          if (date >= conge[x].date_debut_conge && date <= conge[x].date_fin_conge) {
-            const statut = "en congé";
-            const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${conge[x].id_personnel};`;
-            window.electronAPI.updatePersonnel(req_personnel);
-          }
-          if ((date.getDate() === conge[x].date_fin_conge.getDate() && date.getMonth() === conge[x].date_fin_conge.getMonth() && date.getFullYear() === conge[x].date_fin_conge.getFullYear())) {
-            const statut_conge = "terminé";
-            const req_conge = `UPDATE conge SET statut_conge = "${statut_conge}" WHERE id_conge = ${conge[x].id_conge}`;
-            window.electronAPI.addConge(req_conge);
-          }
-          if (date.getMonth() > conge[x].date_fin_conge.getMonth() && date.getFullYear() === conge[x].date_fin_conge.getFullYear()) {
-            const statut_conge = "terminé";
-            const req_conge = `UPDATE conge SET statut_conge = "${statut_conge}" WHERE id_conge = ${conge[x].id_conge}`;
-            window.electronAPI.addConge(req_conge);
-          }
-          if (date.getDate() === conge[x].attestation_conge.repriseDate.getDate() && date.getMonth() === conge[x].attestation_conge.repriseDate.getMonth() && date.getFullYear() === conge[x].attestation_conge.repriseDate.getFullYear()) {
-            const statut = "en poste";
-            const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${conge[x].id_personnel};`;
-            window.electronAPI.updatePersonnel(req_personnel);
-          }
-          if (date.getMonth() > conge[x].attestation_conge.repriseDate.getMonth() && date.getFullYear() === conge[x].attestation_conge.repriseDate.getFullYear()) {
-            const statut = "en poste";
-            const req_personnel = `UPDATE personnel SET statut_personnel = "${statut}" WHERE id_personnel = ${conge[x].id_personnel};`;
-            window.electronAPI.updatePersonnel(req_personnel);
-          }
-          setTimeout(() => { setSuccess(""); }, 3000)
-        }
-      }
-      } catch (err) {
-        console.error("Erreur : " + err.message);
-      }
-    }
-    updatePersonnelState()
-  }, [conge]);
 
   // useEffect for getting conge for a specific user
   useEffect(() => {
