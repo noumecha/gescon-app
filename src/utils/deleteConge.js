@@ -48,7 +48,7 @@ const deleteConge = async (conge, setSuccess, setError, setStatus) => {
         console.log("req_conge update : ", req_conge);
         console.log("req_personnel update : ", req_personnel);
         // send request and getting response
-        /*window.electronAPI.addConge(req_conge);
+        window.electronAPI.addConge(req_conge);
         window.electronAPI.updatePersonnel(req_personnel);
         window.electronAPI.congeAddedSuccess(() => {
             setSuccess("congé supprimer/annuler avec succès");
@@ -56,7 +56,7 @@ const deleteConge = async (conge, setSuccess, setError, setStatus) => {
         });
         setTimeout(() => {
             setSuccess("");
-        }, 3000);*/
+        }, 3000);
     } catch (error) {
         setError("Error when deleting conge : ", error);
         setTimeout(() => {
