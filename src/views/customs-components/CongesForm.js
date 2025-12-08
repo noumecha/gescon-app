@@ -223,7 +223,7 @@ const CongesForm = ({
                         </FormGroup>
                       </Col>
                     </Row>
-                    {selectedType === "congé maladie" || selectedType === "congé maternité" ? (
+                    {selectedType.value === "congé maladie" || selectedType.value === "congé maternité" ? (
                       <Row>
                         <Col>
                           <FormGroup>

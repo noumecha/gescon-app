@@ -67,15 +67,27 @@ const nbDaysBetween = (start, end) => {
 }
 
 const formatDateDayForm = (date) => {
-    if (formatDate(date).getDate() < 10 ) 
+    if (formatDate(date).getDate() < 10 )
         return "0"+formatDate(date).getDate()
-    else 
+    else
         return formatDate(date).getDate()
 }
+
 const formatDateMonthForm = (date) => {
-    if (parseInt(formatDate(date).getMonth()+1) >= 10) 
+    if (parseInt(formatDate(date).getMonth()+1) >= 10)
         return parseInt(formatDate(date).getMonth()+1)
-    else 
+    else
         return "0"+parseInt(formatDate(date).getMonth()+1)
 }
-export {dateInRange, formatDate, lastDateOfMonth, firstDateOfMonth, monthToText, nbDaysBetween, formatDateDayForm, formatDateMonthForm}
+
+function formatFullDate(startDate) {
+    const day = formatDateDayForm(startDate);
+    const month = formatDateMonthForm(startDate);
+    const year = formatDate(startDate).getFullYear();
+    return `${day}/${month}/${year}`;
+}
+export {
+    dateInRange, formatDate, lastDateOfMonth,
+    firstDateOfMonth, monthToText, nbDaysBetween,
+    formatDateDayForm, formatDateMonthForm, formatFullDate
+}

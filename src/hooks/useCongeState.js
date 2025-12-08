@@ -14,7 +14,7 @@ const useCongeState = () => {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [repriseDate, setRepriseDate] = useState("");
-    const [selectedType, setSelectedType] = useState(typeConge.length > 0 ? typeConge[0].libelle_type_conge : "congé administratif");
+    const [selectedType, setSelectedType] = useState([]);
     const [name, setName] = useState(selectedPerson ? selectedPerson.nom_prenom_personnel : "TCHUENTE");
     const preposition = selectedPerson ? selectedPerson.preposition_personnel : "au";
     const grade = selectedPerson ? selectedPerson.grade_personnel : "GRADE";

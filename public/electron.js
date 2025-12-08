@@ -72,10 +72,14 @@ function getPersonnel(event, arg) {
     });
 }
 function updatePersonnel(event, req) {
-    pool.query(req, (err) => {
-        if (err) throw err;
-        event.sender.send('update-personnel-success', { message: 'Personnel mis à jour avec succès!' });
-    });
+    try {
+        pool.query(req, (err) => {
+            if (err) throw err;
+            event.sender.send('update-personnel-success', { message: 'Personnel mis à jour avec succès!' });
+        });
+    } catch (error) {
+        console.log("Error on udpate personnel ", error.message);
+    }
 }
 // functions for decision : 
 function getDecision(event, arg) {
@@ -180,10 +184,14 @@ function getSpecificConge(event, req) {
 }
 // congés -> congés
 function addConge(event, req) {
-    pool.query(req, (err) => {
-        if (err) throw err;
-        event.sender.send('conge-added-success', { message: 'Conge ajouté avec succès!' });
-    })
+    try {
+        pool.query(req, (err) => {
+            if (err) throw err;
+            event.sender.send('conge-added-success', { message: 'Conge ajouté avec succès!' });
+        })
+    } catch (error) {
+        console.log("Error on adding congé : " , error.message);
+    }
 }
 
 function updateConge(event, req) {
