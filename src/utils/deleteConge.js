@@ -37,50 +37,45 @@ const deleteConge = async (conge, setSuccess, setError, setStatus) => {
             req_personnel = `UPDATE personnel SET nb_jours_conges = (nb_jours_conges + ${parseInt(left_days)}),
             statut_personnel = 'en poste' WHERE id_personnel = ${conge.id_personnel};`;
         }
+        let req_conge = `UPDATE conge SET  statut_conge = "annulé" WHERE id_conge = ${conge.id_conge} AND id_personnel = ${conge.id_personnel};`;
         let today = formatDate(new Date());
         let start = formatDate(conge.date_debut_conge);
         let end = formatDate(conge.date_fin_conge);
-        let req_conge = `UPDATE conge SET  statut_conge = "annulé" WHERE id_conge = ${conge.id_conge} AND id_personnel = ${conge.id_personnel};`;
+        // nombre de jours à restituer dans chaque cas
         if (start > today) {
-            let restored = parseInt(conge.attestation_conge.duree_conge);
+            // annulation avant début : restituer toute la durée demandée
+            const restored = parseInt(conge.attestation_conge.duree_conge, 10);
+            const { nb_jours_conges, dette_conge } = restoreDays(person, restored);
+
             req_conge = `
                 DELETE FROM conge
                 WHERE id_conge = ${conge.id_conge} AND id_personnel = ${conge.id_personnel};
             `;
-            let { nb_jours_conges, dette_conge } = restoreDays(person, restored);
+
             req_personnel = `
                 UPDATE personnel SET
-                    nb_jours_conges = ${nb_jours_conges},
-                    dette_conge = ${dette_conge},
-                    statut_personnel = 'en poste'
+                nb_jours_conges = (nb_jours_conges + ${nb_jours_conges}),
+                dette_conge = ${dette_conge},
+                statut_personnel = 'en poste'
                 WHERE id_personnel = ${conge.id_personnel};
             `;
         }
         else if (today >= start && today <= end) {
-            let restored = parseInt(left_days);
+            // annulation en cours : restituer les jours restants (left_days)
+            const restored = parseInt(left_days, 10);
+            const { nb_jours_conges, dette_conge } = restoreDays(person, restored);
+
             req_conge = `
                 UPDATE conge
                 SET statut_conge = "annulé"
                 WHERE id_conge = ${conge.id_conge} AND id_personnel = ${conge.id_personnel};
             `;
-            let { nb_jours_conges, dette_conge } = restoreDays(person, restored);
+
             req_personnel = `
                 UPDATE personnel SET
-                    nb_jours_conges = ${nb_jours_conges},
-                    dette_conge = ${dette_conge},
-                    statut_personnel = 'en poste'
-                WHERE id_personnel = ${conge.id_conge};
-            `;
-        }
-        else if (today > end) {
-            req_conge = `
-                UPDATE conge
-                SET statut_conge = "terminé"
-                WHERE id_conge = ${conge.id_conge} AND id_personnel = ${conge.id_personnel};
-            `;
-            req_personnel = `
-                UPDATE personnel
-                SET statut_personnel = 'en poste'
+                nb_jours_conges = (nb_jours_conges + ${nb_jours_conges}),
+                dette_conge = ${dette_conge},
+                statut_personnel = 'en poste'
                 WHERE id_personnel = ${conge.id_personnel};
             `;
         }

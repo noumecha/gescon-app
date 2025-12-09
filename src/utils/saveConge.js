@@ -259,9 +259,7 @@ const saveConge = async (
     }
     // saving leaves
     window.electronAPI.addConge(req_conge);
-    if(req_personnel !== '') {
-      window.electronAPI.updatePersonnel(req_personnel);
-    }
+    if(req_personnel !== '') window.electronAPI.updatePersonnel(req_personnel);
     window.electronAPI.congeAddedSuccess(() => {
       setSuccess("congé ajouté avec succès");
       setStatus(`Le satut de ${formatPersonnelName(sexe, name)} a été mis à jour !`);

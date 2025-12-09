@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Container } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import { Row,Col,Card,CardHeader,CardBody,Button,Alert,Form,FormGroup,Label } from 'reactstrap';
@@ -6,18 +7,23 @@ import GlobalStatsDoc from "documents/GlobalStatsDoc";
 import Select from "react-select";
 import { useState, useEffect } from "react";
 import StructStatsDoc from "documents/StrucStatsDoc";
+import PersonStatsDoc from "documents/PersonStatsDoc";
+import { generateStatsFileName } from "utils/utils";
 
 const FicheStatsGlobal = () => {
     const [conges, setConges] = useState([]);
     const [infoMsg, setInfoMsg] = useState({});
     const [structureNames, setStructureNames] = useState([]);
+    const [personnelNames, setPersonnelNames] = useState([]);
     const [years, setYears] = useState([]);
     const [showPdf, setShowPdf] = useState(false);
     const [statType, setStatType] = useState(null);
     const [filter, setFilter] = useState([]);
+    const [name, setName] = useState([]);
     const [yearFilter, setYearFilter] = useState(null);
     const [stats, setStats] = useState(null);
     const [structStats, setStructStats] = useState(null);
+    const [personnelStats, setPersonnelStats] = useState(null);
     const [pdfDoc, setPdfDoc] = useState(null);
 
 
@@ -29,6 +35,7 @@ const FicheStatsGlobal = () => {
     const typeOptions = [
         { value: "globales", label: "Globales" },
         { value: "structure", label: "Par Structure" },
+        { value: "personnel", label: "Par Personne" },
     ];
 
     const yearOptions = years.map((y, i) => ({
@@ -40,6 +47,12 @@ const FicheStatsGlobal = () => {
         value: t.structure_personnel,
         label: t.structure_personnel,
     }));
+
+    const personnelOptions = personnelNames.map((t, i) => ({
+        value: t.id_personnel,
+        label: t.nom_prenom_personnel,
+    }));
+
     
     const handleFilterChange = (setState) => (selectedOption) => {
         setState(selectedOption);
@@ -57,7 +70,7 @@ const FicheStatsGlobal = () => {
     useEffect(() => {
         setShowPdf(false);
         setPdfDoc(null);
-    }, [statType, yearFilter, filter]);
+    }, [statType, yearFilter, filter, name]);
 
     useEffect(() => {
         setFilter([]);
@@ -75,9 +88,28 @@ const FicheStatsGlobal = () => {
                 errorShow({msg: "Selectionner au moins un type de statistiques pour générer les statistiques.", type: "error"});
                 return ;
             }
-            if (statType.value === "structure" && !filter.value) {
+            if (statType.value === "structure" && filter.length <= 0) {
                 errorShow({msg: "Selectionner au moins une structure pour générer ses statistiques.", type: "error"});
                 return ;
+            }
+            if (statType.value === "personnel" && name.length <= 0) {
+                errorShow({msg: "Selectionner au moins une personne pour générer ses statistiques.", type: "error"});
+                return ;
+            }
+            if (statType.value === "personnel" && yearFilter.value !== "" && name.length > 0) {
+                const names = Object.entries(name).map(([key, value]) => ({
+                    names : value
+                }));
+                const nameArray = names.map(s => `${s.names.value}`).join(", ");
+                query = `
+                    SELECT *
+                    FROM personnel
+                    LEFT JOIN conge
+                        ON personnel.id_personnel = conge.id_personnel
+                        AND YEAR(conge.date_debut_conge) = ${yearFilter.value}
+                    WHERE personnel.id_personnel IN (${nameArray})
+                    ORDER BY personnel.nom_prenom_personnel ASC, conge.date_debut_conge ASC;
+                `;
             }
             if(statType.value === "globales" && filter.length > 0 && yearFilter.value !== "") {
                 const structures = Object.entries(filter).map(([key, value]) => ({
@@ -104,7 +136,7 @@ const FicheStatsGlobal = () => {
                 const structures = Object.entries(filter).map(([key, value]) => ({
                     names : value
                 }));
-                const strucArray = structures.map(s => `'${s.names.replace(/'/g, "''")}'`).join(", ");
+                const strucArray = structures.map(s => `'${s.names.value.replace(/'/g, "''")}'`).join(", ");
                 query = `
                     SELECT *
                     FROM personnel
@@ -120,6 +152,7 @@ const FicheStatsGlobal = () => {
             setConges(res);
             setStats(computeStatistics(res, filter, structureNames));
             setStructStats(computeStructStats(res));
+            setPersonnelStats(computePersonStats(res));
             errorShow({msg: "Statistiques générées avec succès!", type: "success"});
             setShowPdf(true);
         } catch (err) {
@@ -137,6 +170,10 @@ const FicheStatsGlobal = () => {
             window.electronAPI.getCongeYears();
             await window.electronAPI.retrieveCongesYears((event, res) => {
                 setYears(res);
+            })
+            window.electronAPI.getPersonnel();
+            await window.electronAPI.receivePersonnel((event, res) => {
+                setPersonnelNames(res);
             })
         } catch (error) {
             console.error("Erreur : " + error.message);
@@ -220,6 +257,79 @@ const FicheStatsGlobal = () => {
             return {};
         }
     };
+
+    const computePersonStats = (conges) => {
+        try {
+            const stats = {};
+            const personnelList = conges.filter(
+                (c) => c.nom_prenom_personnel
+            );
+
+            if (personnelList.length === 0)
+                return { stats: {}, isGlobal: false };
+            // ✅ Initialize per-person stats
+            personnelList.forEach((p) => {
+                const personnelKey =
+                    `${p.nom_prenom_personnel || ""}`.trim() || "Non défini";
+                stats[personnelKey] = {
+                    id_type_personnel: p.id_type_personnel,
+                    conges: [],
+                    months: {},
+                    total: 0
+                };
+                monthNames.forEach((month) => {
+                    stats[personnelKey].months[month] = null;
+                });
+            });
+
+            conges.forEach((c) => {
+                if (!c.date_debut_conge || !c.date_fin_conge) return;
+                const personnelKey = `${c.nom_prenom_personnel || ""}`.trim();
+                const startDate = new Date(c.date_debut_conge);
+                const endDate = new Date(c.date_debut_conge);
+                const duration = c.duree_conge || 0;
+                const monthName = monthNames[endDate.getMonth()];
+                if (!stats[personnelKey]) {
+                    stats[personnelKey] = {
+                        id_type_personnel: c.id_type_personnel,
+                        conges: [],
+                        months: {},
+                        total: 0
+                    };
+                    monthNames.forEach((month) => {
+                        stats[personnelKey].months[month] = null;
+                    });
+                }
+                stats[personnelKey].months[monthName] = `(${duration} jrs)`;
+                stats[personnelKey].total++;
+                stats[personnelKey].conges.push({
+                    monthName,
+                    startDate,
+                    endDate,
+                    duration
+                });
+            });
+            const globalMonthTotals = {};
+            monthNames.forEach((month) => {
+                globalMonthTotals[month] = 0;
+            });
+            Object.values(stats).forEach((p) => {
+                monthNames.forEach((month) => {
+                    if (p.months[month]) {
+                        globalMonthTotals[month]++;
+                    }
+                });
+            });
+            return {
+                stats,
+                globalMonthTotals,
+                isGlobal: false
+            };
+        } catch (error) {
+            console.error(`computePersonnelStats error: ${error.message}`);
+            return {};
+        }
+    }
 
     const computeStructStats = (conges) => {
         try {
@@ -310,15 +420,19 @@ const FicheStatsGlobal = () => {
     };
 
     useEffect(() => {
-        if (!statType || !yearFilter || !stats || !structStats) {
+        if (!statType || !yearFilter || !stats || !structStats || !personnelStats) {
             setPdfDoc(null);
             return;
         }
 
         if (statType.value === "globales") {
             setPdfDoc(<GlobalStatsDoc stats={stats} year={yearFilter} />);
-        } else {
+        }
+        if (statType.value === "structure") {
             setPdfDoc(<StructStatsDoc stats={structStats} year={yearFilter} structure={filter} />);
+        }
+        if (statType.value === "personnel") {
+            setPdfDoc(<PersonStatsDoc stats={personnelStats} year={yearFilter} structure={name} />);
         }
     }, [statType, yearFilter, showPdf]);
 
@@ -326,9 +440,7 @@ const FicheStatsGlobal = () => {
     // file name according to your requested format
     const date = new Date().getDate() + '_' + parseInt(new Date().getMonth() + 1 )+ '_' + new Date().getFullYear()
     const safeDate = yearFilter?.value || (new Date().getFullYear());
-    const fileName = statType?.value === "globales"
-    ? `fiche_des_statistiques_globales_${safeDate}_${date}.pdf`
-    : `fiche_des_statistiques_${filter?.value || "structure"}_${safeDate}_${date}.pdf`;
+    const fileName = generateStatsFileName(statType, filter, safeDate, date);
 
     return (
         <>
@@ -385,8 +497,23 @@ const FicheStatsGlobal = () => {
                                                     onChange={handleFilterChange(setFilter)}
                                                     options={options}
                                                     isSearchable
-                                                    isMulti={statType?.value !== "structure"}
+                                                    isDisabled={statType?.value === "personnel"}
+                                                    isMulti={statType?.value !== "structure" || statType?.value !== "personnel"}
                                                     placeholder="Selectionnez une structure"
+                                                />
+                                            </Col>
+                                            <Col md="12">
+                                                <Label for="personnel">
+                                                    Personnel
+                                                </Label>
+                                                <Select
+                                                    value={name}
+                                                    onChange={handleFilterChange(setName)}
+                                                    options={personnelOptions}
+                                                    isSearchable
+                                                    isDisabled={statType?.value !== "personnel"}
+                                                    isMulti={statType?.value !== "globales" || statType?.value !== "structure"}
+                                                    placeholder="Selectionnez une personne"
                                                 />
                                             </Col>
                                         </Row>
@@ -399,7 +526,7 @@ const FicheStatsGlobal = () => {
                                                 }
                                             </Col>
                                         </Row>
-                                        <Row className="mt-3">
+                                        <Row className="mt-4">
                                             <Col md="6">
                                                 <Button
                                                     color="primary"

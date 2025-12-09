@@ -33,21 +33,53 @@ const leftDays = (startDate, endDate, attestation) => {
     }
 }
 
-function restoreDays(person, restored_days) {
-    let { nb_jours_conges, dette_conge } = person;
-    // 1. Restituer à la dette d'abord
-    const restoreToDebt = Math.min(restored_days, person.initial_dette_used || dette_conge);
-    dette_conge += restoreToDebt;
-    // 2. Puis au solde normal
-    const remaining = restored_days - restoreToDebt;
-    nb_jours_conges += remaining;
-    return { nb_jours_conges, dette_conge };
+/**
+ * Restitue `restoredDays` au personnel en :
+ *  1) réduisant la dette existante (si any)
+ *  2) puis en réaugmentant le solde normal, sans dépasser le quota annuel
+ *
+ * @param {Object} person - objet personnel avec au moins:
+ *    id_type_personnel (1 or 2), nb_jours_conges (number), dette_conge (number)
+ * @param {number} restoredDays - nombre de jours à restituer
+ * @returns {{ nb_jours_conges: number, dette_conge: number }}
+ */
+function restoreDays(person, restoredDays) {
+    const entitlement = person.id_type_personnel === 1 ? 30 : 18;
+    // Defensive parsing
+    let nb = Number.parseInt(person.nb_jours_conges || 0, 10);
+    let debt = Number.parseInt(person.dette_conge || 0, 10);
+    let rest = Number.parseInt(restoredDays || 0, 10);
+    // Type 1 cannot have debt: ensure it's zero
+    if (person.id_type_personnel === 1) {
+        debt = 0;
+    }
+    if (rest <= 0) {
+        return { nb_jours_conges: nb, dette_conge: debt };
+    }
+    // 1) D'abord réduire la dette existante (si la personne est de type 2)
+    if (debt > 0) {
+        const reduceDebt = Math.min(rest, debt);
+        debt -= reduceDebt;
+        rest -= reduceDebt;
+    }
+    // 2) Puis ajouter au solde normal sans dépasser l'entitlement annuel
+    if (rest > 0) {
+        const canAddToNb = Math.max(0, entitlement - nb); // combien on peut encore remettre sans dépasser le quota
+        const addToNb = Math.min(rest, canAddToNb);
+        nb += addToNb;
+        rest -= addToNb;
+    }
+    // Tout reste non appliqué (rest > 0) est volontairement ignoré :
+    // on ne crée pas de "compte négatif" ni on n'augmente la dette automatiquement.
+    // Si tu veux au lieu de l'ignorer le convertir en dette, on peut l'activer facilement.
+    return { nb_jours_conges: nb, dette_conge: debt };
 }
+
 
 function getCongeTypeId(selectedType) {
     if (!selectedType) return 0;
 
-    const value = selectedType.value || selectedType;
+    const value = selectedType.value || selectedType?.libelle_type_conge || selectedType;
 
     const typeMap = {
         "congé administratif": 1,
@@ -63,7 +95,7 @@ function getCongeTypeId(selectedType) {
 
 function calculateCongeAdmin(selectedType, duration, selectedPerson, total_conge_admin) {
     // Extract value safely
-    const typeValue = selectedType?.value;
+    const typeValue = selectedType?.value || selectedType?.libelle_type_conge;
 
     // Return current if not "congé administratif"
     if (typeValue !== "congé administratif") {
