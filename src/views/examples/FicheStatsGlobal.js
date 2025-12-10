@@ -310,6 +310,7 @@ const FicheStatsGlobal = () => {
                 });
             });
             const globalMonthTotals = {};
+            let totalGlobal = 0;
             monthNames.forEach((month) => {
                 globalMonthTotals[month] = 0;
             });
@@ -317,12 +318,14 @@ const FicheStatsGlobal = () => {
                 monthNames.forEach((month) => {
                     if (p.months[month]) {
                         globalMonthTotals[month]++;
+                        totalGlobal++
                     }
                 });
             });
             return {
                 stats,
                 globalMonthTotals,
+                totalGlobal,
                 isGlobal: false
             };
         } catch (error) {

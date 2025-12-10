@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { Text, View, Document } from '@react-pdf/renderer';
 import { generateQRCode } from 'utils/generateQRCode';

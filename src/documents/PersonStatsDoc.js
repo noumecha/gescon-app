@@ -54,12 +54,16 @@ const PersonStatsDoc = ({ stats, year, structure }) => {
                         {/* Table Header */}
                         <View>
                             <View style={styles.row}>
-                                <Text style={[styles.cellHeaderNoBorderBottom, { flex: 2.09 }]}>
+                                <Text style={[styles.cellHeader, { flex: 2.09 }]}>
                                     {year && year.value}
                                 </Text>
                                 {months.map((m, i) => (
                                     <Text key={i} style={styles.cellHeader}>{m}</Text>
                                 ))}
+                                {/* Totals*/}
+                                <Text style={styles.cellHeader}>
+                                    Total
+                                </Text>
                             </View>
                         </View>
 
@@ -89,9 +93,8 @@ const PersonStatsDoc = ({ stats, year, structure }) => {
                                     </React.Fragment>
                                 ))}
 
-                                {/* Totals
-                                <Text style={styles.cell}>{data.fonctionnaire ? data.total : 0}</Text>
-                                <Text style={styles.cell}>{data.contractuel ? data.total : 0}</Text>*/}
+                                {/* Totals */}
+                                <Text style={[styles.cell]}>{data?.total ?? 0}</Text>
                             </View>
                         ))}
 
@@ -106,8 +109,9 @@ const PersonStatsDoc = ({ stats, year, structure }) => {
                                     </React.Fragment>
                                 ))}
 
-                                {/*<Text style={styles.cellHeader}>{stats.totalFonctionnaire || 0}</Text>
-                                <Text style={styles.cellHeader}>{stats.totalContractuel || 0}</Text>*/}
+                                <Text style={[styles.cellHeader]}>
+                                    {stats.totalGlobal || 0}
+                                </Text>
                             </View>
                         )}
                     </View>
