@@ -44,7 +44,7 @@ const deleteConge = async (conge, setSuccess, setError, setStatus) => {
         // nombre de jours à restituer dans chaque cas
         if (start > today) {
             // annulation avant début : restituer toute la durée demandée
-            const restored = parseInt(conge.attestation_conge.duree_conge, 10);
+            const restored = parseInt(conge.duree_conge, 10);
             const { nb_jours_conges, dette_conge } = restoreDays(person, restored);
 
             req_conge = `
@@ -54,7 +54,7 @@ const deleteConge = async (conge, setSuccess, setError, setStatus) => {
 
             req_personnel = `
                 UPDATE personnel SET
-                nb_jours_conges = (nb_jours_conges + ${nb_jours_conges}),
+                nb_jours_conges = ${nb_jours_conges},
                 dette_conge = ${dette_conge},
                 statut_personnel = 'en poste'
                 WHERE id_personnel = ${conge.id_personnel};
@@ -73,7 +73,7 @@ const deleteConge = async (conge, setSuccess, setError, setStatus) => {
 
             req_personnel = `
                 UPDATE personnel SET
-                nb_jours_conges = (nb_jours_conges + ${nb_jours_conges}),
+                nb_jours_conges = ${nb_jours_conges},
                 dette_conge = ${dette_conge},
                 statut_personnel = 'en poste'
                 WHERE id_personnel = ${conge.id_personnel};
@@ -81,7 +81,7 @@ const deleteConge = async (conge, setSuccess, setError, setStatus) => {
         }
         console.log("req_conge update : ", req_conge);
         console.log("req_personnel update : ", req_personnel);
-        // send request and getting response
+        //send request and getting response
         window.electronAPI.addConge(req_conge);
         window.electronAPI.updatePersonnel(req_personnel);
         window.electronAPI.congeAddedSuccess(() => {
