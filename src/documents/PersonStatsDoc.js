@@ -7,7 +7,7 @@ import PageWithHeaderFooter from 'utils/PageWithHeaderFooter';
 import { chunkArray } from 'utils/stats-utils';
 import { monthsNoYear as months, fullMonths } from 'utils/docs-utils';
 
-const PersonStatsDoc = ({ stats, year, structure }) => {
+const PersonStatsDoc = ({ stats, year, structure, title }) => {
     const d = new Date();
     const qrText = `GESCON-APP - ${d.getFullYear()} - ${d.getTime()}`;
     const [qrData, setQrData] = useState(null);
@@ -44,7 +44,8 @@ const PersonStatsDoc = ({ stats, year, structure }) => {
                     {/* 👇 ONLY FIRST PAGE SHOWS THE TITLE HEADER */}
                     {pageIndex === 0 && (
                         <Text style={styles.title} break>
-                            {`STATISTIQUES DES CONGÉS -  ${year?.value || d.getFullYear()}`.toUpperCase()}
+                            {`${title || 'FICHE STATISTIQUE PAR PERSONNE DES CONGÉS'} - ${year?.value || d.getFullYear()}`.toUpperCase()}
+                            {/*`STATISTIQUES DES CONGÉS -  ${year?.value || d.getFullYear()}`.toUpperCase()*/}
                         </Text>
                     )}
 

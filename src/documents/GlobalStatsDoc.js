@@ -7,7 +7,7 @@ import PageWithHeaderFooter from 'utils/PageWithHeaderFooter';
 import { makeBreakable, chunkArray } from 'utils/stats-utils';
 import { months, fullMonths } from 'utils/docs-utils';
 
-const GlobalStatsDoc = ({ stats, year }) => {
+const GlobalStatsDoc = ({ stats, year, title }) => {
     const d = new Date();
     const qrText = `GESCON-APP - ${d.getFullYear()} - ${d.getTime()}`;
     const [qrData, setQrData] = React.useState(null);
@@ -31,7 +31,7 @@ const GlobalStatsDoc = ({ stats, year }) => {
                     {/* Title */}
                     {pageIndex === 0 && (
                         <Text style={styles.title}>
-                        {`FICHE STATISTIQUES DES CONGÉS ${year?.value || d.getFullYear()}`}
+                            {`${title || 'FICHE STATISTIQUE GLOBALE DES CONGÉS'} - ${year?.value || d.getFullYear()}`.toUpperCase()}
                         </Text>
                     )}
 
@@ -39,11 +39,11 @@ const GlobalStatsDoc = ({ stats, year }) => {
                     <View style={styles.table}>
                         <View>
                             <View style={styles.row}>
-                                <Text style={[styles.cellHeaderNoBorderBottom, { flex: 2.03 }]}>
+                                <Text style={[styles.cellHeaderNoBorderBottom, { flex: 2.08 }]}>
                                     {year && year.value}
                                 </Text>
                                 {months.map((m, i) => (
-                                    <Text key={i} style={styles.cellHeader}>
+                                    <Text key={i} style={[styles.cellHeader, { flex: 1 }]}>
                                         {m}
                                     </Text>
                                 ))}
@@ -56,8 +56,8 @@ const GlobalStatsDoc = ({ stats, year }) => {
                                 </Text>
                                 {months.map((m, i) => (
                                     <React.Fragment key={i}>
-                                        <Text style={styles.cellHeader}>Fonct.</Text>
-                                        <Text style={styles.cellHeader}>Contr.</Text>
+                                        <Text style={styles.cellHeaderRightBorder}>Fonct.</Text>
+                                        <Text style={styles.cellHeaderLeftBorder}>Contr.</Text>
                                     </React.Fragment>
                                 ))}
                                 {/* Totals */}
@@ -92,18 +92,18 @@ const GlobalStatsDoc = ({ stats, year }) => {
                                     {/* Monthly Data */}
                                     {fullMonths.map((month, i) => (
                                         <React.Fragment key={i}>
-                                            <Text style={styles.cell}>
+                                            <Text style={styles.cellRightBorder}>
                                                 {(data.fonctionnaire && data.fonctionnaire[month]) ?? 0}
                                             </Text>
-                                            <Text style={styles.cell}>
+                                            <Text style={styles.cellLeftBorder}>
                                                 {(data.contractuel && data.contractuel[month]) ?? 0}
                                             </Text>
                                         </React.Fragment>
                                     ))}
 
                                     {/* Totals */}
-                                    <Text style={styles.cell}>{data.fonctionnaire?.total ?? 0}</Text>
-                                    <Text style={styles.cell}>{data.contractuel?.total ?? 0}</Text>
+                                    <Text style={styles.cellRightBorder}>{data.fonctionnaire?.total ?? 0}</Text>
+                                    <Text style={styles.cellLeftBorder}>{data.contractuel?.total ?? 0}</Text>
                                     <Text style={[styles.cell, { flex: 2.47 }]}>{data.fonctionnaire?.total + data.contractuel?.total ?? 0}</Text>
                                 </View>
                             ))
@@ -118,19 +118,19 @@ const GlobalStatsDoc = ({ stats, year }) => {
                                 {stats &&
                                     Object.entries(stats.globalMonthTotals).map(([month, total], i) => (
                                         <React.Fragment key={i}>
-                                            <Text style={styles.cellHeader}>
+                                            <Text style={styles.cellHeaderRightBorder}>
                                                 {total.fonctionnaire ?? 0}
                                             </Text>
-                                            <Text style={styles.cellHeader}>
+                                            <Text style={styles.cellHeaderLeftBorder}>
                                                 {total.contractuel ?? 0}
                                             </Text>
                                         </React.Fragment>
                                     ))}
                                 <React.Fragment>
-                                    <Text style={styles.cellHeader}>
+                                    <Text style={styles.cellHeaderRightBorder}>
                                         {stats.totalFonctionnaire || 0}
                                     </Text>
-                                    <Text style={styles.cellHeader}>
+                                    <Text style={styles.cellHeaderLeftBorder}>
                                         {stats.totalContractuel || 0}
                                     </Text>
                                     <Text style={[styles.cellHeader, { flex: 2.47 }]}>
@@ -142,22 +142,22 @@ const GlobalStatsDoc = ({ stats, year }) => {
                         {/* total global by month */}
                         {(stats.isGlobal || pageIndex === pages.length - 1) && (
                             <View style={styles.row}>
-                                <Text style={[styles.cellHeader, { flex: 5 }]}>
+                                <Text style={[styles.cellHeader, { flex: 5.08 }]}>
                                     {"Totaux Mensuels"}
                                 </Text>
                                 {stats &&
                                     Object.entries(stats.globalMonthTotals).map(([month, total], i) => (
                                         <React.Fragment key={i}>
-                                            <Text style={[styles.cellHeader, { flex: 2.47 }]}>
+                                            <Text style={[styles.cellHeader, { flex: 2.45 }]}>
                                                 {total.fonctionnaire + total.contractuel}
                                             </Text>
                                         </React.Fragment>
                                     ))}
                                 <React.Fragment>
-                                    <Text style={[styles.cellHeader, { flex: 2.47 }]}>
+                                    <Text style={[styles.cellHeader, { flex: 2.50 }]}>
                                         {stats.totalFonctionnaire + stats.totalContractuel}
                                     </Text>
-                                    <Text style={[styles.cellHeader, { flex: 2.47, color: '#eee' }]}>
+                                    <Text style={[styles.cellHeader, { flex: 2.50, color: '#eee' }]}>
                                         {stats.totalFonctionnaire + stats.totalContractuel || 0}
                                     </Text>
                                 </React.Fragment>

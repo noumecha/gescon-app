@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Container } from "reactstrap";
+import { Container, Input } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import { Row,Col,Card,CardHeader,CardBody,Button,Alert,Form,FormGroup,Label } from 'reactstrap';
 import { PDFDownloadLink } from "@react-pdf/renderer";
@@ -25,6 +25,7 @@ const FicheStatsGlobal = () => {
     const [structStats, setStructStats] = useState(null);
     const [personnelStats, setPersonnelStats] = useState(null);
     const [pdfDoc, setPdfDoc] = useState(null);
+    const [title, setTitle] = useState("");
 
 
     const monthNames = [
@@ -57,6 +58,11 @@ const FicheStatsGlobal = () => {
     const handleFilterChange = (setState) => (selectedOption) => {
         setState(selectedOption);
     };
+
+    // a function help to set state from input change
+    const handleStateChange = (setState) => (e) => {
+        setState(e.target.value);
+    }
 
     const errorShow = (obj) => {
         if (!obj || !obj.msg || !obj.type) {
@@ -429,13 +435,13 @@ const FicheStatsGlobal = () => {
         }
 
         if (statType.value === "globales") {
-            setPdfDoc(<GlobalStatsDoc stats={stats} year={yearFilter} />);
+            setPdfDoc(<GlobalStatsDoc stats={stats} year={yearFilter} title={title}/>);
         }
         if (statType.value === "structure") {
-            setPdfDoc(<StructStatsDoc stats={structStats} year={yearFilter} structure={filter} />);
+            setPdfDoc(<StructStatsDoc stats={structStats} year={yearFilter} structure={filter} title={title}/>);
         }
         if (statType.value === "personnel") {
-            setPdfDoc(<PersonStatsDoc stats={personnelStats} year={yearFilter} structure={name} />);
+            setPdfDoc(<PersonStatsDoc stats={personnelStats} year={yearFilter} structure={name} title={title}/>);
         }
     }, [statType, yearFilter, showPdf]);
 
@@ -517,6 +523,17 @@ const FicheStatsGlobal = () => {
                                                     isDisabled={statType?.value !== "personnel"}
                                                     isMulti={statType?.value !== "globales" || statType?.value !== "structure"}
                                                     placeholder="Selectionnez une personne"
+                                                />
+                                            </Col>
+                                            <Col md="12" className="mt-4">
+                                                <Label for="title">
+                                                    Titre (optionnel)
+                                                </Label>
+                                                <Input
+                                                    type="text"
+                                                    id="title"
+                                                    placeholder="Titre à afficher dans la fiche statistiques"
+                                                    onChange={handleStateChange(setTitle)}
                                                 />
                                             </Col>
                                         </Row>

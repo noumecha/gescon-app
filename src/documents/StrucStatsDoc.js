@@ -7,7 +7,7 @@ import PageWithHeaderFooter from 'utils/PageWithHeaderFooter';
 import { chunkArray } from 'utils/stats-utils';
 import { monthsNoYear as months, fullMonths } from 'utils/docs-utils';
 
-const StructStatsDoc = ({ stats, year, structure }) => {
+const StructStatsDoc = ({ stats, year, structure, title }) => {
     const d = new Date();
     const qrText = `GESCON-APP - ${d.getFullYear()} - ${d.getTime()}`;
     const [qrData, setQrData] = useState(null);
@@ -44,7 +44,7 @@ const StructStatsDoc = ({ stats, year, structure }) => {
                     {/* 👇 ONLY FIRST PAGE SHOWS THE TITLE HEADER */}
                     {pageIndex === 0 && (
                         <Text style={styles.title} break>
-                            {`STATISTIQUES DES CONGÉS - ${structure?.value || 'Structure'} -  ${year?.value || d.getFullYear()}`.toUpperCase()}
+                            {`${title || 'FICHE STATISTIQUE PAR STRUCTURE DES CONGÉS'} - ${year?.value || d.getFullYear()}`.toUpperCase()}
                         </Text>
                     )}
 
@@ -54,7 +54,7 @@ const StructStatsDoc = ({ stats, year, structure }) => {
                         {/* Table Header */}
                         <View>
                             <View style={styles.row}>
-                                <Text style={[styles.cellHeaderNoBorderBottom, { flex: 2.09 }]}>
+                                <Text style={[styles.cellHeaderNoBorderBottom, { flex: 2.14 }]}>
                                     {year && year.value}
                                 </Text>
                                 {months.map((m, i) => (
@@ -68,8 +68,8 @@ const StructStatsDoc = ({ stats, year, structure }) => {
                                 </Text>
                                 {months.map((m, i) => (
                                     <React.Fragment key={i}>
-                                        <Text style={styles.cellHeader}>Fonct.</Text>
-                                        <Text style={styles.cellHeader}>Contr.</Text>
+                                        <Text style={styles.cellHeaderRightBorder}>Fonct.</Text>
+                                        <Text style={styles.cellHeaderLeftBorder}>Contr.</Text>
                                     </React.Fragment>
                                 ))}
                             </View>
@@ -95,10 +95,10 @@ const StructStatsDoc = ({ stats, year, structure }) => {
                                 {/* Monthly data */}
                                 {fullMonths.map((month, i) => (
                                     <React.Fragment key={i}>
-                                        <Text style={styles.cell}>
+                                        <Text style={styles.cellRightBorder}>
                                             {data.fonctionnaire && data.months[month] ? data.months[month] : "-"}
                                         </Text>
-                                        <Text style={styles.cell}>
+                                        <Text style={styles.cellLeftBorder}>
                                             {data.contractuel && data.months[month] ? data.months[month] : "-"}
                                         </Text>
                                     </React.Fragment>
@@ -117,8 +117,8 @@ const StructStatsDoc = ({ stats, year, structure }) => {
 
                                 {Object.entries(stats.globalMonthTotals).map(([month, total], i) => (
                                     <React.Fragment key={i}>
-                                        <Text style={styles.cellHeader}>{total.fonctionnaire ?? 0}</Text>
-                                        <Text style={styles.cellHeader}>{total.contractuel ?? 0}</Text>
+                                        <Text style={styles.cellHeaderRightBorder}>{total.fonctionnaire ?? 0}</Text>
+                                        <Text style={styles.cellHeaderLeftBorder}>{total.contractuel ?? 0}</Text>
                                     </React.Fragment>
                                 ))}
 

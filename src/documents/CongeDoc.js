@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useState } from 'react';
 import { Page, Text, View, Document, Image} from '@react-pdf/renderer';
 import { generateQRCode } from 'utils/generateQRCode';
 import { styles, fontStyles } from 'utils/attestation-style';
@@ -7,8 +8,8 @@ import { styles, fontStyles } from 'utils/attestation-style';
 const CongeDoc = (props) => {
     const d = new Date();
     const qrText = `GESCON-APP - ${d.getFullYear()} - ${d.getTime()}`;
-    const [qrData, setQrData] = React.useState(null);
-    React.useEffect(() => {
+    const [qrData, setQrData] = useState(null);
+    useEffect(() => {
         generateQRCode(qrText).then(setQrData);
     }, []);
 
