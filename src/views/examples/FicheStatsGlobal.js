@@ -26,7 +26,7 @@ const FicheStatsGlobal = () => {
     const [personnelStats, setPersonnelStats] = useState(null);
     const [pdfDoc, setPdfDoc] = useState(null);
     const [title, setTitle] = useState("");
-
+    const [sort, setSort] = useState(null);
 
     const monthNames = [
         "January", "February", "March", "April", "May", "June",
@@ -38,6 +38,12 @@ const FicheStatsGlobal = () => {
         { value: "structure", label: "Par Structure" },
         { value: "personnel", label: "Par Personne" },
     ];
+
+    const sortOptions = [
+        { value: "ASC", label: "Ascendant (ordre alphabetique de noms)" },
+        { value: "DESC", label: "Descendant (ordre alphabetique de noms)" },
+        { value: "default", label: "Par Défaut (ordre de selection)" },
+    ]
 
     const yearOptions = years.map((y, i) => ({
         value: y.annee,
@@ -76,18 +82,22 @@ const FicheStatsGlobal = () => {
     useEffect(() => {
         setShowPdf(false);
         setPdfDoc(null);
-    }, [statType, yearFilter, filter, name]);
+    }, [statType, yearFilter, filter, name, sort]);
 
     useEffect(() => {
         setFilter([]);
     }, [statType]);
 
-    const generateStats = async () => {
+    const generateStats = async (currentSort) => {
         try {
             // building query
             let query = '';
             if(yearFilter === null) {
                 errorShow({msg: "Selectionner une année pour générer les statistiques.", type: "error"});
+                return ;
+            }
+            if(!currentSort?.value) {
+                errorShow({msg: "Selectionner un ordre de tri pour générer les statistiques.", type: "error"});
                 return ;
             }
             if(!statType.value) {
@@ -102,7 +112,7 @@ const FicheStatsGlobal = () => {
                 errorShow({msg: "Selectionner au moins une personne pour générer ses statistiques.", type: "error"});
                 return ;
             }
-            if (statType.value === "personnel" && yearFilter.value !== "" && name.length > 0) {
+            if (statType.value === "personnel" && yearFilter.value !== "" && name.length > 0 && currentSort.value !== null) {
                 const names = Object.entries(name).map(([key, value]) => ({
                     names : value
                 }));
@@ -114,10 +124,12 @@ const FicheStatsGlobal = () => {
                         ON personnel.id_personnel = conge.id_personnel
                         AND YEAR(conge.date_debut_conge) = ${yearFilter.value}
                     WHERE personnel.id_personnel IN (${nameArray})
-                    ORDER BY personnel.nom_prenom_personnel ASC, conge.date_debut_conge ASC;
+                    ${currentSort.value !== "default" ? "ORDER BY personnel.nom_prenom_personnel " + currentSort.value + ";" : "ORDER BY FIELD(personnel.id_personnel, " + nameArray + ");"}
                 `;
+                console.log(currentSort)
+                console.log(query)
             }
-            if(statType.value === "globales" && filter.length > 0 && yearFilter.value !== "") {
+            if(statType.value === "globales" && filter.length > 0 && yearFilter.value !== "" && currentSort.value !== null) {
                 const structures = Object.entries(filter).map(([key, value]) => ({
                     names : value
                 }));
@@ -127,18 +139,19 @@ const FicheStatsGlobal = () => {
                     INNER JOIN personnel
                     ON personnel.id_personnel = conge.id_personnel WHERE personnel.structure_personnel
                     IN (${strucArray}) && YEAR(conge.date_debut_conge) = ${yearFilter.value}
-                    ORDER BY personnel.structure_personnel, conge.date_debut_conge;`;
+                    ${currentSort.value !== "default" ? "ORDER BY personnel.nom_prenom_personnel " + currentSort.value + ", conge.date_debut_conge " + currentSort.value + ";"
+                    : "ORDER BY FIELD(personnel.structure_personnel, " + strucArray + ");"}`;
             }
-            if (statType.value === "globales" && filter.length === 0 && yearFilter.value !== "") {
+            if (statType.value === "globales" && filter.length === 0 && yearFilter.value !== "" && currentSort.value !== null) {
                 query = `
                     SELECT * FROM conge
                     INNER JOIN personnel
                         ON personnel.id_personnel = conge.id_personnel
                         WHERE YEAR(conge.date_debut_conge) = ${yearFilter.value}
-                    ORDER BY personnel.structure_personnel, conge.date_debut_conge;
-                    `;
+                    ${currentSort.value !== "default" ? "ORDER BY personnel.nom_prenom_personnel " + currentSort.value + ", conge.date_debut_conge " + currentSort.value + ";"
+                    : "ORDER BY personnel.structure_personnel, conge.date_debut_conge"};`;
             }
-            if (statType.value === "structure" && filter.value !== "" && yearFilter.value !== "") {
+            if (statType.value === "structure" && filter.value !== "" && yearFilter.value !== "" && currentSort.value !== null) {
                 const structures = Object.entries(filter).map(([key, value]) => ({
                     names : value
                 }));
@@ -150,8 +163,8 @@ const FicheStatsGlobal = () => {
                         ON personnel.id_personnel = conge.id_personnel
                         AND YEAR(conge.date_debut_conge) = ${yearFilter.value}
                     WHERE personnel.structure_personnel IN (${strucArray})
-                    ORDER BY personnel.nom_prenom_personnel ASC, conge.date_debut_conge ASC;
-                `;
+                    ${sort.value !== "default" ? "ORDER BY personnel.nom_prenom_personnel " + currentSort.value + ", conge.date_debut_conge " + currentSort.value + ";"
+                    : "ORDER BY personnel.structure_personnel, conge.date_debut_conge"};`;
             }
             // fetching datas
             const res = await window.electronAPI.getStatsConge(query);
@@ -429,7 +442,7 @@ const FicheStatsGlobal = () => {
     };
 
     useEffect(() => {
-        if (!statType || !yearFilter || !stats || !structStats || !personnelStats) {
+        if (!statType || !yearFilter || !sort || !stats || !structStats || !personnelStats) {
             setPdfDoc(null);
             return;
         }
@@ -512,6 +525,18 @@ const FicheStatsGlobal = () => {
                                                 />
                                             </Col>
                                             <Col md="12">
+                                                <Label for="sort-order">
+                                                    Ordre de classement
+                                                </Label>
+                                                <Select
+                                                    value={sort}
+                                                    onChange={handleFilterChange(setSort)}
+                                                    options={sortOptions}
+                                                    isSearchable
+                                                    placeholder="Selectionnez un ordre de classement"
+                                                />
+                                            </Col>
+                                            <Col md="12" className="mt-4">
                                                 <Label for="personnel">
                                                     Personnel
                                                 </Label>
@@ -550,7 +575,7 @@ const FicheStatsGlobal = () => {
                                             <Col md="6">
                                                 <Button
                                                     color="primary"
-                                                    onClick={() => generateStats()}
+                                                    onClick={() => generateStats(sort)}
                                                     >
                                                     Générer la fiche statistiques
                                                 </Button>

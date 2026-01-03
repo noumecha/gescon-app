@@ -44,7 +44,7 @@ const StructStatsDoc = ({ stats, year, structure, title }) => {
                     {/* 👇 ONLY FIRST PAGE SHOWS THE TITLE HEADER */}
                     {pageIndex === 0 && (
                         <Text style={styles.title} break>
-                            {`${title || 'FICHE STATISTIQUE PAR STRUCTURE DES CONGÉS'} - ${year?.value || d.getFullYear()}`.toUpperCase()}
+                            {`${title || 'FICHE STATISTIQUE DES CONGÉS'} - ${structure[0]?.value || 'Structure'} - ${year?.value || d.getFullYear()}`.toUpperCase()}
                         </Text>
                     )}
 
